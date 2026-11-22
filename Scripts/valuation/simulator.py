@@ -6302,6 +6302,30 @@ def _mc_realized_stats(
     return out
 
 
+def _collect_scheduled_checkpoint_months(
+    m: int,
+    iso: str,
+    inc_sa: bool,
+    actions: list[dict[str, Any]],
+    cp_set: set[int],
+) -> None:
+    """Adds annual checkpoints plus `(m-1, m)` around non-monthly scheduled actions so event cliffs render crisply."""
+    if m == 0 or m % 12 == 0:
+        cp_set.add(m)
+    if m >= 1 and inc_sa and actions:
+        ym = iso[:7]
+        for act in actions:
+            if not isinstance(act, dict):
+                continue
+            cad = str(act.get("cadence") or "one_time").strip().lower()
+            if cad == "monthly":
+                continue
+            if _action_triggers_in_ym(act, ym, vested_this_month=False):
+                cp_set.add(m - 1)
+                cp_set.add(m)
+                break
+
+
 def run_monte_carlo(
     payload: dict[str, Any],
     settings: dict[str, Any] | None = None,
@@ -6357,7 +6381,7 @@ def run_monte_carlo(
 
     tax_cfg = build_tax_schedule_cfg(payload, eff)
     sched: list[dict[str, Any]] = []
-    checkpoints: list[int] = []
+    cp_set: set[int] = set()
     p_milestone_month = horizon
     for m in range(0, horizon + 1):
         tot_m = start_year * 12 + start_month0 + m
@@ -6375,12 +6399,11 @@ def run_monte_carlo(
             else 0.0
         )
         sched.append({"iso": iso, "full_lbl": full_lbl, "deflator": deflator, "raw_target": raw_target_net, "ssn_gross": ssn_gross})
-        if m % 12 == 0:
-            checkpoints.append(m)
+        _collect_scheduled_checkpoint_months(m, iso, inc_sa, actions, cp_set)
         if m < p_milestone_month and age_on_iso(p_by, p_bm, p_bd, iso, m) >= p_ma:
             p_milestone_month = m
-    if checkpoints[-1] != horizon:
-        checkpoints.append(horizon)
+    cp_set.add(horizon)
+    checkpoints = sorted(cp_set)
 
     mc = dict(mc or {})
     adjust_year = _build_year_rate_adjuster(sim_assets, eff, primary_sym, mc, today_iso=today_iso)
@@ -6937,7 +6960,7 @@ def run_historical_cohorts(
     p_id, p_by, p_bm, p_bd, p_ma = p_inv["id"], p_inv["birth_year"], p_inv["birth_month"], p_inv["birth_day"], p_inv["milestone_age"]
 
     skel: list[dict[str, Any]] = []
-    checkpoints: list[int] = []
+    cp_set_coh: set[int] = set()
     p_milestone_month = horizon
     for m in range(0, horizon + 1):
         tot_m = start_year * 12 + start_month0 + m
@@ -6961,12 +6984,11 @@ def run_historical_cohorts(
             "ssn_gross_real_base": ssn_gross_real_base,
             "year_offset": (m - 1) // 12 if m > 0 else 0,
         })
-        if m % 12 == 0:
-            checkpoints.append(m)
+        _collect_scheduled_checkpoint_months(m, iso, inc_sa, actions, cp_set_coh)
         if m < p_milestone_month and age_on_iso(p_by, p_bm, p_bd, iso, m) >= p_ma:
             p_milestone_month = m
-    if checkpoints[-1] != horizon:
-        checkpoints.append(horizon)
+    cp_set_coh.add(horizon)
+    checkpoints = sorted(cp_set_coh)
 
     qs = (0.10, 0.25, 0.50, 0.75, 0.90)
     qkey = {0.10: "p10", 0.25: "p25", 0.50: "p50", 0.75: "p75", 0.90: "p90"}

@@ -470,6 +470,56 @@ class ParityTest(unittest.TestCase):
         self.assertAlmostEqual(js["tax_to_ms"]["cum_tax_real"], py["tax_to_ms"]["cum_tax_real"], delta=2.0)
         self.assertAlmostEqual(js["tax_to_ms"]["eff_tax_pct"], py["tax_to_ms"]["eff_tax_pct"], delta=0.1)
 
+    def test_scheduled_withdrawal_adds_pre_post_event_checkpoints_in_mc_and_cohorts(self):
+        """Non-monthly scheduled actions add pre-(m-1) and post-(m) checkpoints in MC and Historical cohorts."""
+        eff = build_effective_settings(
+            self.payload,
+            self.base,
+            overrides={
+                "simIncludeScheduledActions": True,
+                "simScheduledActions": [
+                    {
+                        "id": "gift_june",
+                        "type": "withdrawal",
+                        "cadence": "one_time",
+                        "ym": "2027-06",
+                        "amount": 1_500_000,
+                        "amount_mode": "usd",
+                        "dollar_mode": "today",
+                        "from_asset_id": "auto",
+                        "comment": "June Withdrawal",
+                    }
+                ],
+            },
+        )
+        mc_cfg = {"returnModel": "normal", "simulations": 25}
+        js_mc = _invoke_harness(self.index_path, {**eff, "__mc": mc_cfg, "__seed": 1}, "montecarlo")
+        py_mc = run_monte_carlo(self.payload, eff, mc=mc_cfg, seed=1)
+        self.assertEqual([b["monthIdx"] for b in js_mc["band"]], [b["monthIdx"] for b in py_mc["band"]])
+        mc_by_m = {b["monthIdx"]: b for b in py_mc["band"]}
+        self.assertIn(6, mc_by_m)
+        self.assertIn(7, mc_by_m)
+        self.assertLess(mc_by_m[7]["real"]["p50"], mc_by_m[6]["real"]["p50"] - 1_000_000)
+
+        js_coh = _invoke_harness(
+            self.index_path,
+            {**eff, "__opts": {"centerMode": "anchor", "inflationMode": "real_cpi"}},
+            "cohorts",
+        )
+        py_coh = run_historical_cohorts(
+            self.payload,
+            eff,
+            opts={"center_mode": "anchor", "inflation_mode": "real_cpi"},
+        )
+        self.assertEqual([b["monthIdx"] for b in js_coh["band"]], [b["monthIdx"] for b in py_coh["band"]])
+        js_by_m = {b["monthIdx"]: b for b in js_coh["band"]}
+        py_by_m = {b["monthIdx"]: b for b in py_coh["band"]}
+        self.assertIn(6, js_by_m)
+        self.assertIn(7, js_by_m)
+        self.assertLess(js_by_m[7]["real"]["p50"], js_by_m[6]["real"]["p50"] - 1_000_000)
+        self.assertAlmostEqual(js_by_m[6]["real"]["p50"], py_by_m[6]["real"]["p50"], delta=2.0)
+        self.assertAlmostEqual(js_by_m[7]["real"]["p50"], py_by_m[7]["real"]["p50"], delta=2.0)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

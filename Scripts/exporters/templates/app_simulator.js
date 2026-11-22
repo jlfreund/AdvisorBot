@@ -5296,6 +5296,24 @@
         : Date.now();
     }
 
+    function _collectScheduledCheckpointMonths(m, iso, cpSet) {
+      if (m === 0 || m % 12 === 0) cpSet.add(m);
+      if (m >= 1 && simIncludeScheduledActions && Array.isArray(simScheduledActions) && simScheduledActions.length > 0) {
+        const ym = iso.slice(0, 7);
+        for (let i = 0; i < simScheduledActions.length; i++) {
+          const act = simScheduledActions[i];
+          if (!act) continue;
+          const cad = act.cadence || "one_time";
+          if (cad === "monthly") continue;
+          if (actionTriggersInYm(act, ym, false)) {
+            cpSet.add(m - 1);
+            cpSet.add(m);
+            break;
+          }
+        }
+      }
+    }
+
     // mc: { singleStockVolPct?, broadEquityVolPct?, singleStockCorr?, googVolPct?, nonGoogVolPct?, googRestCorr?,
     //       returnModel: 'normal'|'historical', simulations, histPairs?: [[gRet,bRet],...] }
     function createMonteCarloStepper(mc, seed) {
@@ -5308,7 +5326,7 @@
 
       // Deterministic monthly schedule (identical across every path).
       const sched = [];
-      const checkpoints = [];
+      const cpSet = new Set();
       let msTargetMonth = horizon;
       const targetAge = Number(INV0.milestone_age) || 85;
       for (let m = 0; m <= horizon; m++) {
@@ -5323,10 +5341,11 @@
         const rawTargetNet = (simAnnualBurn * deflator) / 12.0;
         const ssnGross = simIncludeSSN ? (computeMonthlySsnForIso(iso, m).totNomGross || 0.0) : 0.0;
         sched.push({ iso, fullLbl, deflator, rawTarget: rawTargetNet, ssnGross });
-        if (m % 12 === 0) checkpoints.push(m);
+        _collectScheduledCheckpointMonths(m, iso, cpSet);
         if (m < msTargetMonth && ageOnIso(INV0.birth_year, INV0.birth_month, INV0.birth_day, iso, m) >= targetAge) msTargetMonth = m;
       }
-      if (checkpoints[checkpoints.length - 1] !== horizon) checkpoints.push(horizon);
+      cpSet.add(horizon);
+      const checkpoints = Array.from(cpSet).sort((a, b) => a - b);
 
       const rawSsVol = mc.singleStockVolPct ?? mc.googVolPct ?? mcSingleStockVolPct ?? mcGoogVolPct ?? 36.2;
       const rawMktVol = mc.broadEquityVolPct ?? mc.nonGoogVolPct ?? mcBroadEquityVolPct ?? mcNonGoogVolPct ?? 13.9;
@@ -5865,7 +5884,6 @@
       const byYearAssetRates = buildCohortAssetMonthlyRates(allYears, ydata, centerMode);
 
       const skel = [];
-      const checkpoints = [];
       const cpSet = new Set();
       let msTargetMonth = horizon;
       const targetAge = Number(INV0.milestone_age) || 85;
@@ -5880,10 +5898,11 @@
           ? (computeMonthlySsnForIso(iso, m, ssnInv0ClaimAge, ssnInv1ClaimAge, 0.0).totNomGross || 0.0)
           : 0.0;
         skel.push({ iso, fullLbl, ssnGrossFlat, ssnGrossRealBase });
-        if (m % 12 === 0) { checkpoints.push(m); cpSet.add(m); }
+        _collectScheduledCheckpointMonths(m, iso, cpSet);
         if (m < msTargetMonth && ageOnIso(INV0.birth_year, INV0.birth_month, INV0.birth_day, iso, m) >= targetAge) msTargetMonth = m;
       }
-      if (checkpoints[checkpoints.length - 1] !== horizon) { checkpoints.push(horizon); cpSet.add(horizon); }
+      cpSet.add(horizon);
+      const checkpoints = Array.from(cpSet).sort((a, b) => a - b);
 
       const defFrom = (cohortStartFrom != null && cohortStartFrom >= 0) ? cohortStartFrom : firstY;
       const yFrom = Math.max(firstY, Math.round(opts.startYearFrom != null ? opts.startYearFrom : defFrom));
