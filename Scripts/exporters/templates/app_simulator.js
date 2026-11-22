@@ -5692,6 +5692,8 @@
                 schedActionEvents: sres.schedActionEvents || [],
                 schedWithdrawEvents: sres.schedWithdrawEvents || [],
                 deflator: sc.deflator,
+                rawMonthlyExpense: sc.rawTarget,
+                ssnNetMo: sres.ssnNetMo || 0,
                 bearShieldActive: Boolean(repIn.yearlyBear[yrI - 1]),
                 monthlyWorkContrib: sres.monthlyWorkContrib || 0,
                 monthlyPaycheckOffset: sres.monthlyPaycheckOffset || 0,
@@ -6123,6 +6125,8 @@
                 schedActionEvents: sres.schedActionEvents || [],
                 schedWithdrawEvents: sres.schedWithdrawEvents || [],
                 deflator: repDfl,
+                rawMonthlyExpense: rawTarget,
+                ssnNetMo: sres.ssnNetMo || 0,
                 bearShieldActive: Boolean(repBear),
                 monthlyWorkContrib: sres.monthlyWorkContrib || 0,
                 monthlyPaycheckOffset: sres.monthlyPaycheckOffset || 0,
@@ -8961,8 +8965,12 @@
         }
       }
       const cfScale = repBarForCf ? (isReal ? (1.0 / (repBarForCf.deflator || 1.0)) : 1.0) : scale;
-      const dispAfterTaxExp = (b.rawMonthlyExpense != null ? b.rawMonthlyExpense : b.monthlyBurn) * scale;
-      const dispSsnNet = (b.ssnNetMo || 0) * scale;
+      const dispAfterTaxExp = repBarForCf && repBarForCf.rawMonthlyExpense != null
+        ? (repBarForCf.rawMonthlyExpense * cfScale)
+        : ((b.rawMonthlyExpense != null ? b.rawMonthlyExpense : b.monthlyBurn) * scale);
+      const dispSsnNet = repBarForCf && repBarForCf.ssnNetMo != null
+        ? (repBarForCf.ssnNetMo * cfScale)
+        : ((b.ssnNetMo || 0) * scale);
       const dispPaycheckOff = repBarForCf
         ? ((repBarForCf.monthlyPaycheckOffset || 0) * cfScale)
         : ((b.monthlyPaycheckOffset || 0) * scale);
@@ -8979,7 +8987,7 @@
       const workCashflowLinesHtml =
         (dispPaycheckOff > 0.5
           ? `<div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;margin:1.5px 0;">
-              <span class="muted">Paycheck Covers Expenses</span>
+              <span class="muted">Paycheck Covers Expenses (Inf. Adjusted)</span>
               <strong style="color:#34d399;">+${fmtUSD0(dispPaycheckOff)}</strong>
             </div>`
           : "") +

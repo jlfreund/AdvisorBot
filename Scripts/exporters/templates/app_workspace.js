@@ -8087,7 +8087,7 @@
                   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
                     <div style="min-width:200px;flex:1;">
                       <label for="proj-wp-budget-input" style="display:block;font-size:12px;font-weight:700;color:#f8fafc;margin-bottom:2px;">
-                        2. How much of their paycheck contributes to the household&#39;s monthly budget?
+                        2. How much of their after-tax paycheck contributes to the household&#39;s monthly budget?
                       </label>
                       <div class="muted mono" id="proj-wp-q2-sub" style="font-size:10.8px;line-height:1.35;">${escHtml(_formatWorkPlanQ2Sub(bd, wp))}</div>
                     </div>
