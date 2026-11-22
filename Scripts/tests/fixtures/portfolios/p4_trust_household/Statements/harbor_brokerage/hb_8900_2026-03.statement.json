@@ -1,0 +1,35 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Harbor Brokerage",
+  "account_id": "HB-8900",
+  "account_name": "Harbor Individual (Zs\u00f3fia)",
+  "account_type": "BROKERAGE",
+  "tax_status": "TAXABLE",
+  "display_order": 50,
+  "period_start": "2026-03-01",
+  "as_of_date": "2026-03-31",
+  "reported_total": 37385.55,
+  "positions": [
+    {
+      "security_id": "TICKER:ITOT",
+      "symbol_or_code": "ITOT",
+      "canonical_name": "iShares Core S&P Total U.S. Stock Market ETF",
+      "asset_class": "ETF",
+      "stack_bucket": "stocks",
+      "risk_class": "broad_equity",
+      "is_scrapeable": true,
+      "quote_symbol": "ITOT",
+      "quantity": 180.0,
+      "stmt_price": 207.6975,
+      "market_value": 37385.55,
+      "value_date": "2026-03-31",
+      "cost_basis": 20160.0,
+      "acquisition_date": "2024-09-03"
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "fd752403b6d831a3"
+  }
+}

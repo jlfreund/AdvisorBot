@@ -1,0 +1,33 @@
+{
+  "_as_of": "2026-11-16",
+  "_generated_by": "tests.generate",
+  "_spec_sha": "f26c4a1467b786b8",
+  "account.CB-5100.child_count": 2,
+  "account.CB-5100.current_value": 466300.0,
+  "account.CB-5100.institution": "Cedarline Wealth",
+  "account.CB-5101.child_count": 4,
+  "account.CB-5101.current_value": 925204.54,
+  "account.CB-5101.institution": "Cedarline Wealth",
+  "account.CB-5102.child_count": 4,
+  "account.CB-5102.current_value": 283495.0,
+  "account.CB-5102.institution": "Cedarline Wealth",
+  "account_count": 3,
+  "grant_symbols": [],
+  "has_portfolio": true,
+  "household_name": "Brennan-Castillo Household",
+  "institutions": [
+    "Cedarline Wealth"
+  ],
+  "investor_count": 2,
+  "sim_asset_count": 7,
+  "sim_asset_ids": [
+    "ann_granite_ANN-B2",
+    "ann_solstice_ANN-A1",
+    "ann_northwind_ANN-C3",
+    "munis_CB_5102",
+    "clgrx_CB_5100",
+    "cash_sweeps",
+    "cash_CB_5100"
+  ],
+  "today_iso": "2026-11-16"
+}

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 1: Setting Up Your Portfolio — AdvisorBot Documentation</title>
+  <link rel="icon" href="../Assets/default_badge.svg" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <span>🛡️ AdvisorBot</span>
+      <span style="color: var(--muted); font-weight: normal;">|</span>
+      <span>Documentation &amp; User Manual</span>
+    </div>
+    <nav class="topbar-links">
+      <a class="nav-pill" href="../index.html">← Live Dashboard</a>
+      <a class="nav-pill active" href="index.html">User Guide</a>
+      <a class="nav-pill" href="readme.html">Top-Level README</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar Table of Contents -->
+    <aside class="toc" id="doc-toc">
+      <div class="toc-header">
+        <div class="toc-heading">Documentation Chapters</div>
+        <button type="button" class="toc-toggle-all-btn" id="toc-toggle-all" onclick="toggleAllChapters()" title="Toggle all chapters">Expand All</button>
+      </div>
+
+      <div class="toc-item">
+        <a href="index.html" class="toc-nav-link">
+          <span style="font-size:14px;">📖</span>
+          <span>Overview &amp; Architecture</span>
+        </a>
+      </div>
+
+      <!-- Chapter 1 -->
+      <div class="toc-chapter-group" id="ch-group-1">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(1)" aria-label="Toggle Chapter 1 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch1-portfolio-setup.html" class="toc-chapter-link active">
+            1. Setting Up Your Portfolio
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="#portfolio-dir">1.1 Create &amp; Complete Your Portfolio</a>
+          <a class="sub" href="#llm-setup">1.2 Configuring AI &amp; Local LLMs</a>
+          <a class="sub" href="#statements-drop">1.3 Dropping Financial Statements</a>
+          <a class="sub" href="#portfolio-settings-audit">1.4 Settings Portfolio Audit</a>
+          <a class="sub" href="#agent-plugins">1.5 Developing Custom Plugins</a>
+        </div>
+      </div>
+
+      <!-- Chapter 2 -->
+      <div class="toc-chapter-group" id="ch-group-2">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(2)" aria-label="Toggle Chapter 2 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch2-core-walkthrough.html" class="toc-chapter-link">
+            2. Core Application Walkthrough
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch2-core-walkthrough.html#page-positions">2.1 Positions &amp; Weekly Timeline</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-grants">2.2 Employee Stock &amp; Vesting</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-simulator">2.3 Retirement Simulator &amp; Drawdown</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-social-security">2.4 Income &amp; Expense (Social Security)</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-scenarios">2.5 Scenario Details &amp; Baselines</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-settings">2.6 Settings &amp; Preferences</a>
+          <a class="sub" href="ch2-core-walkthrough.html#holding-forecast-methodology">2.7 Holding Forecasts &amp; Baselines</a>
+        </div>
+      </div>
+
+      <!-- Chapter 3 -->
+      <div class="toc-chapter-group" id="ch-group-3">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(3)" aria-label="Toggle Chapter 3 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch3-security-privacy.html" class="toc-chapter-link">
+            3. Security &amp; Privacy Architecture
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch3-security-privacy.html#sec-local-first">3.1 Localhost &amp; Network Isolation</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-cross-tab">3.2 Protection From Browser Tabs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-profiles">3.3 The 3 AI Privacy Profiles</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-local-llm">3.4 100% Offline Local LLMs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-alias-table">3.5 Maintaining the Alias Table</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-unsupported-banks">3.6 Unsupported Banks &amp; Parsers</a>
+        </div>
+      </div>
+
+      <!-- Chapter 4 -->
+      <div class="toc-chapter-group" id="ch-group-4">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(4)" aria-label="Toggle Chapter 4 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch4-developer-agent.html" class="toc-chapter-link">
+            4. Developer &amp; Agent Integration
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp">4.1 External Agent MCP Integration</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp-security">4.2 MCP Security &amp; Injection Defense</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-guardrails">4.3 Engineering &amp; Privacy Guardrails</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-testing">4.4 Isolated Test Suite &amp; Verification</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      <div class="chapter-banner">
+        <div class="chapter-badge-wrap">
+          <span class="badge badge-blue">Chapter 1</span>
+          <span class="badge badge-green">Setup Guide</span>
+        </div>
+        <h1 style="margin-bottom:6px;">Setting Up Your Portfolio</h1>
+        <p class="subtitle" style="margin-bottom:0;">Workspace initialization, statement ingestion, portfolio configuration, and custom parser plugin development.</p>
+      </div>
+
+      <section id="ch1-portfolio-setup">
+        <p>Everything runs locally on your machine with private files stored inside the gitignored <code>Portfolios/</code> directory. Follow the 5 quick steps below—each step pairs a short instruction with a ready-to-copy AI prompt, while manual commands and developer details stay tucked inside expandable drawers.</p>
+
+        <div class="os-filter-bar" role="region" aria-label="Filter setup instructions by operating system">
+          <span class="os-filter-label">Platform Commands:</span>
+          <button type="button" class="os-filter-btn active" data-os-filter="all">All Platforms</button>
+          <button type="button" class="os-filter-btn" data-os-filter="macos">macOS</button>
+          <button type="button" class="os-filter-btn" data-os-filter="linux">Linux</button>
+          <button type="button" class="os-filter-btn" data-os-filter="windows">Windows</button>
+        </div>
+
+        <!-- Step 0: Environment & Launch -->
+        <div class="callout callout-info" style="margin-bottom:24px;">
+          <strong>Before You Start — Install &amp; Launch:</strong> Make sure <strong>Python 3.11+</strong>, <strong>Git</strong>, and your AI coding CLI (Claude Code, Gemini CLI, Codex CLI, Cursor, or Antigravity) are installed, then paste this prompt in the cloned folder to set up <code>.venv</code> and open the dashboard:
+          <div class="prompt-card" style="margin:12px 0 10px;">
+            <div class="prompt-card-hdr">
+              <div class="prompt-card-title">
+                <span class="badge badge-blue">Setup Prompt</span>
+                <span>Create <code>.venv</code>, Install Dependencies &amp; Launch Dashboard</span>
+              </div>
+              <button type="button" class="prompt-copy-btn" onclick="copyPromptCard(this)" title="Copy prompt to clipboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span class="prompt-copy-label">Copy</span>
+              </button>
+            </div>
+            <pre>Read pyproject.toml and set up this AdvisorBot checkout for my OS:
+1. Verify Python 3.11+ is available and create a `.venv` virtual environment at the repo root if missing.
+2. Install dependencies with `.venv` (`pip install -e ".[mcp,ingest,ui]"`).
+3. Start the local server with `--port 8765 --open` (`Scripts/advisorbot_server.py`) so the dashboard opens in my browser.</pre>
+          </div>
+          <details class="doc-details" style="margin:8px 0 0;">
+            <summary>
+              <span class="doc-details-title">
+                <span class="doc-details-chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+                <span>Manual Commands &amp; Package Details (macOS / Linux / Windows)</span>
+              </span>
+              <span class="doc-details-tag">CLI / AI Reference</span>
+            </summary>
+            <div class="doc-details-body">
+              <p>Core portfolio math uses Python stdlib; optional extras in <code>pyproject.toml</code> enable PDF/XLSX ingestion (<code>ingest</code>: <code>pypdf</code>, <code>openpyxl</code>), badge image uploads (<code>ui</code>: <code>Pillow</code>), external agents (<code>mcp</code>), and tests (<code>dev</code>: <code>pytest</code>). Public quotes require Yahoo Finance access during refresh.</p>
+              <div class="platform-variants" style="margin-bottom:4px;">
+                <div class="platform-variant" data-os="macos">
+                  <div class="platform-variant-header"><span>macOS</span><span class="platform-variant-shell">Terminal (zsh / bash)</span></div>
+                  <pre><code>git clone &lt;repository-url&gt; &amp;&amp; cd AdvisorBot
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+python -m pip install -e ".[mcp,ingest,ui]"   # Add ,dev if running pytest
+.venv/bin/python Scripts/advisorbot_server.py --port 8765 --open</code></pre>
+                </div>
+                <div class="platform-variant" data-os="linux">
+                  <div class="platform-variant-header"><span>Linux</span><span class="platform-variant-shell">Terminal (bash / zsh)</span></div>
+                  <pre><code>git clone &lt;repository-url&gt; &amp;&amp; cd AdvisorBot
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+python -m pip install -e ".[mcp,ingest,ui]"   # Add ,dev if running pytest
+.venv/bin/python Scripts/advisorbot_server.py --port 8765 --open</code></pre>
+                  <div class="platform-variant-note">Headless/WSL without a desktop browser opener: omit <code>--open</code> and open the printed <code>http://127.0.0.1:8765/?token=...</code> link.</div>
+                </div>
+                <div class="platform-variant" data-os="windows">
+                  <div class="platform-variant-header"><span>Windows</span><span class="platform-variant-shell">PowerShell / Command Prompt</span></div>
+                  <pre><code>git clone &lt;repository-url&gt;; cd AdvisorBot
+py -3 -m venv .venv; .\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[mcp,ingest,ui]"   # Add ,dev if running pytest
+.\.venv\Scripts\python.exe Scripts\advisorbot_server.py --port 8765 --open</code></pre>
+                  <div class="platform-variant-note">If PowerShell script activation is blocked, run <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> once, or run <code>.\.venv\Scripts\python.exe</code> directly.</div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Step 1 -->
+        <h3 id="portfolio-dir"><span class="step-num">1</span> Create &amp; Complete Your Portfolio in Settings</h3>
+        <p>In the browser, open <strong>Settings (⚙️) &rarr; Portfolio</strong>, click <strong>+ New Portfolio</strong>, and fill in your <strong>Portfolio Name</strong>, <strong>Annual Burn Rate</strong>, <strong>Tax State &amp; Rates</strong>, and at least one member in <strong>Family Members</strong> (Name + Birthdate) so <strong>Select Portfolio</strong> becomes active.</p>
+        <div class="prompt-card">
+          <div class="prompt-card-hdr">
+            <div class="prompt-card-title">
+              <span class="badge badge-blue">Optional Prompt</span>
+              <span>Initialize &amp; Configure Portfolio From the CLI Instead</span>
+            </div>
+            <button type="button" class="prompt-copy-btn" onclick="copyPromptCard(this)" title="Copy prompt to clipboard">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span class="prompt-copy-label">Copy</span>
+            </button>
+          </div>
+          <pre>Read Examples/project.example.json and Scripts/config.py (specifically validate_portfolio_config). Help me initialize `Portfolios/&lt;portfolio_slug&gt;/` with `Statements/`, `Scenarios/`, `Plugins/`, `Assets/`, and a valid `project.json`, ask me only for the required household/tax/member fields, verify `validate_portfolio_config` passes cleanly, and set `Portfolios/_active.json`.</pre>
+        </div>
+        <details class="doc-details">
+          <summary>
+            <span class="doc-details-title">
+              <span class="doc-details-chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+              <span>5-Tab Settings Guide, Incomplete Validation Rules &amp; Manual CLI Init</span>
+            </span>
+            <span class="doc-details-tag">UI &amp; AI Reference</span>
+          </summary>
+          <div class="doc-details-body">
+            <h4>What Each Tab in Portfolio Settings (⚙️) Configures</h4>
+            <table>
+              <thead>
+                <tr><th style="width:155px;">Settings Tab</th><th>Capabilities</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>1. Portfolio</strong></td><td>Create/select/delete portfolios, set Name, Annual Burn Rate slider, Tax Jurisdiction / MFJ / Minimum Tax Bracket Floor, upload or AI-generate a 240&times;64 Site Graphic (10 presets, 10 slots), and audit/ingest statements (<code>&#8635; Rescan</code> / <code>&#9881; Portfolio Refresh</code>).</td></tr>
+                <tr><td><strong>2. Family Members</strong></td><td>Investors &amp; beneficiaries, Birthdate, Milestone Age, Designated RMD Owner, <strong>Pre-Retirement Work Plans &amp; 401(k)/IRA Contributions</strong>, Default Social Security Claim Age, and <strong><code>ssa.gov</code> XML upload</strong> (<code>Select ssa.gov XML file</code>).</td></tr>
+                <tr><td><strong>3. Symbols</strong></td><td>Up to <strong>10 verified Yahoo tickers or market indices</strong> (<code>AAPL</code>, <code>VTI</code>, <code>NASDAQ</code>, <code>SP500</code>, <code>DJIA</code>, <code>VIX</code>); drag item <strong>#1</strong> to set your Primary Equity.</td></tr>
+                <tr><td><strong>4. Prompts</strong></td><td>Create or edit reusable AI Chat quick-prompts saved per portfolio.</td></tr>
+                <tr><td><strong>5. Privacy</strong></td><td><strong>AI Chat Privacy</strong> (Modes <strong>A. Clear Text</strong>, <strong>B. Obfuscated Names</strong>, <strong>C. Obfuscated Names &amp; Values</strong>), <strong>Demo Mode</strong> slider, <strong>Alias &amp; Synonym Registry</strong> (+ custom terms &amp; Wire Preview), and the <strong>MCP Server</strong> toggle.</td></tr>
+              </tbody>
+            </table>
+            <h4>Manual CLI Initialization &amp; Validation Rules (<code>validate_portfolio_config</code>)</h4>
+            <p>A portfolio remains marked <strong>Incomplete</strong> (disabling <strong>Select Portfolio</strong>) until <code>household_name</code>, <code>reference_annual_burn &gt; 0</code>, <code>tax_rates.state_code</code> (or <code>FED</code>), <code>tax_rates.ltcg_top</code>, <code>tax_rates.ordinary_top</code>, and at least one entry in <code>investors</code> with <code>name</code> + <code>birth_date</code> are present.</p>
+            <div class="platform-variants">
+              <div class="platform-variant" data-os="macos">
+                <div class="platform-variant-header"><span>macOS / Linux</span><span class="platform-variant-shell">bash / zsh</span></div>
+                <pre><code>mkdir -p Portfolios/my_household/{Statements,Scenarios,Plugins,Assets}
+cp Examples/project.example.json Portfolios/my_household/project.json
+printf '{\n  "active_portfolio_id": "my_household"\n}\n' &gt; Portfolios/_active.json</code></pre>
+              </div>
+              <div class="platform-variant" data-os="linux">
+                <div class="platform-variant-header"><span>Linux</span><span class="platform-variant-shell">bash</span></div>
+                <pre><code>mkdir -p Portfolios/my_household/{Statements,Scenarios,Plugins,Assets}
+cp Examples/project.example.json Portfolios/my_household/project.json
+printf '{\n  "active_portfolio_id": "my_household"\n}\n' &gt; Portfolios/_active.json</code></pre>
+              </div>
+              <div class="platform-variant" data-os="windows">
+                <div class="platform-variant-header"><span>Windows</span><span class="platform-variant-shell">PowerShell</span></div>
+                <pre><code>New-Item -ItemType Directory -Force -Path Portfolios\my_household\Statements, Portfolios\my_household\Scenarios, Portfolios\my_household\Plugins, Portfolios\my_household\Assets | Out-Null
+Copy-Item Examples\project.example.json Portfolios\my_household\project.json
+Set-Content -Path Portfolios\_active.json -Encoding ascii -Value '{"active_portfolio_id": "my_household"}'</code></pre>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Step 2 -->
+        <h3 id="llm-setup"><span class="step-num">2</span> Connect AI Chat (Optional)</h3>
+        <p>To use the built-in AI Financial Assistant (or AI Site Graphic generator), copy this prompt so your AI CLI wires up a local Ollama model or a Gemini / Claude / OpenAI key for you.</p>
+        <div class="prompt-card">
+          <div class="prompt-card-hdr">
+            <div class="prompt-card-title">
+              <span class="badge badge-blue">AI Config Prompt</span>
+              <span>Configure Local Ollama or Cloud LLM Provider</span>
+            </div>
+            <button type="button" class="prompt-copy-btn" onclick="copyPromptCard(this)" title="Copy prompt to clipboard">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span class="prompt-copy-label">Copy</span>
+            </button>
+          </div>
+          <pre>Read `Examples/README_LLM_CONFIGS.md` and the `Examples/llm_config.*.json` templates. Ask me whether I want offline local Ollama/LM Studio or a cloud API key (Gemini, Claude, or OpenAI), then set up `Data/Config/LLM/` (using environment variables if I prefer not storing keys in JSON) without putting secrets into git-tracked files.</pre>
+        </div>
+        <details class="doc-details">
+          <summary>
+            <span class="doc-details-title">
+              <span class="doc-details-chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+              <span>Manual LLM Config Paths, Environment Variables &amp; Templates</span>
+            </span>
+            <span class="doc-details-tag">CLI / AI Reference</span>
+          </summary>
+          <div class="doc-details-body">
+            <p>Starter templates live in <code>Examples/</code> (<code>llm_config.local_ollama.json</code>, <code>llm_config.gemini.json</code>, <code>llm_config.claude.json</code>, <code>llm_config.openai.json</code>; see <code>Examples/README_LLM_CONFIGS.md</code> in your editor for full provider notes). Place active configs in one of two discovery tiers, or supply environment variables:</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Tier</th>
+                  <th>Path / Variable</th>
+                  <th>Precedence &amp; Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Portfolio Override</strong></td>
+                  <td><code>Portfolios/&lt;slug&gt;/LLM/*.json</code></td>
+                  <td>Highest precedence &mdash; applies only when <code>&lt;slug&gt;</code> is active.</td>
+                </tr>
+                <tr>
+                  <td><strong>Global Default</strong></td>
+                  <td><code>Data/Config/LLM/*.json</code></td>
+                  <td>Shared across all portfolios (gitignored).</td>
+                </tr>
+                <tr>
+                  <td><strong>Environment Variables</strong></td>
+                  <td><code>GEMINI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, <code>OPENAI_API_KEY</code></td>
+                  <td>Used automatically whenever <code>api_key</code> in JSON is blank or left as <code>PASTE_YOUR_...</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <!-- Step 3 -->
+        <h3 id="statements-drop"><span class="step-num">3</span> Add Your Statements</h3>
+        <p>Copy brokerage or stock-plan statements into <code>Portfolios/&lt;slug&gt;/Statements/</code>, and upload official <code>ssa.gov</code> <code>.xml</code> earnings files per investor inside <strong>Settings (⚙️) &rarr; Family Members</strong>.</p>
+        <details class="doc-details">
+          <summary>
+            <span class="doc-details-title">
+              <span class="doc-details-chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+              <span>Supported Built-In Formats &amp; Statement Directory Rules</span>
+            </span>
+            <span class="doc-details-tag">Reference</span>
+          </summary>
+          <div class="doc-details-body">
+            <ul>
+              <li><strong>Morgan Stanley &amp; StockPlan Connect</strong> (<code>Statements/*.pdf</code>, <code>Statements/*.xlsx</code>): Monthly/quarterly brokerage PDFs (including UMA sleeves &amp; Muni SMAs), unvested grant PDFs, and StockPlan Connect Activity <code>.xlsx</code> reports.</li>
+              <li><strong>Wells Fargo Advisors</strong> (<code>Statements/*.pdf</code>): Consolidated <code>SNAPSHOT</code> brokerage, IRA/Roth IRA, and annuity summary rows.</li>
+              <li><strong>Social Security Administration (<code>ssa.gov</code> <code>.xml</code>)</strong>: Upload in <strong>Settings &rarr; Family Members &rarr; Select ssa.gov XML file</strong> (stored under <code>Statements/SSN/</code>). Raw <code>.xml</code> files placed directly in <code>Statements/</code> are skipped by CLI <code>refresh</code> (<code>scanner.py</code> scans <code>.pdf</code>, <code>.xlsx</code>, <code>*.statement.json</code>, and <code>*.grants.json</code>).</li>
+              <li><strong>Canonical JSON Schemas</strong> (<code>*.statement.json</code>, <code>*.grants.json</code>): Zero-code structured imports from any institution (see Step 5).</li>
+            </ul>
+          </div>
+        </details>
+
+        <!-- Step 4 -->
+        <h3 id="portfolio-settings-audit"><span class="step-num">4</span> Rescan &amp; Refresh</h3>
+        <p>In <strong>Settings (⚙️) &rarr; Portfolio</strong>, click <strong>&#8635; Rescan</strong> and then click <strong>&#9881; Portfolio Refresh</strong> to ingest green <strong>Available</strong> files—if any files stay red <strong>Unknown</strong>, proceed to Step 5.</p>
+        <details class="doc-details">
+          <summary>
+            <span class="doc-details-title">
+              <span class="doc-details-chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+              <span>Status Pill Meanings &amp; Local Session Auth Details</span>
+            </span>
+            <span class="doc-details-tag">Reference</span>
+          </summary>
+          <div class="doc-details-body">
+            <table>
+              <thead>
+                <tr><th>Pill Status</th><th>Meaning</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="badge" style="background:#334155;color:#cbd5e1;border:1px solid #475569;">Processed</span></td><td>Already ingested and reconciled in <code>portfolio.sqlite</code>.</td><td>None needed.</td></tr>
+                <tr><td><span class="badge badge-green">Available</span></td><td>Matched a parser dry-run and ready to ingest.</td><td>Click <strong>&#9881; Portfolio Refresh</strong> (unghosts automatically).</td></tr>
+                <tr><td><span class="badge badge-rose">Unknown</span></td><td>No enabled parser matched this layout yet.</td><td>Run Step 5 below.</td></tr>
+              </tbody>
+            </table>
+            <p><strong>Why <code>--open</code> &amp; Session Auth exist:</strong> Because <code>127.0.0.1</code> is shared locally, <code>--open</code> performs a one-time <code>/?token=...</code> handshake backed by <code>Data/.session_secret</code> (<code>0600</code>), storing a 1-year <code>HttpOnly; SameSite=Strict</code> cookie so server restarts reconnect automatically. Re-run <code>--open</code> if switching between <code>127.0.0.1</code> and <code>localhost</code> or using a fresh browser profile.</p>
+          </div>
+        </details>
+
+        <!-- Step 5 -->
+        <h3 id="agent-plugins"><span class="step-num">5</span> Onboard Unsupported Statements With AI</h3>
+        <p>For any statement marked <strong>Unknown</strong> (e.g. Fidelity, Schwab, Vanguard, TIAA, E*TRADE), open your AI CLI inside <code>AdvisorBot</code>, copy this prompt, and then click <strong>&#8635; Rescan</strong> &rarr; <strong>&#9881; Portfolio Refresh</strong> once it finishes:</p>
+
+        <div class="prompt-card">
+          <div class="prompt-card-hdr">
+            <div class="prompt-card-title">
+              <span class="badge badge-blue">Primary Prompt</span>
+              <span>Inspect, Build &amp; Test a Custom Parser Plugin</span>
+            </div>
+            <button type="button" class="prompt-copy-btn" onclick="copyPromptCard(this)" title="Copy prompt to clipboard">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span class="prompt-copy-label">Copy</span>
+            </button>
+          </div>
+          <pre>Onboard the unparsed statement at `Portfolios/&lt;portfolio_slug&gt;/Statements/&lt;statement_file&gt;`.
+
+Read these references first:
+- .agents/skills/statement-onboarding/SKILL.md
+- Scripts/ingest/framework.py, Scripts/ingest/models.py, and Scripts/ingest/classification.py
+- Scripts/ingest/plugins/wells_fargo.py (and morgan_stanley_activity.py for XLSX)
+
+Then:
+1. Run `Scripts/holdings.py inspect-statement "Portfolios/&lt;portfolio_slug&gt;/Statements/&lt;statement_file&gt;" --max-pages 12` (keep default redaction enabled).
+2. Write a `StatementPlugin` in `Portfolios/&lt;portfolio_slug&gt;/Plugins/&lt;institution&gt;_plugin.py` scoring &gt; 0.80 in `detect()`, resolving accounts via `ctx.resolve_account_metadata(...)`, setting valid `(asset_class, risk_class)` pairs across the 7-class taxonomy (`classify_public_security()` for public tickers), and setting `reported_total`.
+3. Add `"&lt;institution&gt;_plugin.py"` under `"allowed_plugins"` in `Portfolios/&lt;portfolio_slug&gt;/project.json`.
+4. Verify with `Scripts/holdings.py test-plugin "Portfolios/&lt;portfolio_slug&gt;/Statements/&lt;statement_file&gt;" --offline` until exit code 0 (passing detect, RiskClass gate, and ±$0.05 checksum), and run `pytest Scripts/tests/scans/ -q`.</pre>
+        </div>
+
+        <details class="doc-details">
+          <summary>
+            <span class="doc-details-title">
+              <span class="doc-details-chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+              <span>Alternative Prompts: One-Off JSON Import or Upstream Community PR</span>
+            </span>
+            <span class="doc-details-tag">Optional Prompts</span>
+          </summary>
+          <div class="doc-details-body">
+            <p>Use <strong>Prompt 2</strong> when you just want a one-time conversion from CSV/PDF into AdvisorBot&#39;s zero-code JSON schema, or <strong>Prompt 3</strong> to contribute a sanitized parser back into the main repository with tests:</p>
+            <div class="prompt-card">
+              <div class="prompt-card-hdr">
+                <div class="prompt-card-title">
+                  <span class="badge badge-green">Prompt 2</span>
+                  <span>Zero-Code Canonical JSON Import (<code>*.statement.json</code> / <code>*.grants.json</code>)</span>
+                </div>
+                <button type="button" class="prompt-copy-btn" onclick="copyPromptCard(this)" title="Copy prompt to clipboard">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span class="prompt-copy-label">Copy</span>
+                </button>
+              </div>
+              <pre>Convert `Portfolios/&lt;portfolio_slug&gt;/Statements/&lt;source_file&gt;` into canonical `Portfolios/&lt;portfolio_slug&gt;/Statements/&lt;output_name&gt;.statement.json` (or `.grants.json` for equity grants). Read `Scripts/ingest/plugins/canonical_json.py`, `grant_json.py`, `Examples/grants.example.json`, and `Scripts/ingest/classification.py` first, then verify with `Scripts/holdings.py test-plugin "Portfolios/&lt;portfolio_slug&gt;/Statements/&lt;output_name&gt;.statement.json" --offline`.</pre>
+            </div>
+            <div class="prompt-card" style="margin-bottom:4px;">
+              <div class="prompt-card-hdr">
+                <div class="prompt-card-title">
+                  <span class="badge badge-purple">Prompt 3</span>
+                  <span>Promote a Parser Upstream &amp; Add Golden Regression Tests</span>
+                </div>
+                <button type="button" class="prompt-copy-btn" onclick="copyPromptCard(this)" title="Copy prompt to clipboard">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span class="prompt-copy-label">Copy</span>
+                </button>
+              </div>
+              <pre>Promote `Portfolios/&lt;portfolio_slug&gt;/Plugins/&lt;institution&gt;_plugin.py` into a PII-free built-in parser. Read `Scripts/ingest/plugins/__init__.py`, `Scripts/ingest/plugins/wells_fargo.py`, `Scripts/ingest/wells_fargo.py`, and `Scripts/tests/parsers/test_golden_pages.py` first. Move sanitized parsing code to `Scripts/ingest/` &amp; `Scripts/ingest/plugins/`, register it in `build_default_registry()`, add synthetic golden fixtures (`*.pages.txt` with `\f\n` separators + `*.expected.json`) under `Scripts/tests/fixtures/parsers/&lt;institution&gt;/`, and verify `pytest Scripts/tests/parsers/ Scripts/tests/scans/ -q` passes cleanly.</pre>
+            </div>
+          </div>
+        </details>
+
+        <details class="doc-details">
+          <summary>
+            <span class="doc-details-title">
+              <span class="doc-details-chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+              <span>AI &amp; Developer Reference: Doc Pointers, <code>inspect-statement</code> / <code>test-plugin</code> Flags &amp; Privacy</span>
+            </span>
+            <span class="doc-details-tag">AI / Dev Reference</span>
+          </summary>
+          <div class="doc-details-body">
+            <p><strong>Privacy note:</strong> Sharing raw statements with cloud AI tools exposes account details—prefer <a href="ch3-security-privacy.html#sec-unsupported-banks">Section 3.6 redaction practices</a>, a local offline model, or <code>inspect-statement</code> (redacts 7+ digit runs by default; pass <code>--unredacted</code> only locally).</p>
+            <table>
+              <thead>
+                <tr><th style="width:265px;">Repository File</th><th>Role for AI CLI / Developers</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>.agents/skills/statement-onboarding/SKILL.md</code></td><td>Full 4-step parser onboarding guide, forecast enrichment fields, and 7-class <code>RiskClass</code> table.</td></tr>
+                <tr><td><code>Scripts/ingest/framework.py</code> &amp; <code>models.py</code></td><td><code>StatementPlugin</code> contract (<code>detect</code>, <code>parse</code>, <code>verify_checksum</code>, <code>dry_run</code>), <code>IngestContext.resolve_account_metadata()</code>, and dataclasses.</td></tr>
+                <tr><td><code>Scripts/ingest/classification.py</code></td><td>Mandatory <code>validate_risk_class()</code> gate and deterministic <code>classify_public_security()</code> helper.</td></tr>
+                <tr><td><code>Scripts/ingest/plugins/wells_fargo.py</code><br><code>Scripts/ingest/plugins/morgan_stanley_activity.py</code></td><td>Multi-position PDF plugin and StockPlan Excel <code>.xlsx</code> plugin examples.</td></tr>
+                <tr><td><code>Scripts/ingest/plugins/canonical_json.py</code><br><code>Examples/grants.example.json</code></td><td>Universal JSON schemas (<code>*.statement.json</code>, <code>*.grants.json</code>).</td></tr>
+                <tr><td><code>Scripts/ingest/plugins/__init__.py</code></td><td>Built-in registry (<code>build_default_registry()</code>) and <code>SA-15</code> opt-in rules (skips <code>_</code>-prefixed files and symlinks; custom plugins win tie-breaks).</td></tr>
+                <tr><td><code>Scripts/tests/parsers/test_golden_pages.py</code></td><td>Golden page-text harness (<code>*.pages.txt</code> + <code>*.expected.json</code> under <code>Scripts/tests/fixtures/parsers/</code>).</td></tr>
+              </tbody>
+            </table>
+            <p><strong>CLI Commands, Flags &amp; Reload:</strong> Clicking <strong>&#8635; Rescan</strong> in <strong>Settings &rarr; Portfolio</strong> reloads opted-in plugins from <code>project.json</code> without restarting the server. For CLI verification, use <code>Scripts/holdings.py test-plugin &lt;file&gt;</code> with <code>--offline</code> (no Yahoo calls), <code>--plugins-dir &lt;dir&gt;</code> (test before <code>project.json</code> opt-in), <code>--no-strict-checksum</code> (warn instead of fail on <code>&gt;$0.05</code> mismatch), and <code>--json</code>. Exit codes: <code>0</code> pass, <code>2</code> detect missed, <code>3</code> parse or <code>RiskClass</code> error, <code>4</code> strict checksum mismatch.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- Chapter Pagination Footer -->
+      <div class="chapter-nav-footer">
+        <a href="index.html" class="chapter-nav-btn prev">
+          <span class="dir-label">← Previous</span>
+          <span class="title-label">Documentation Overview</span>
+        </a>
+        <a href="ch2-core-walkthrough.html" class="chapter-nav-btn next">
+          <span class="dir-label">Next Chapter →</span>
+          <span class="title-label">Chapter 2: Core Application Walkthrough</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      initDocsPage(1);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE lolz [
+  <!ENTITY lol "lol">
+  <!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;">
+]>
+<osss:OnlineSocialSecurityStatementData xmlns:osss="http://ssa.gov/osss/schemas/2.0">
+  <osss:UserInformation>
+    <osss:Name>&lol2;</osss:Name>
+    <osss:DateOfBirth>1974-06-17</osss:DateOfBirth>
+  </osss:UserInformation>
+  <osss:EarningsRecord>
+    <osss:Earnings startYear="2020" endYear="2020">
+      <osss:FicaEarnings>50000</osss:FicaEarnings>
+    </osss:Earnings>
+  </osss:EarningsRecord>
+</osss:OnlineSocialSecurityStatementData>

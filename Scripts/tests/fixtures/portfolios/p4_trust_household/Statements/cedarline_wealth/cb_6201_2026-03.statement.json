@@ -1,0 +1,35 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Cedarline Wealth",
+  "account_id": "CB-6201",
+  "account_name": "Cedarline Traditional IRA (Petros)",
+  "account_type": "TRAD_IRA",
+  "tax_status": "TRAD_IRA",
+  "display_order": 40,
+  "period_start": "2026-03-01",
+  "as_of_date": "2026-03-31",
+  "reported_total": 592517.6,
+  "positions": [
+    {
+      "security_id": "TICKER:AGG",
+      "symbol_or_code": "AGG",
+      "canonical_name": "iShares Core U.S. Aggregate Bond ETF",
+      "asset_class": "ETF",
+      "stack_bucket": "bonds",
+      "risk_class": "fixed_income",
+      "is_scrapeable": true,
+      "quote_symbol": "AGG",
+      "quantity": 4000.0,
+      "stmt_price": 148.1294,
+      "market_value": 592517.6,
+      "value_date": "2026-03-31",
+      "cost_basis": 432000.0,
+      "acquisition_date": "2017-02-01"
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "fd752403b6d831a3"
+  }
+}

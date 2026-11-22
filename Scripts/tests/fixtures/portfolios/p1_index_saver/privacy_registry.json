@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "ai_shield": {
+    "mode": "identity_aliased",
+    "block_inapp_agy_cli": true,
+    "dob_granularity": "year_month",
+    "notes_policy": "translate"
+  },
+  "demo_mode": {
+    "enabled": false,
+    "scale_factor": 0.6,
+    "seed": "demo-2102",
+    "dob_granularity": "shift_years"
+  },
+  "mcp_server": {
+    "enabled": false
+  },
+  "synonyms": {
+    "Harbor Brokerage": [
+      "Harbor",
+      "HB"
+    ]
+  },
+  "entities": [],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "f3c875157999152f"
+  }
+}

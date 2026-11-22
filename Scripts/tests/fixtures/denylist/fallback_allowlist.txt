@@ -1,0 +1,16 @@
+# Literal fallbacks that are still open, as `<relpath>:<line>:<pattern-id>`.
+#
+# Each line is a place where an original-household literal still wins when the
+# configuration field is empty. These are the remaining members of the LL-01 family
+# recorded in .dev/SecurityAudit.html section 3.
+#
+# This list can only SHRINK:
+#   * a hit that is not listed fails `test_no_new_literal_fallback__has_been_introduced`
+#   * a listed line that stops matching fails `test_fallback_allowlist__has_no_stale_entries`
+#
+# So when a fix lands, the suite tells you to delete the line, and deleting it locks the
+# fix in. Line numbers move when a file is edited; refresh with:
+#
+#   PYTHONPATH=Scripts python3 -c "import sys;sys.path.insert(0,'Scripts');\
+#   from tests.support import env,scans;print('\n'.join(sorted(scans.scan_fallbacks(env.app_checkout_dir()))))"
+#

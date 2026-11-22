@@ -1,0 +1,81 @@
+{
+  "spec_version": 1,
+  "name": "p0_empty_household",
+  "seed": 20260001,
+  "as_of": "2026-11-16",
+  "title": "Fresh install with no statements",
+  "purpose": "A portfolio that has been created but never fed a statement. This is the state every new user starts in, and the state in which every literal fallback in the code becomes visible: with no primary equity symbol, no accounts and no Social Security history, anything the dashboard still displays came from a hard-coded default rather than from data.",
+  "exercises": [
+    "empty_state.render",
+    "empty_state.server_start",
+    "fallbacks.primary_symbol",
+    "fallbacks.social_security",
+    "fallbacks.yields",
+    "scenarios.default_only"
+  ],
+  "household": {
+    "name": "Nakamura Household",
+    "state": "WA",
+    "state_label": "Washington (no state income tax)",
+    "primary_equity_symbol": "",
+    "reference_annual_burn": 60000,
+    "retirement_annual_burn": 60000,
+    "tax_rates": {
+      "ltcg_top": 0.238,
+      "ordinary_top": 0.37,
+      "state_rate": 0.0,
+      "ssn_effective": 0.3145
+    }
+  },
+  "investors": [
+    {
+      "id": "inv_solo",
+      "name": "Ren Nakamura",
+      "birth": "1988-09-14",
+      "milestone_age": 85,
+      "rmd_owner": true
+    }
+  ],
+  "beneficiaries": [],
+  "accounts": [],
+  "market_prices": {},
+  "scenarios": [
+    {
+      "name": "Default",
+      "protected": true,
+      "active": true,
+      "notes_md": "Generated baseline for the empty-household fixture."
+    }
+  ],
+  "privacy": {
+    "ai_shield": "identity_aliased",
+    "demo_mode": { "enabled": false }
+  },
+  "invariants": [
+    {
+      "path": "has_portfolio",
+      "equals": true,
+      "note": "A configured-but-empty portfolio still counts as present.",
+      "source": "payload"
+    },
+    {
+      "path": "household_name",
+      "equals": "Nakamura Household",
+      "note": "Page title and header come from config, not from a literal.",
+      "source": "payload"
+    },
+    {
+      "path": "sim_asset_count",
+      "equals": 0,
+      "note": "No statements means no simulator buckets at all.",
+      "source": "payload_summary"
+    },
+    {
+      "path": "account_count",
+      "equals": 0,
+      "note": "No accounts are invented from defaults.",
+      "source": "payload_summary"
+    }
+  ],
+  "notes": "This fixture is the default for tests that do not declare a portfolio, so it is also the cheapest root to assemble."
+}

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AdvisorBot Documentation &amp; User Manual</title>
+  <link rel="icon" href="../Assets/default_badge.svg" />
+  <link rel="stylesheet" href="docs.css" />
+  <script>
+    // Immediate hash redirect before body renders if an anchor was targeted
+    (function () {
+      const hash = window.location.hash;
+      if (!hash) return;
+      const routes = {
+        // Chapter 1
+        "#ch1-portfolio-setup": "ch1-portfolio-setup.html#ch1-portfolio-setup",
+        "#portfolio-dir": "ch1-portfolio-setup.html#portfolio-dir",
+        "#llm-setup": "ch1-portfolio-setup.html#llm-setup",
+        "#statements-drop": "ch1-portfolio-setup.html#statements-drop",
+        "#portfolio-settings-audit": "ch1-portfolio-setup.html#portfolio-settings-audit",
+        "#agent-plugins": "ch1-portfolio-setup.html#agent-plugins",
+
+        // Chapter 2
+        "#ch2-page-walkthrough": "ch2-core-walkthrough.html#ch2-page-walkthrough",
+        "#page-positions": "ch2-core-walkthrough.html#page-positions",
+        "#page-grants": "ch2-core-walkthrough.html#page-grants",
+        "#page-simulator": "ch2-core-walkthrough.html#page-simulator",
+        "#page-social-security": "ch2-core-walkthrough.html#page-social-security",
+        "#page-scenarios": "ch2-core-walkthrough.html#page-scenarios",
+        "#page-settings": "ch2-core-walkthrough.html#page-settings",
+        "#holding-forecast-methodology": "ch2-core-walkthrough.html#holding-forecast-methodology",
+
+        // Chapter 3
+        "#ch3-security-privacy": "ch3-security-privacy.html#ch3-security-privacy",
+        "#sec-local-first": "ch3-security-privacy.html#sec-local-first",
+        "#sec-cross-tab": "ch3-security-privacy.html#sec-cross-tab",
+        "#sec-profiles": "ch3-security-privacy.html#sec-profiles",
+        "#sec-local-llm": "ch3-security-privacy.html#sec-local-llm",
+        "#sec-alias-table": "ch3-security-privacy.html#sec-alias-table",
+        "#sec-unsupported-banks": "ch3-security-privacy.html#sec-unsupported-banks",
+
+        // Chapter 4
+        "#ch4-advanced": "ch4-developer-agent.html#ch4-advanced",
+        "#adv-mcp": "ch4-developer-agent.html#adv-mcp",
+        "#adv-mcp-security": "ch4-developer-agent.html#adv-mcp-security",
+        "#adv-guardrails": "ch4-developer-agent.html#adv-guardrails",
+        "#adv-testing": "ch4-developer-agent.html#adv-testing"
+      };
+      if (routes[hash]) {
+        window.location.replace(routes[hash]);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <span>🛡️ AdvisorBot</span>
+      <span style="color: var(--muted); font-weight: normal;">|</span>
+      <span>Documentation &amp; User Manual</span>
+    </div>
+    <nav class="topbar-links">
+      <a class="nav-pill" href="../index.html">← Live Dashboard</a>
+      <a class="nav-pill active" href="index.html">User Guide</a>
+      <a class="nav-pill" href="readme.html">Top-Level README</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar Table of Contents -->
+    <aside class="toc" id="doc-toc">
+      <div class="toc-header">
+        <div class="toc-heading">Documentation Chapters</div>
+        <button type="button" class="toc-toggle-all-btn" id="toc-toggle-all" onclick="toggleAllChapters()" title="Toggle all chapters">Expand All</button>
+      </div>
+
+      <div class="toc-item">
+        <a href="index.html" class="toc-nav-link active">
+          <span style="font-size:14px;">📖</span>
+          <span>Overview &amp; Architecture</span>
+        </a>
+      </div>
+
+      <!-- Chapter 1 -->
+      <div class="toc-chapter-group" id="ch-group-1">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(1)" aria-label="Toggle Chapter 1 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch1-portfolio-setup.html" class="toc-chapter-link">
+            1. Setting Up Your Portfolio
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-dir">1.1 Create &amp; Complete Your Portfolio</a>
+          <a class="sub" href="ch1-portfolio-setup.html#llm-setup">1.2 Configuring AI &amp; Local LLMs</a>
+          <a class="sub" href="ch1-portfolio-setup.html#statements-drop">1.3 Dropping Financial Statements</a>
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-settings-audit">1.4 Settings Portfolio Audit</a>
+          <a class="sub" href="ch1-portfolio-setup.html#agent-plugins">1.5 Developing Custom Plugins</a>
+        </div>
+      </div>
+
+      <!-- Chapter 2 -->
+      <div class="toc-chapter-group" id="ch-group-2">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(2)" aria-label="Toggle Chapter 2 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch2-core-walkthrough.html" class="toc-chapter-link">
+            2. Core Application Walkthrough
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch2-core-walkthrough.html#page-positions">2.1 Positions &amp; Weekly Timeline</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-grants">2.2 Employee Stock &amp; Vesting</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-simulator">2.3 Retirement Simulator &amp; Drawdown</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-social-security">2.4 Income &amp; Expense (Social Security)</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-scenarios">2.5 Scenario Details &amp; Baselines</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-settings">2.6 Settings &amp; Preferences</a>
+          <a class="sub" href="ch2-core-walkthrough.html#holding-forecast-methodology">2.7 Holding Forecasts &amp; Baselines</a>
+        </div>
+      </div>
+
+      <!-- Chapter 3 -->
+      <div class="toc-chapter-group" id="ch-group-3">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(3)" aria-label="Toggle Chapter 3 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch3-security-privacy.html" class="toc-chapter-link">
+            3. Security &amp; Privacy Architecture
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch3-security-privacy.html#sec-local-first">3.1 Localhost &amp; Network Isolation</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-cross-tab">3.2 Protection From Browser Tabs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-profiles">3.3 The 3 AI Privacy Profiles</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-local-llm">3.4 100% Offline Local LLMs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-alias-table">3.5 Maintaining the Alias Table</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-unsupported-banks">3.6 Unsupported Banks &amp; Parsers</a>
+        </div>
+      </div>
+
+      <!-- Chapter 4 -->
+      <div class="toc-chapter-group" id="ch-group-4">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(4)" aria-label="Toggle Chapter 4 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch4-developer-agent.html" class="toc-chapter-link">
+            4. Developer &amp; Agent Integration
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp">4.1 External Agent MCP Integration</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp-security">4.2 MCP Security &amp; Injection Defense</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-guardrails">4.3 Engineering &amp; Privacy Guardrails</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-testing">4.4 Isolated Test Suite &amp; Verification</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      <h1>AdvisorBot User &amp; Architecture Manual</h1>
+      <p class="subtitle">Complete technical reference for setting up portfolios, statement ingestion plugins, tax-aware retirement drawdown modeling, and local-first data privacy.</p>
+
+      <div class="callout callout-info" style="margin-bottom:26px;">
+        <strong>Visual Guide &mdash; Portfolio vs. Scenario Color Coding:</strong>
+        <ul style="margin:6px 0 0;padding-left:20px;">
+          <li><strong>&#9881; Portfolio Settings (Slate):</strong> Household members, statements, tax jurisdiction, friendly names, and management fees &mdash; <em>shared across all scenarios</em>.</li>
+          <li><strong style="color:#c4b5fd;">&#9670; Scenario Inputs (Purple):</strong> Editable what-if assumptions (projected returns, half-lives, market corrections, spending/inflation overrides, scheduled events, and sell priority) &mdash; <em>saved per Scenario</em> (<code>&#8984;S</code>).</li>
+          <li><strong style="color:#fcd34d;">&#9733; Scenario Outcomes (Gold KPIs):</strong> Primary milestone results (<em>Milestone Wealth</em>, <em>Solvency</em>, and <em>Tax Efficiency</em>) recomputed from your <strong>&#9670;</strong> inputs and shown on Saved Scenario cards for side-by-side comparison.</li>
+        </ul>
+      </div>
+
+      <!-- Chapter Directory Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:20px;margin-bottom:38px;">
+        
+        <!-- Chapter 1 Card -->
+        <a href="ch1-portfolio-setup.html" class="chapter-hub-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="badge badge-blue">Chapter 1</span>
+            <span style="font-size:12px;color:var(--muted);">5 sections &bull; 8 min</span>
+          </div>
+          <h3>Setting Up Your Portfolio</h3>
+          <p>Initialize your workspace directory, configure local or cloud AI models, drop monthly statements, and collaborate with coding agents to build parser plugins.</p>
+          <div class="chapter-hub-pills">
+            <span class="chapter-hub-pill">📁 Portfolio Folder</span>
+            <span class="chapter-hub-pill">🤖 LLM Config</span>
+            <span class="chapter-hub-pill">📄 Statement Drop</span>
+            <span class="chapter-hub-pill">⚙️ Portfolio Audit</span>
+            <span class="chapter-hub-pill">🧩 Plugins</span>
+          </div>
+          <div class="chapter-hub-footer">
+            <span>Read Chapter 1</span>
+            <span>&rarr;</span>
+          </div>
+        </a>
+
+        <!-- Chapter 2 Card -->
+        <a href="ch2-core-walkthrough.html" class="chapter-hub-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="badge badge-green">Chapter 2</span>
+            <span style="font-size:12px;color:var(--muted);">7 sections &bull; 15 min</span>
+          </div>
+          <h3>Core Application Walkthrough</h3>
+          <p>Deep-dive into each screen: mark-to-market positions, equity grant releases, multi-decade retirement solvency, Social Security PIA estimation, and evidence-backed holding forecasts.</p>
+          <div class="chapter-hub-pills">
+            <span class="chapter-hub-pill">📈 Weekly Timeline</span>
+            <span class="chapter-hub-pill">🎁 Stock Grants</span>
+            <span class="chapter-hub-pill">🏖️ Solvency Sim</span>
+            <span class="chapter-hub-pill">🏛️ Social Security</span>
+            <span class="chapter-hub-pill">📊 Empirical Forecasts</span>
+          </div>
+          <div class="chapter-hub-footer">
+            <span>Read Chapter 2</span>
+            <span>&rarr;</span>
+          </div>
+        </a>
+
+        <!-- Chapter 3 Card -->
+        <a href="ch3-security-privacy.html" class="chapter-hub-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="badge badge-purple">Chapter 3</span>
+            <span style="font-size:12px;color:var(--muted);">6 sections &bull; 10 min</span>
+          </div>
+          <h3>Security &amp; Privacy Architecture</h3>
+          <p>Inspect AdvisorBot's defense-in-depth model: strict 127.0.0.1 binding, DNS rebinding guards, Mode B/C Privacy Shield obfuscation, offline Ollama execution, and PII protection.</p>
+          <div class="chapter-hub-pills">
+            <span class="chapter-hub-pill">🛡️ Localhost Binding</span>
+            <span class="chapter-hub-pill">🔑 Session Isolation</span>
+            <span class="chapter-hub-pill">🎭 Privacy Profiles</span>
+            <span class="chapter-hub-pill">📴 Offline LLMs</span>
+            <span class="chapter-hub-pill">🔒 Alias Registry</span>
+          </div>
+          <div class="chapter-hub-footer">
+            <span>Read Chapter 3</span>
+            <span>&rarr;</span>
+          </div>
+        </a>
+
+        <!-- Chapter 4 Card -->
+        <a href="ch4-developer-agent.html" class="chapter-hub-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="badge badge-amber">Chapter 4</span>
+            <span style="font-size:12px;color:var(--muted);">4 sections &bull; 10 min</span>
+          </div>
+          <h3>Developer &amp; Agent Integration</h3>
+          <p>Integrate external desktop agents (Claude Desktop, Cursor, Gemini CLI) via the Model Context Protocol over local IPC, with threat modeling, prompt injection defense, and engineering guardrails.</p>
+          <div class="chapter-hub-pills">
+            <span class="chapter-hub-pill">🔌 MCP Server</span>
+            <span class="chapter-hub-pill">💻 Local IPC</span>
+            <span class="chapter-hub-pill">🛡️ Injection Defense</span>
+            <span class="chapter-hub-pill">📦 Engineering Guardrails</span>
+          </div>
+          <div class="chapter-hub-footer">
+            <span>Read Chapter 4</span>
+            <span>&rarr;</span>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- System Architecture & Principles -->
+      <h2>Core System Architecture</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h4>🔒 1. Local-First Confidentiality</h4>
+          <p>All statements, API credentials, portfolio databases, and saved scenarios reside strictly on your local disk inside your private portfolio directory. The local web server binds exclusively to <code>127.0.0.1</code>, enforces strict same-origin guards, and authenticates browser sessions automatically via restricted local session credentials.</p>
+        </div>
+        <div class="card">
+          <h4>📊 2. Evidence-Backed Empirical Baselines</h4>
+          <p>Rather than guessing annual investment returns, AdvisorBot calculates holding growth rates and 7-class risk profiles from 10-year weekly Yahoo Finance total-return history, statement-reported yields to maturity (YTM), contractual fixed credited APYs, or official carrier returns.</p>
+        </div>
+        <div class="card">
+          <h4>⚡ 3. Multi-Scenario Retirement Engine</h4>
+          <p>Simulate multi-decade cashflows with deterministic and stochastic models: progressive Federal &amp; State tax brackets, IRC §86 Social Security provisional income, IRS §72 LIFO annuity rules, SECURE 2.0 RMDs (age 73 or 75), HIFO equity lot depletion, Monte Carlo solvency fans, and 1929–2025 multi-asset historical cohorts.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <strong>Getting Started:</strong> To set up your first household workspace and ingest financial statements, begin with <a href="ch1-portfolio-setup.html" style="font-weight:600;">Chapter 1: Setting Up Your Portfolio &rarr;</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      initDocsPage(0);
+    });
+  </script>
+</body>
+</html>

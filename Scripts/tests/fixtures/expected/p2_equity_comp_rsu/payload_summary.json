@@ -1,0 +1,41 @@
+{
+  "_as_of": "2026-11-16",
+  "_generated_by": "tests.generate",
+  "_spec_sha": "22d3d59ce37a565f",
+  "account.HB-7101.child_count": 3,
+  "account.HB-7101.current_value": 288465.64,
+  "account.HB-7101.institution": "Harbor Brokerage",
+  "account.HB-7102.child_count": 1,
+  "account.HB-7102.current_value": 35879.4,
+  "account.HB-7102.institution": "Harbor Brokerage",
+  "account.HB-7103.child_count": 1,
+  "account.HB-7103.current_value": 121028.94,
+  "account.HB-7103.institution": "Harbor Brokerage",
+  "account.NB-2210.child_count": 1,
+  "account.NB-2210.current_value": 328800.0,
+  "account.NB-2210.institution": "Northbank Retirement",
+  "account_count": 4,
+  "grant_symbols": [
+    "VNTG"
+  ],
+  "has_portfolio": true,
+  "household_name": "Okafor-Lindqvist Household",
+  "institutions": [
+    "Harbor Brokerage",
+    "Northbank Retirement"
+  ],
+  "investor_count": 2,
+  "sim_asset_count": 9,
+  "sim_asset_ids": [
+    "stock_vntg_high_basis",
+    "future_unvested_vntg",
+    "voo_HB_7101",
+    "nbtdf2045_NB_2210",
+    "vbtlx_HB_7102",
+    "stock_vntg_low_basis",
+    "harbor_vntg_HB_7101",
+    "cash_sweeps",
+    "vtsax_HB_7103"
+  ],
+  "today_iso": "2026-11-16"
+}

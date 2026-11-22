@@ -1,0 +1,14 @@
+{
+  "_as_of": "2026-11-16",
+  "_generated_by": "tests.generate",
+  "_spec_sha": "741fbb455018473f",
+  "account_count": 0,
+  "grant_symbols": [],
+  "has_portfolio": true,
+  "household_name": "Nakamura Household",
+  "institutions": [],
+  "investor_count": 1,
+  "sim_asset_count": 0,
+  "sim_asset_ids": [],
+  "today_iso": "2026-11-16"
+}

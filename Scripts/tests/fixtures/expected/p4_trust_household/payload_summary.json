@@ -1,0 +1,41 @@
+{
+  "_as_of": "2026-11-16",
+  "_generated_by": "tests.generate",
+  "_spec_sha": "fd752403b6d831a3",
+  "account.CB-6200.child_count": 3,
+  "account.CB-6200.current_value": 2482643.76,
+  "account.CB-6200.institution": "Cedarline Wealth",
+  "account.CB-6201.child_count": 1,
+  "account.CB-6201.current_value": 627470.8,
+  "account.CB-6201.institution": "Cedarline Wealth",
+  "account.HB-8800.child_count": 2,
+  "account.HB-8800.current_value": 884951.12,
+  "account.HB-8800.institution": "Harbor Brokerage",
+  "account.HB-8801.child_count": 1,
+  "account.HB-8801.current_value": 172192.44,
+  "account.HB-8801.institution": "Harbor Brokerage",
+  "account.HB-8900.child_count": 1,
+  "account.HB-8900.current_value": 44278.06,
+  "account.HB-8900.institution": "Harbor Brokerage",
+  "account_count": 5,
+  "grant_symbols": [],
+  "has_portfolio": true,
+  "household_name": "Varga Family Trust",
+  "institutions": [
+    "Cedarline Wealth",
+    "Harbor Brokerage"
+  ],
+  "investor_count": 3,
+  "sim_asset_count": 8,
+  "sim_asset_ids": [
+    "iefa_HB_8800",
+    "itot_CB_6200",
+    "itot_HB_8900",
+    "agg_CB_6201",
+    "cedarline_klrn_CB_6200",
+    "harbor_klrn_HB_8800",
+    "cash_sweeps",
+    "itot_HB_8801"
+  ],
+  "today_iso": "2026-11-16"
+}

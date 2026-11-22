@@ -1,0 +1,81 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Quill & Quire Securities",
+  "account_id": "QQ-0001",
+  "account_name": "Quill & Quire Taxable",
+  "account_type": "BROKERAGE",
+  "tax_status": "TAXABLE",
+  "display_order": 10,
+  "period_start": "2026-09-01",
+  "as_of_date": "2026-09-30",
+  "reported_total": 117413.65,
+  "positions": [
+    {
+      "security_id": "TICKER:QX",
+      "symbol_or_code": "QX",
+      "canonical_name": "Quixote Industries');alert(1)//",
+      "asset_class": "EQUITY",
+      "stack_bucket": "stocks",
+      "risk_class": "single_stock",
+      "is_scrapeable": true,
+      "quote_symbol": "QX",
+      "quantity": 1500.0,
+      "stmt_price": 38.4091,
+      "market_value": 57613.65,
+      "value_date": "2026-09-30",
+      "cost_basis": 46500.0,
+      "acquisition_date": "2022-01-04"
+    },
+    {
+      "security_id": "TICKER:ZQZ",
+      "symbol_or_code": "ZQZ",
+      "canonical_name": "Zero Quantity Holding <script>alert(2)</script>",
+      "asset_class": "EQUITY",
+      "stack_bucket": "stocks",
+      "risk_class": "single_stock",
+      "is_scrapeable": true,
+      "quote_symbol": "ZQZ",
+      "quantity": 0.0,
+      "stmt_price": 8.8,
+      "market_value": 0.0,
+      "value_date": "2026-09-30",
+      "cost_basis": 0.0,
+      "acquisition_date": "2023-05-01"
+    },
+    {
+      "security_id": "TICKER:NOBASIS",
+      "symbol_or_code": "NOBASIS",
+      "canonical_name": "Fund With No Reported Basis",
+      "asset_class": "MUTUAL_FUND",
+      "stack_bucket": "stocks",
+      "risk_class": "broad_equity",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1200.0,
+      "stmt_price": null,
+      "market_value": 64000.0,
+      "value_date": "2026-09-30",
+      "cost_basis": 64000.0
+    },
+    {
+      "security_id": "CASH:QQ-0001",
+      "symbol_or_code": "USD",
+      "canonical_name": "Overdrawn Settlement Cash",
+      "asset_class": "CASH",
+      "stack_bucket": "cash",
+      "risk_class": "cash_fixed",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1.0,
+      "stmt_price": null,
+      "market_value": -4200.0,
+      "value_date": "2026-09-30",
+      "yield_pct": null
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "a7359e63b0b0e876"
+  }
+}

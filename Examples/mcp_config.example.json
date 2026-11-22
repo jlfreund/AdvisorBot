@@ -1,0 +1,11 @@
+{
+  "_comment": "Register the holdings-tools MCP server in Claude Desktop (macOS: ~/Library/Application Support/Claude/claude_desktop_config.json | Linux: ~/.config/Claude/claude_desktop_config.json | Windows: %APPDATA%\\Claude\\claude_desktop_config.json), Cursor (.cursor/mcp.json), or Gemini CLI (~/.gemini/settings.json). On Windows, set command to C:\\path\\to\\AdvisorBot\\.venv\\Scripts\\python.exe and args to C:\\path\\to\\AdvisorBot\\Scripts\\mcp_server.py.",
+  "mcpServers": {
+    "holdings-tools": {
+      "command": "/ABSOLUTE/PATH/TO/AdvisorBot/.venv/bin/python",
+      "args": [
+        "/ABSOLUTE/PATH/TO/AdvisorBot/Scripts/mcp_server.py"
+      ]
+    }
+  }
+}

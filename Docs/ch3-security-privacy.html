@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 3: Security &amp; Privacy Architecture — AdvisorBot Documentation</title>
+  <link rel="icon" href="../Assets/default_badge.svg" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <span>🛡️ AdvisorBot</span>
+      <span style="color: var(--muted); font-weight: normal;">|</span>
+      <span>Documentation &amp; User Manual</span>
+    </div>
+    <nav class="topbar-links">
+      <a class="nav-pill" href="../index.html">← Live Dashboard</a>
+      <a class="nav-pill active" href="index.html">User Guide</a>
+      <a class="nav-pill" href="readme.html">Top-Level README</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar Table of Contents -->
+    <aside class="toc" id="doc-toc">
+      <div class="toc-header">
+        <div class="toc-heading">Documentation Chapters</div>
+        <button type="button" class="toc-toggle-all-btn" id="toc-toggle-all" onclick="toggleAllChapters()" title="Toggle all chapters">Expand All</button>
+      </div>
+
+      <div class="toc-item">
+        <a href="index.html" class="toc-nav-link">
+          <span style="font-size:14px;">📖</span>
+          <span>Overview &amp; Architecture</span>
+        </a>
+      </div>
+
+      <!-- Chapter 1 -->
+      <div class="toc-chapter-group" id="ch-group-1">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(1)" aria-label="Toggle Chapter 1 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch1-portfolio-setup.html" class="toc-chapter-link">
+            1. Setting Up Your Portfolio
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-dir">1.1 Create &amp; Complete Your Portfolio</a>
+          <a class="sub" href="ch1-portfolio-setup.html#llm-setup">1.2 Configuring AI &amp; Local LLMs</a>
+          <a class="sub" href="ch1-portfolio-setup.html#statements-drop">1.3 Dropping Financial Statements</a>
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-settings-audit">1.4 Settings Portfolio Audit</a>
+          <a class="sub" href="ch1-portfolio-setup.html#agent-plugins">1.5 Developing Custom Plugins</a>
+        </div>
+      </div>
+
+      <!-- Chapter 2 -->
+      <div class="toc-chapter-group" id="ch-group-2">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(2)" aria-label="Toggle Chapter 2 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch2-core-walkthrough.html" class="toc-chapter-link">
+            2. Core Application Walkthrough
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch2-core-walkthrough.html#page-positions">2.1 Positions &amp; Weekly Timeline</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-grants">2.2 Employee Stock &amp; Vesting</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-simulator">2.3 Retirement Simulator &amp; Drawdown</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-social-security">2.4 Income &amp; Expense (Social Security)</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-scenarios">2.5 Scenario Details &amp; Baselines</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-settings">2.6 Settings &amp; Preferences</a>
+          <a class="sub" href="ch2-core-walkthrough.html#holding-forecast-methodology">2.7 Holding Forecasts &amp; Baselines</a>
+        </div>
+      </div>
+
+      <!-- Chapter 3 -->
+      <div class="toc-chapter-group" id="ch-group-3">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(3)" aria-label="Toggle Chapter 3 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch3-security-privacy.html" class="toc-chapter-link active">
+            3. Security &amp; Privacy Architecture
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="#sec-local-first">3.1 Localhost &amp; Network Isolation</a>
+          <a class="sub" href="#sec-cross-tab">3.2 Protection From Browser Tabs</a>
+          <a class="sub" href="#sec-profiles">3.3 The 3 AI Privacy Profiles</a>
+          <a class="sub" href="#sec-local-llm">3.4 100% Offline Local LLMs</a>
+          <a class="sub" href="#sec-alias-table">3.5 Maintaining the Alias Table</a>
+          <a class="sub" href="#sec-unsupported-banks">3.6 Unsupported Banks &amp; Parsers</a>
+        </div>
+      </div>
+
+      <!-- Chapter 4 -->
+      <div class="toc-chapter-group" id="ch-group-4">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(4)" aria-label="Toggle Chapter 4 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch4-developer-agent.html" class="toc-chapter-link">
+            4. Developer &amp; Agent Integration
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp">4.1 External Agent MCP Integration</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp-security">4.2 MCP Security &amp; Injection Defense</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-guardrails">4.3 Engineering &amp; Privacy Guardrails</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-testing">4.4 Isolated Test Suite &amp; Verification</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      <div class="chapter-banner">
+        <div class="chapter-badge-wrap">
+          <span class="badge badge-purple">Chapter 3</span>
+          <span class="badge badge-rose">Security &amp; Privacy</span>
+        </div>
+        <h1 style="margin-bottom:6px;">Security &amp; Privacy Architecture</h1>
+        <p class="subtitle" style="margin-bottom:0;">Defense-in-depth protection: localhost binding, persistent <code>0600</code> session secrets, server-enforced Privacy Shield profiles, and offline AI execution.</p>
+      </div>
+
+      <section id="ch3-security-privacy">
+        <p>Personal financial data requires rigorous confidentiality guarantees. AdvisorBot implements a defense-in-depth security model designed specifically for local execution.</p>
+
+        <h3 id="sec-local-first">3.1 Localhost &amp; Network Isolation</h3>
+        <p>AdvisorBot is strictly local software:</p>
+        <ul>
+          <li><strong>Strict 127.0.0.1 Binding</strong>: The local web server binds strictly to the loopback interface (<code>127.0.0.1</code>) and refuses external LAN connections.</li>
+          <li><strong>Zero Cloud Telemetry &amp; Sidecar-Only Quotes</strong>: No analytics scripts, tracking beacons, or third-party fonts are bundled. Live stock quotes are fetched solely through the local server proxy (<code>GET /api/quote</code>)—never via third-party browser CORS proxies.</li>
+          <li><strong>Owner-Only Local Storage &amp; Dynamic Aliasing</strong>: Portfolio SQLite databases and configuration files are restricted to owner-only permissions (<code>0600</code>) and display your real account names and contract numbers in Live View—automatically aliasing them to realistic personas in <strong>Demo Mode</strong> and translating them to <code>ACCT_N</code> / <code>CONTRACT_N</code> tokens when <strong>AI Chat Privacy Shield</strong> obfuscation (Mode B or C) is enabled, while exported view-models trim investor/beneficiary birthdates to <code>YYYY-MM</code>.</li>
+          <li><strong>Git Hygiene &amp; Sensitive File Exclusions</strong>: The repository ships without portfolio data, and <code>.gitignore</code> excludes private portfolio folders, API credentials, session tokens, and generated HTML snapshots so personal records and keys are never committed to Git.</li>
+        </ul>
+
+        <h3 id="sec-cross-tab">3.2 Protection From Browser Inspection, Cross-Tab &amp; Local Loopback Attacks</h3>
+        <p>AdvisorBot isolates <code>advisorbot_server.py</code> at <code>http://127.0.0.1:8765</code> using same-origin serving, Host/Origin/CSRF validation, and persistent local session secrets:</p>
+        <div class="card-grid">
+          <div class="card">
+            <h4>🛡️ Same-Origin Serving &amp; Zero CORS Exposure</h4>
+            <p>The dashboard is served strictly same-origin directly from the local server (<code>http://127.0.0.1:8765/</code>). All <code>Access-Control-Allow-*</code> CORS headers and Chrome's <code>Access-Control-Allow-Private-Network</code> header are completely omitted, and mutating <code>POST</code>/<code>DELETE</code> routes enforce same-port <code>Origin</code>, <code>Sec-Fetch-Site</code>, and JSON/<code>X-Requested-With</code> CSRF checks.</p>
+          </div>
+          <div class="card">
+            <h4>🔑 Persistent 0600 Secret &amp; 1-Year Strict Cookies</h4>
+            <p>A 256-bit machine-local secret persisted in <code>Data/.session_secret</code> (mode <code>0600</code>, mirrored at runtime to <code>Data/.session_token</code> for local CLI tools and unlinked on shutdown) gates the dashboard (<code>/</code> and <code>/index.html</code>), every API endpoint, statement files, documentation, and scenario snapshots via a 1-year <code>SameSite=Strict</code> <code>HttpOnly</code> cookie (bootstrapped once via <code>/?token=…</code> across both <code>127.0.0.1</code> and <code>localhost</code>) or <code>X-Session-Token</code> header. Only <code>/api/health</code>, <code>/favicon.ico</code>, and top-level repository docs (<code>README.md</code>, <code>DISCLAIMER.md</code>, <code>LICENSE</code>, <code>NOTICE</code>) are unauthenticated.</p>
+          </div>
+          <div class="card">
+            <h4>🌐 Loopback Host &amp; DNS Rebinding Defense</h4>
+            <p>Every incoming request validates both the HTTP <code>Host</code> header and port against the bound loopback listener (<code>127.0.0.1</code> or <code>localhost</code>), preventing DNS rebinding attacks where an external malicious domain resolves to the local port.</p>
+          </div>
+          <div class="card">
+            <h4>🔒 Sandboxed Execution &amp; No Ambient CLI Privileges</h4>
+            <p>The server executes with standard user permissions, invokes subprocesses solely via explicit argv lists without <code>shell=True</code>, and disables permission-bypass flags and slash commands on optional headless CLI calls.</p>
+          </div>
+        </div>
+
+        <p>If a saved privacy policy is unreadable or contains an unsupported mode, private dashboard requests and AI calls stop until the portfolio’s <code>privacy_registry.json</code> is restored. After switching households or Demo Mode, reopen the dashboard if a stale tab reports that its portfolio changed.</p>
+        <h4>Why the "Session Authentication Required" Screen Exists &amp; When It Is Needed</h4>
+        <p>If you visit <code>http://127.0.0.1:8765/</code> in a browser that does not yet carry an AdvisorBot session cookie, the server returns a <em>Session Authentication Required</em> screen instructing you to run <code>advisorbot_server.py --open</code> rather than automatically logging the browser in.</p>
+        <div class="callout callout-info">
+          <strong>Threat Boundary Behind the One-Time Bootstrap:</strong>
+          <ul style="margin: 8px 0 0; padding-left: 20px;">
+            <li><strong>Trusted workstation.</strong> The session secret protects requests from callers without a credential. Browser cookies are shared across ports on the same hostname. Use AdvisorBot where the local web services your browser visits are trusted.</li>
+            <li><strong>Why normal restarts do NOT prompt you again:</strong> Unlike ephemeral per-process tokens, <code>Data/.session_secret</code> persists across server restarts and pairs with a 1-year <code>HttpOnly; SameSite=Strict</code> cookie. Open browser tabs and bookmarks reconnect seamlessly whenever <code>advisorbot_server.py</code> stops and restarts.</li>
+            <li><strong>When you will see the screen:</strong>
+              <ol style="margin: 6px 0 0; padding-left: 20px;">
+                <li>Opening AdvisorBot for the first time in a new browser, browser profile, or Private/Incognito window.</li>
+                <li>Switching hostnames between <code>http://127.0.0.1:8765/</code> and <code>http://localhost:8765/</code> (browsers maintain separate cookie jars for <code>127.0.0.1</code> vs. <code>localhost</code>—bookmarking <code>http://127.0.0.1:8765/</code> avoids hostname mismatches).</li>
+                <li>After clearing browser cookies or explicitly revoking sessions via <code>advisorbot_server.py --rotate-token</code>.</li>
+              </ol>
+            </li>
+            <li><strong>Browser sign-in.</strong> Run <code>python3 Scripts/advisorbot_server.py --open</code> to open the dashboard, including when this checkout’s server is already running. The launcher verifies the instance before opening the browser. If another application owns the port, choose a different port.</li>
+            <li><strong>What to bookmark.</strong> Bookmark the dashboard after sign-in. A launcher link works once and remains available until used or until that server stops. The browser stores the signed cookie automatically and reconnects across ordinary restarts. An older valid cookie is upgraded automatically on a private request. If a new profile or cleared cookies require sign-in, run <code>--open</code> again in the same browser profile. Leave any tab with unsaved edits open and retry Save there.</li>
+          </ul>
+        </div>
+
+        <h3 id="sec-profiles">3.3 The 3 AI Privacy Profiles</h3>
+        <p>When using the in-page AI Financial Assistant or MCP tools, AdvisorBot translates tool inputs and outputs according to the active Privacy Shield mode (Mode B performs reversible, session-stable pseudonymisation — real names, accounts, institutions, and primary employer symbols are aliased, while exact dollar figures and year-month birthdates remain unscaled for accurate tax/RMD modeling):</p>
+
+        <!-- Privacy Table Legend -->
+        <div class="table-legend">
+          <span style="font-weight: 600; color: #fff;">Legend:</span>
+          <span class="legend-item"><span class="legend-chip legend-clear"></span> <strong>Clear Text (Green)</strong> — real unmasked data sent</span>
+          <span class="legend-item"><span class="legend-chip legend-obfuscated"></span> <strong>Obfuscated / Perturbed (Yellow)</strong> — synthetic aliases or scaled values</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Profile</th>
+              <th>Names &amp; Institutions</th>
+              <th>Dollar Amounts</th>
+              <th>Dates &amp; Birthdays</th>
+              <th>Recommended Use Case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Mode A: Clear Text</strong></td>
+              <td class="cell-clear">Real names &amp; tickers</td>
+              <td class="cell-clear">Exact dollar values</td>
+              <td class="cell-clear">Exact birthdates</td>
+              <td>Local offline LLMs (Ollama) or trusted internal models.</td>
+            </tr>
+            <tr>
+              <td><strong>Mode B: Obfuscated Names (Pseudonymised)</strong></td>
+              <td class="cell-obfuscated">Reversible session-stable aliases (e.g. "Apex Corp", "PRIMARY_EQ")</td>
+              <td class="cell-clear">Exact dollar values</td>
+              <td class="cell-obfuscated">Year-month birthdates (<code>YYYY-MM</code>, day masked)</td>
+              <td>Cloud models when exact tax-bracket and RMD math is required while masking family/account/employer identifiers. Note: exact dollar magnitudes remain visible.</td>
+            </tr>
+            <tr>
+              <td><strong>Mode C: Obfuscated Names &amp; Values</strong></td>
+              <td class="cell-obfuscated">Synthetic aliases</td>
+              <td class="cell-obfuscated">Multiplied by your configured deterministic Portfolio Value Scale Factor (e.g. 0.35x)</td>
+              <td class="cell-obfuscated">Shifted birth years (configurable <code>&plusmn;N</code> yr offset; day masked to <code>YYYY-MM</code>)</td>
+              <td>
+                Maximum privacy with external cloud AI. Protects exact net worth, birth years, and family identities.
+                <div style="margin-top: 6px; padding: 6px 9px; background: rgba(244, 63, 94, 0.14); border: 1px solid rgba(244, 63, 94, 0.4); border-radius: 6px; color: #fda4af; font-size: 12px; line-height: 1.4;">
+                  <strong style="color: #f43f5e;">⚠️ Warning:</strong> AI Chat cannot reason accurately about dollar-threshold tax questions or exact RMD / Social Security start years in this mode, because progressive tax brackets, NIIT thresholds, Social Security provisional-income tiers, and age-based milestones depend on unscaled dollar magnitudes and unshifted birth years.
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 id="sec-local-llm">3.4 100% Offline Local LLMs (Ollama &amp; LM Studio)</h3>
+        <p>For complete privacy, you can run open-weights models on your own computer across macOS, Linux, and Windows. AdvisorBot natively supports any OpenAI-compatible local server:</p>
+        <div class="platform-variants">
+          <div class="platform-variant" data-os="macos">
+            <div class="platform-variant-header">
+              <span>macOS</span>
+              <span class="platform-variant-shell">Terminal (zsh / bash)</span>
+            </div>
+            <pre><code># 1. Install (if needed) &amp; start Ollama with your preferred model
+brew install ollama
+ollama run llama3.1
+
+# 2. Configure AdvisorBot from the repo root
+mkdir -p Data/Config/LLM
+cp Examples/llm_config.local_ollama.json Data/Config/LLM/ollama.json
+
+# 3. Open Settings &gt; Privacy &amp; AI Security and select your local Ollama model.</code></pre>
+          </div>
+          <div class="platform-variant" data-os="linux">
+            <div class="platform-variant-header">
+              <span>Linux</span>
+              <span class="platform-variant-shell">Terminal (bash / zsh)</span>
+            </div>
+            <pre><code># 1. Install (if needed) &amp; start Ollama with your preferred model
+curl -fsSL https://ollama.com/install.sh | sh
+ollama run llama3.1
+
+# 2. Configure AdvisorBot from the repo root
+mkdir -p Data/Config/LLM
+cp Examples/llm_config.local_ollama.json Data/Config/LLM/ollama.json
+
+# 3. Open Settings &gt; Privacy &amp; AI Security and select your local Ollama model.</code></pre>
+          </div>
+          <div class="platform-variant" data-os="windows">
+            <div class="platform-variant-header">
+              <span>Windows</span>
+              <span class="platform-variant-shell">PowerShell</span>
+            </div>
+            <pre><code># 1. Install (if needed) &amp; start Ollama with your preferred model
+winget install Ollama.Ollama
+ollama run llama3.1
+
+# 2. Configure AdvisorBot from the repo root
+New-Item -ItemType Directory -Force -Path Data\Config\LLM | Out-Null
+Copy-Item Examples\llm_config.local_ollama.json Data\Config\LLM\ollama.json
+
+# 3. Open Settings &gt; Privacy &amp; AI Security and select your local Ollama model.</code></pre>
+          </div>
+        </div>
+
+        <h3 id="sec-alias-table">3.5 Maintaining the Alias &amp; Synonym Table</h3>
+        <p>The <strong>Alias &amp; Synonym Registry</strong> is a unified substitution dictionary used to replace real identifying names and their common synonyms with realistic, synthetic pseudonyms. Crucially, this table is <strong>shared by both AI Chat Obfuscation (Modes B &amp; C) and Demo Mode</strong>. In AI Chat, aliases ensure cloud models never see real personal names or account identifiers; in Demo Mode, the same aliases are rendered directly across the on-screen dashboard and tables for privacy-safe screen shares and presentations.</p>
+
+        <h4>Algorithmic Generation &amp; Entity Seed Pools</h4>
+        <p>When a portfolio is initialized or updated, AdvisorBot automatically populates the table using a deterministic pseudonymization algorithm:</p>
+        <ul>
+          <li><strong>Entity Extraction &amp; Synonym Mapping</strong>: The ingestion engine extracts every primary entity from your portfolio (investors, beneficiaries, employers, stock tickers, financial institutions, insurance carriers, and account numbers) and pairs each with its common variations and synonyms (e.g., <em>"Morgan Stanley"</em>, <em>"MS"</em>, and <em>"Morgan Stanley &amp; Co."</em> all map to the same alias).</li>
+          <li><strong>Domain-Aware Synthetic Pools</strong>: Each real entity is categorized by type and paired with a realistic replacement drawn deterministically from large, curated synthetic pools (including 20 bank institutions, 200 synthetic equities with realistic tickers, 25 mutual funds, 12 asset managers, and 10 insurance carriers).</li>
+          <li><strong>Deterministic Stable Seeding</strong>: Assignments are calculated using a stable hash seed. An entity always receives the exact same synthetic alias across repeated runs and server restarts, preserving coherent financial narratives without random drift.</li>
+        </ul>
+
+        <h4>Inspecting &amp; Editing the Registry</h4>
+        <p>Located under <strong>Settings &gt; Privacy &amp; AI Security &gt; Alias &amp; Synonym Registry</strong>, this interactive collapsible panel allows you to inspect every active alias pair:</p>
+        <ul>
+          <li><strong>Bidirectional Translation</strong>: When the AI Assistant answers, the client-side UI translates the aliases back into real names in the live chat transcript so you read natural responses.</li>
+          <li><strong>Manual Customization</strong>: You can directly edit any alias or synonym in the table. User customizations are persisted to your portfolio's local configuration, taking precedence over default algorithmic assignments.</li>
+        </ul>
+
+        <h3 id="sec-unsupported-banks">3.6 Unsupported Banks &amp; Statement Parser Privacy</h3>
+        <p>Constructing your portfolio from statements issued by unsupported banks or financial institutions will require the development of new Python script parsers to ingest those statements into your portfolio SQLite database. Unless you want to write those parser scripts by hand from scratch, you will need to share your bank statements with an AI coding agent (such as Claude, Gemini, Antigravity, or Cursor) so the agent can study the visual formatting, table layouts, and text streams of the document and develop a new Python parser plugin to ingest the file into the application database.</p>
+        <p>While the resulting parser plugin runs 100% locally on your machine once generated, sharing raw statements with an external cloud AI agent during the development phase exposes the financial records, transaction histories, and identifiers contained in those files. To help reduce this privacy exposure across the community over time, users are encouraged to share their sanitized, generic parser scripts in the project's Git repository. As community contributions expand the library of built-in institution parsers, future users will be able to ingest their statements out-of-the-box without ever needing to expose their private financial documents to an AI agent to build custom parsers.</p>
+
+        <div class="callout callout-info">
+          <strong>🔒 Best Practices When Collaborating With AI on Parsers:</strong>
+          <ul style="margin: 8px 0 0; padding-left: 20px;">
+            <li><strong>Redact Sensitive PII First</strong>: Before sharing an unsupported statement with a cloud AI model, redact your name, street address, account numbers, and Social Security / Tax ID numbers using a PDF editor or by blacking out personal identifiers. The AI agent only needs to understand the table headers, line-item column order, and numerical delimiters to write an accurate parser.</li>
+            <li><strong>Use Local Offline LLMs When Feasible</strong>: You can point your coding agent to an offline local model (via Ollama or LM Studio) to inspect the statement and write the parser entirely on your local machine with zero external network transmission.</li>
+            <li><strong>Share Generic Parsers Upstream</strong>: When submitting your parser script to the repository, ensure the script contains only generalized parsing logic and regex pattern matching, with no hardcoded personal account numbers or personal transaction data.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Chapter Pagination Footer -->
+      <div class="chapter-nav-footer">
+        <a href="ch2-core-walkthrough.html" class="chapter-nav-btn prev">
+          <span class="dir-label">← Previous Chapter</span>
+          <span class="title-label">Chapter 2: Core Application Walkthrough</span>
+        </a>
+        <a href="ch4-developer-agent.html" class="chapter-nav-btn next">
+          <span class="dir-label">Next Chapter →</span>
+          <span class="title-label">Chapter 4: Developer &amp; Agent Integration</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      initDocsPage(3);
+    });
+  </script>
+</body>
+</html>

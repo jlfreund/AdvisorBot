@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "active_id": "001",
+  "next_seq": 6,
+  "models": [
+    {
+      "id": "001",
+      "name": "Default",
+      "file": "001_default.json",
+      "snapshot": null,
+      "created_at": "2026-11-16T09:00:00+00:00",
+      "updated_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
+      "id": "002",
+      "name": "Ilona's Default",
+      "file": "002_ilona_s_default.json",
+      "snapshot": null,
+      "created_at": "2026-11-16T09:00:00+00:00",
+      "updated_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
+      "id": "003",
+      "name": "Gift To Noa At 21",
+      "file": "003_gift_to_noa_at_21.json",
+      "snapshot": null,
+      "created_at": "2026-11-16T09:00:00+00:00",
+      "updated_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
+      "id": "004",
+      "name": "Sell Concentrated Position 2028",
+      "file": "004_sell_concentrated_position_2028.json",
+      "snapshot": null,
+      "created_at": "2026-11-16T09:00:00+00:00",
+      "updated_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
+      "id": "005",
+      "name": "Compare Baseline",
+      "file": "005_compare_baseline.json",
+      "snapshot": null,
+      "created_at": "2026-11-16T09:00:00+00:00",
+      "updated_at": "2026-11-16T09:00:00+00:00"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "_as_of": "2026-11-16",
+  "_generated_by": "tests.generate",
+  "_spec_sha": "fd752403b6d831a3",
+  "demo_enabled": false,
+  "entities.account": 5,
+  "entities.beneficiary": 1,
+  "entities.custodian": 2,
+  "entities.equity": 4,
+  "entities.household": 2,
+  "entities.investor": 3,
+  "entities.scenario": 2,
+  "entities.trust": 1,
+  "entity_count": 20,
+  "shield_mode": "identity_aliased"
+}

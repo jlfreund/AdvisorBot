@@ -1,0 +1,266 @@
+{
+  "spec_version": 1,
+  "name": "p5_adversarial",
+  "seed": 20260506,
+  "as_of": "2026-11-16",
+  "title": "Hostile and malformed data",
+  "purpose": "Everything a portfolio folder should survive but no well-behaved fixture contains: script payloads in holding and scenario names, a duplicate statement, a future-dated statement, a stale statement, zero and negative values, a missing cost basis, an XML entity declaration, a grants file with a missing symbol, an unsupported file extension, a broken scenario index and a custom plugin that must not be executed. Nothing here should raise; everything here should be reported.",
+  "exercises": [
+    "ingest.dedupe",
+    "ingest.future_dated",
+    "ingest.stale_statement",
+    "ingest.unsupported_extension",
+    "parsers.malformed_grants",
+    "parsers.xml_entity_declaration",
+    "plugins.opt_in_enforced",
+    "render.escaping",
+    "scenarios.index_repair",
+    "payload.zero_and_negative",
+    "aliasing.awkward_names"
+  ],
+  "household": {
+    "name": "O'Neil & Søren-Quist Household",
+    "state": "NY",
+    "state_label": "New York",
+    "primary_equity_symbol": "QX",
+    "reference_annual_burn": 95000,
+    "retirement_annual_burn": 95000,
+    "tax_rates": {
+      "ltcg_top": 0.304,
+      "ordinary_top": 0.449,
+      "state_rate": 0.0685,
+      "ssn_effective": 0.3145
+    },
+    "allow_custom_plugins": false,
+    "ticker_aliases": { "QX/A": "QX" }
+  },
+  "investors": [
+    {
+      "id": "inv_oneil",
+      "name": "Fiadh O'Neil",
+      "birth": "1974-06-17",
+      "milestone_age": 88,
+      "rmd_owner": true
+    },
+    {
+      "id": "inv_soren",
+      "name": "Håkon Søren-Quist",
+      "birth": "1972-02-29",
+      "milestone_age": 88
+    }
+  ],
+  "beneficiaries": [
+    { "id": "ben_markup", "name": "<b>Bold</b> Child", "birth": "2010-10-10", "milestone_age": 25 }
+  ],
+  "accounts": [
+    {
+      "id": "QQ-0001",
+      "institution": "Quill & Quire Securities",
+      "account_name": "Quill & Quire Taxable",
+      "account_type": "BROKERAGE",
+      "tax_status": "TAXABLE",
+      "display_order": 10,
+      "periods": { "from": "2026-08", "to": "2026-10" },
+      "positions": [
+        {
+          "kind": "ticker",
+          "symbol": "QX",
+          "name": "Quixote Industries');alert(1)//",
+          "asset_class": "EQUITY",
+          "risk_class": "single_stock",
+          "stack_bucket": "stocks",
+          "lots": [{ "qty": 1500, "acquired": "2022-01-04", "cost_per_share": 31.0 }]
+        },
+        {
+          "kind": "ticker",
+          "symbol": "ZQZ",
+          "name": "Zero Quantity Holding <script>alert(2)</script>",
+          "asset_class": "EQUITY",
+          "risk_class": "single_stock",
+          "stack_bucket": "stocks",
+          "lots": [{ "qty": 0, "acquired": "2023-05-01", "cost_per_share": 10.0 }]
+        },
+        {
+          "kind": "contract_fund",
+          "symbol": "NOBASIS",
+          "name": "Fund With No Reported Basis",
+          "asset_class": "MUTUAL_FUND",
+          "risk_class": "broad_equity",
+          "stack_bucket": "stocks",
+          "value": 64000.0,
+          "quantity": 1200.0
+        },
+        {
+          "kind": "cash",
+          "name": "Overdrawn Settlement Cash",
+          "value": -4200.0,
+          "yield_pct": 0.0
+        }
+      ]
+    },
+    {
+      "id": "QQ-0002",
+      "institution": "Quill & Quire Securities",
+      "account_name": "Quill & Quire IRA",
+      "account_type": "TRAD_IRA",
+      "tax_status": "TRAD_IRA",
+      "display_order": 20,
+      "periods": { "from": "2026-09", "to": "2026-10" },
+      "positions": [
+        {
+          "kind": "ticker",
+          "symbol": "QX",
+          "name": "Quixote Industries",
+          "asset_class": "EQUITY",
+          "risk_class": "single_stock",
+          "stack_bucket": "stocks",
+          "lots": [{ "qty": 400, "acquired": "2024-04-04", "cost_per_share": 55.0 }]
+        }
+      ]
+    }
+  ],
+  "market_prices": {
+    "QX": { "p0": 28.0, "start": "2022-01-03", "mu": 0.11, "sigma": 0.3 },
+    "ZQZ": { "p0": 12.0, "start": "2022-01-03", "mu": 0.0, "sigma": 0.1 }
+  },
+  "scenarios": [
+    {
+      "name": "Default",
+      "protected": true,
+      "active": true,
+      "settings": { "simAnnualBurn": 95000 }
+    },
+    {
+      "name": "Quote \"Injection\" And \\Backslash",
+      "notes_md": "Scenario name with a double quote and a backslash.",
+      "settings_delta": { "simInflationPct": 2.9 }
+    },
+    {
+      "name": "Emoji Scenario 🚀 With A Very Long Name That Goes On And On Past Any Reasonable Column Width To Check Truncation Behaviour In Tables And Dialogs",
+      "settings_delta": { "simInflationPct": 3.4 }
+    }
+  ],
+  "privacy": {
+    "ai_shield": "identity_aliased",
+    "demo_mode": { "enabled": false },
+    "synonyms": { "Quill & Quire Securities": ["Quill & Quire", "QQ"] }
+  },
+  "plugins": [
+    {
+      "file": "evil_plugin.py",
+      "content": "#!/usr/bin/env python3\n\"\"\"\nA custom plugin that must never be imported.\n\nIngest loads `Portfolios/<slug>/Plugins/*.py` only when the portfolio opts in\n(`allow_custom_plugins` / `allowed_plugins`, finding SA-15). This fixture does not opt in,\nso the marker file below must not exist after any ingest, audit or render.\n\"\"\"\nfrom pathlib import Path\n\n(Path(__file__).resolve().parent / \"PLUGIN_EXECUTED.marker\").write_text(\"executed\\n\", encoding=\"utf-8\")\n\nfrom ingest.framework import IngestContext, StatementPlugin  # noqa: E402\nfrom ingest.models import ParsedStatement  # noqa: E402\n\n\nclass EvilPlugin(StatementPlugin):\n    plugin_id = \"evil_plugin\"\n    institution_name = \"Should Never Load\"\n    supported_extensions = (\".pdf\",)\n\n    def detect(self, ctx: IngestContext) -> float:\n        return 1.0\n\n    def parse(self, ctx: IngestContext) -> ParsedStatement:\n        raise RuntimeError(\"evil plugin should never run\")\n"
+    }
+  ],
+  "extra_files": [
+    {
+      "path": "Statements/quill_quire_securities/duplicate_of_october.statement.json",
+      "copy_of": "Statements/quill_quire_securities/qq_0001_2026-10.statement.json"
+    },
+    {
+      "path": "Statements/quill_quire_securities/future_dated.statement.json",
+      "content": {
+        "format": "advisorbot.statement/1",
+        "doc_type": "CANONICAL_JSON",
+        "institution": "Quill & Quire Securities",
+        "account_id": "QQ-0001",
+        "account_name": "Quill & Quire Taxable",
+        "account_type": "BROKERAGE",
+        "tax_status": "TAXABLE",
+        "display_order": 10,
+        "period_start": "2027-06-01",
+        "as_of_date": "2027-06-30",
+        "reported_total": 51000.0,
+        "positions": [
+          {
+            "security_id": "TICKER:QX",
+            "symbol_or_code": "QX",
+            "canonical_name": "Quixote Industries",
+            "asset_class": "EQUITY",
+            "stack_bucket": "stocks",
+            "risk_class": "single_stock",
+            "is_scrapeable": true,
+            "quote_symbol": "QX",
+            "quantity": 1500.0,
+            "stmt_price": 34.0,
+            "market_value": 51000.0,
+            "value_date": "2027-06-30"
+          }
+        ]
+      }
+    },
+    {
+      "path": "Statements/quill_quire_securities/stale_2024.statement.json",
+      "content": {
+        "format": "advisorbot.statement/1",
+        "doc_type": "CANONICAL_JSON",
+        "institution": "Quill & Quire Securities",
+        "account_id": "QQ-0001",
+        "account_name": "Quill & Quire Taxable",
+        "account_type": "BROKERAGE",
+        "tax_status": "TAXABLE",
+        "display_order": 10,
+        "period_start": "2024-01-01",
+        "as_of_date": "2024-01-31",
+        "reported_total": 42000.0,
+        "positions": [
+          {
+            "security_id": "TICKER:QX",
+            "symbol_or_code": "QX",
+            "canonical_name": "Quixote Industries",
+            "asset_class": "EQUITY",
+            "stack_bucket": "stocks",
+            "risk_class": "single_stock",
+            "is_scrapeable": true,
+            "quote_symbol": "QX",
+            "quantity": 1500.0,
+            "stmt_price": 28.0,
+            "market_value": 42000.0,
+            "value_date": "2024-01-31"
+          }
+        ]
+      }
+    },
+    {
+      "path": "Malformed/missing_symbol.grants.json",
+      "content": {
+        "institution": "Quill & Quire Securities",
+        "account_id": "QQ-0001",
+        "company_name": "Quixote Industries",
+        "award_type": "RSU",
+        "as_of_date": "2026-10-31",
+        "unvested_tranches": [
+          {
+            "grant_id": "QG-1",
+            "grant_date": "2025-01-15",
+            "vest_date": "2027-01-15",
+            "orig_qty": 100,
+            "total_qty": 100
+          }
+        ],
+        "releases_history": [],
+        "withdrawals": []
+      }
+    },
+    {
+      "path": "Statements/quill_quire_securities/notes.rtf",
+      "content": "{\\rtf1\\ansi This is not a statement format the app supports.}\n"
+    },
+    {
+      "path": "Malformed/entity_bomb.xml",
+      "content": "<?xml version=\"1.0\"?>\n<!DOCTYPE lolz [\n  <!ENTITY lol \"lol\">\n  <!ENTITY lol2 \"&lol;&lol;&lol;&lol;&lol;\">\n]>\n<osss:OnlineSocialSecurityStatementData xmlns:osss=\"http://ssa.gov/osss/schemas/2.0\">\n  <osss:UserInformation>\n    <osss:Name>&lol2;</osss:Name>\n    <osss:DateOfBirth>1974-06-17</osss:DateOfBirth>\n  </osss:UserInformation>\n  <osss:EarningsRecord>\n    <osss:Earnings startYear=\"2020\" endYear=\"2020\">\n      <osss:FicaEarnings>50000</osss:FicaEarnings>\n    </osss:Earnings>\n  </osss:EarningsRecord>\n</osss:OnlineSocialSecurityStatementData>\n"
+    },
+    {
+      "path": "Scenarios/900_broken.json",
+      "content": "{ \"id\": \"900\", \"name\": \"Broken JSON\", \"settings\": { \n"
+    }
+  ],
+  "invariants": [
+    {
+      "path": "household_name",
+      "equals": "O'Neil & Søren-Quist Household",
+      "note": "Apostrophes, ampersands and diacritics survive the pipeline and the renderer.",
+      "source": "payload"
+    }
+  ],
+  "notes": "Files under `Malformed/` sit deliberately outside `Statements/` because one unparseable statement currently aborts the whole ingest run (`ingest.pipeline` re-raises `IngestError`). The parser tier feeds them to the plugins directly, which is the right level for malformed-input coverage, and keeps this fixture ingestable end to end. `Scenarios/_index.json` does not list `900_broken.json`, so the index-repair path sees an orphan file. The plugin marker file is asserted absent by the plugin opt-in test."
+}

@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "household_name": "Sample Household Portfolio",
+  "badge_image": "Assets/default_badge.svg",
+  "reference_annual_burn": 50000,
+  "retirement_annual_burn": 50000,
+  "primary_equity_symbol": "AAPL",
+  "symbols": [
+    "AAPL",
+    "VTI",
+    "VXUS",
+    "BND"
+  ],
+  "ticker_aliases": {
+    "BRK/B": "BRK-B"
+  },
+  "investors": [
+    {
+      "id": "alex",
+      "name": "Alex",
+      "birth_date": "1972-04-15",
+      "milestone_age": 85,
+      "is_rmd_owner": true,
+      "ssn": {
+        "fra_age": 67,
+        "default_claim_age": 67,
+        "work_span_label": "",
+        "earnings_note": "",
+        "external_file": "",
+        "annual_earnings": {}
+      }
+    },
+    {
+      "id": "taylor",
+      "name": "Taylor",
+      "birth_date": "1974-09-20",
+      "milestone_age": 85,
+      "is_rmd_owner": false,
+      "ssn": {
+        "fra_age": 67,
+        "default_claim_age": 67,
+        "work_span_label": "",
+        "earnings_note": "",
+        "external_file": "",
+        "annual_earnings": {}
+      }
+    }
+  ],
+  "beneficiaries": [
+    {
+      "id": "sam",
+      "name": "Sam",
+      "birth_date": "2004-05-10"
+    },
+    {
+      "id": "riley",
+      "name": "Riley",
+      "birth_date": "2007-11-22"
+    }
+  ],
+  "grant_forecast": {
+    "default_net_retention_rate": 0.62,
+    "retention_trailing_months": 24,
+    "target_vested_account_id": "FID_STOCK_PLAN_01",
+    "target_vested_security_id": "TICKER:AAPL",
+    "in_kind_transfer_target_account_id": "",
+    "in_kind_transfer_vest_date": "",
+    "high_basis_split_threshold": 210.0,
+    "grant_notes": {}
+  },
+  "accounts": {
+    "FID_STOCK_PLAN_01": {
+      "account_name": "Fidelity NetBenefits Stock Plan (FID_STOCK_PLAN_01)",
+      "institution": "Fidelity",
+      "account_type": "STOCK_PLAN",
+      "tax_status": "TAXABLE",
+      "is_stock_plan": true,
+      "display_order": 10,
+      "color": "#38bdf8"
+    },
+    "SCHW-1001": {
+      "account_name": "Household Joint Brokerage (SCHW-1001)",
+      "institution": "Charles Schwab",
+      "account_type": "Taxable Brokerage",
+      "tax_status": "TAXABLE",
+      "display_order": 20,
+      "color": "#10b981"
+    },
+    "SCHW-1002": {
+      "account_name": "Alex Traditional Rollover IRA (SCHW-1002)",
+      "institution": "Charles Schwab",
+      "account_type": "Traditional IRA",
+      "tax_status": "TRAD_IRA",
+      "display_order": 30,
+      "color": "#f59e0b"
+    },
+    "SCHW-1003": {
+      "account_name": "Taylor Roth IRA (SCHW-1003)",
+      "institution": "Charles Schwab",
+      "account_type": "Roth IRA",
+      "tax_status": "ROTH_IRA",
+      "display_order": 40,
+      "color": "#14b8a6"
+    }
+  },
+  "sim_asset_rates": {
+    "cash_sweeps": {
+      "rate_model": "fixed",
+      "annual_rate_pct": 4.2
+    }
+  },
+  "sim_cash_interest_tax_rate": 0.408,
+  "sim_ira_ordinary_tax_rate": 0.37,
+  "tax_rates": {
+    "ltcg_top": 0.238,
+    "ordinary_top": 0.408,
+    "fed_ltcg_top": 0.2,
+    "niit_rate": 0.038,
+    "fed_ordinary_top": 0.37,
+    "state_code": "WA",
+    "state_rate": 0.0,
+    "married_filing_jointly": true,
+    "min_tax_bracket_floor": "none",
+    "ssn_effective": 0.3145
+  },
+  "historical_defaults": {
+    "default_start_date": "2024-01-01",
+    "default_forecast_end_date": "2029-12-28",
+    "backcast_before_earliest_statement": true,
+    "interpolate_between_anchors": true
+  },
+  "principal_overrides": {},
+  "stack_buckets": [
+    {
+      "id": "primary_equity_combined",
+      "label": "Employer Equity (AAPL)",
+      "color": "#38bdf8"
+    },
+    {
+      "id": "broad_equities",
+      "label": "Broad Index ETFs (VTI & VXUS)",
+      "color": "#10b981"
+    },
+    {
+      "id": "fixed_income",
+      "label": "Core Bond Funds (BND)",
+      "color": "#f59e0b"
+    },
+    {
+      "id": "cash_sweeps",
+      "label": "Cash & Money Market Sweeps",
+      "color": "#94a3b8"
+    }
+  ],
+  "sim_buckets": {
+    "fid_aapl_high_basis": {
+      "default_rank": 1,
+      "color": "#38bdf8"
+    },
+    "future_unvested_aapl": {
+      "default_rank": 2,
+      "color": "#7dd3fc"
+    },
+    "cash_sweeps": {
+      "default_rank": 3,
+      "color": "#94a3b8",
+      "rate_model": "fixed",
+      "annual_rate_pct": 4.2
+    },
+    "fid_aapl_low_basis": {
+      "default_rank": 4,
+      "color": "#0284c7"
+    }
+  }
+}

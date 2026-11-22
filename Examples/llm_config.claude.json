@@ -1,0 +1,53 @@
+{
+  "_schema_version": "1.0",
+  "_instructions": {
+    "quick_start": "Copy this file to Data/Config/LLM/claude.json (for global use) or Portfolios/<PortfolioName>/LLM/claude.json (portfolio-specific) and paste your Anthropic API key into 'api_key'.",
+    "key_types": {
+      "anthropic_paid_api_key": "RECOMMENDED. Create an API key at https://console.anthropic.com/settings/keys. Anthropic API keys start with 'sk-ant-api03-'. Note: Anthropic does NOT offer a free-tier API. You must fund your account with prepaid credits at https://console.anthropic.com/settings/billing before keys will work. A key with a $0 credit balance will produce an error in AdvisorBot.",
+      "rate_limits": "Anthropic enforces Tier 1 through Tier 4 rate limits based on deposit history. For heavy simulation and prompt workflows, ensure your tier accommodates 50+ requests per minute."
+    },
+    "environment_variable_alternative": "Instead of pasting your key here, you can set export ANTHROPIC_API_KEY='sk-ant-api03-...' in your shell (~/.bashrc or ~/.zshrc). If 'api_key' in this file is empty or starts with 'PASTE_YOUR_', AdvisorBot will automatically read ANTHROPIC_API_KEY from your environment.",
+    "privacy_shield": "When Privacy Shield is active, AdvisorBot strips sensitive financial identifiers (household names, account numbers, specific entity titles) and substitutes synthetic aliases (e.g. HOUSEHOLD_1, INVESTOR_1) before sending prompts to Anthropic endpoints."
+  },
+  "provider": "claude",
+  "api_key": "PASTE_YOUR_ANTHROPIC_API_KEY_HERE",
+  "model": "claude-sonnet-4-5-20250929",
+  "display_name": "Claude Sonnet 4.5",
+  "api_base_url": "https://api.anthropic.com/v1/messages",
+  "anthropic_version": "2023-06-01",
+  "max_tokens": 4096,
+  "max_tool_rounds": 8,
+  "temperature": 0.2,
+  "models": [
+    {
+      "id": "claude-opus-4-6",
+      "display_name": "Claude Opus 4.6",
+      "tier": "flagship",
+      "description": "Flagship Claude Opus 4.6 reasoning model for deep financial & tax planning"
+    },
+    {
+      "id": "claude-sonnet-4-6",
+      "display_name": "Claude Sonnet 4.6",
+      "tier": "balanced",
+      "description": "Claude Sonnet 4.6 balanced accuracy and speed model"
+    },
+    {
+      "id": "claude-opus-4-5-20251101",
+      "display_name": "Claude Opus 4.5",
+      "tier": "pro",
+      "description": "Claude Opus 4.5 (2025-11-01)"
+    },
+    {
+      "id": "claude-sonnet-4-5-20250929",
+      "display_name": "Claude Sonnet 4.5",
+      "tier": "balanced",
+      "description": "Default Claude Sonnet 4.5 (2025-09-29)"
+    },
+    {
+      "id": "claude-haiku-4-5-20251001",
+      "display_name": "Claude Haiku 4.5",
+      "tier": "fast",
+      "description": "Fast, responsive Claude Haiku 4.5 (2025-10-01)"
+    }
+  ]
+}

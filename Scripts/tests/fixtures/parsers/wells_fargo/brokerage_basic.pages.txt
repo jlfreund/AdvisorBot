@@ -1,0 +1,20 @@
+WELLS FARGO ADVISORS
+Brokerage Statement
+Statement period: JANUARY 1, 2026 - JANUARY 31, 2026
+ACCOUNT NUMBER: 1111-2222
+WFCS CUSTODIAN
+
+Value of your account
+Opening value   $16,100.00
+Closing value   $17,500.00
+
+Cash and sweep balances
+Total Cash and Sweep Balances   1.000   $2,500.00
+
+PERSONALIZED UMA
+Your style: HARBOR LARGE CAP CORE
+Stocks and ETFs
+DESCRIPTION QUANTITY PRICE MARKET VALUE EST ANNUAL INCOME YIELD
+HARBOR WIDGETS INC 100 150.0000 15,000.00 N/A N/A
+HWGT
+Total Stocks and ETFs   15,000.00

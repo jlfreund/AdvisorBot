@@ -1,0 +1,103 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Cedarline Wealth",
+  "account_id": "CB-5102",
+  "account_name": "Cedarline Municipal Bond Ladder",
+  "account_type": "BROKERAGE",
+  "tax_status": "TAXABLE",
+  "display_order": 30,
+  "period_start": "2026-09-01",
+  "as_of_date": "2026-09-30",
+  "reported_total": 283495.0,
+  "positions": [
+    {
+      "security_id": "CUSIP:ORMUNI2031A",
+      "symbol_or_code": "ORMUNI2031A",
+      "canonical_name": "Oregon State Transportation Revenue 2031",
+      "asset_class": "MUNI_BOND",
+      "stack_bucket": "bonds",
+      "risk_class": "fixed_income",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 100000.0,
+      "stmt_price": 102.4,
+      "market_value": 102400.0,
+      "value_date": "2026-09-30",
+      "cost_basis": 100000.0,
+      "est_annual_income": 4100.0,
+      "yield_pct": 4.1,
+      "metadata": {
+        "issuer_state": "OR"
+      },
+      "maturity_date": "2031-07-01"
+    },
+    {
+      "security_id": "CUSIP:ORMUNI2034B",
+      "symbol_or_code": "ORMUNI2034B",
+      "canonical_name": "Portland Metro Water District 2034",
+      "asset_class": "MUNI_BOND",
+      "stack_bucket": "bonds",
+      "risk_class": "fixed_income",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 75000.0,
+      "stmt_price": 101.1,
+      "market_value": 75825.0,
+      "value_date": "2026-09-30",
+      "cost_basis": 75000.0,
+      "est_annual_income": 2925.0,
+      "yield_pct": 3.9,
+      "metadata": {
+        "issuer_state": "OR"
+      },
+      "maturity_date": "2034-03-15"
+    },
+    {
+      "security_id": "CUSIP:WAMUNI2032C",
+      "symbol_or_code": "WAMUNI2032C",
+      "canonical_name": "Washington State Housing Finance 2032",
+      "asset_class": "MUNI_BOND",
+      "stack_bucket": "bonds",
+      "risk_class": "fixed_income",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 60000.0,
+      "stmt_price": 100.6,
+      "market_value": 60360.0,
+      "value_date": "2026-09-30",
+      "cost_basis": 60000.0,
+      "est_annual_income": 2550.0,
+      "yield_pct": 4.25,
+      "metadata": {
+        "issuer_state": "WA"
+      },
+      "maturity_date": "2032-11-01"
+    },
+    {
+      "security_id": "CUSIP:WAMUNI2036D",
+      "symbol_or_code": "WAMUNI2036D",
+      "canonical_name": "Spokane County School District 2036",
+      "asset_class": "MUNI_BOND",
+      "stack_bucket": "bonds",
+      "risk_class": "fixed_income",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 45000.0,
+      "stmt_price": 99.8,
+      "market_value": 44910.0,
+      "value_date": "2026-09-30",
+      "cost_basis": 45000.0,
+      "est_annual_income": 1980.0,
+      "yield_pct": 4.4,
+      "metadata": {
+        "issuer_state": "WA"
+      },
+      "maturity_date": "2036-05-01"
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "f26c4a1467b786b8"
+  }
+}

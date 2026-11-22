@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "ai_shield": {
+    "mode": "identity_aliased",
+    "block_inapp_agy_cli": true,
+    "dob_granularity": "year_month",
+    "notes_policy": "translate"
+  },
+  "demo_mode": {
+    "enabled": false,
+    "scale_factor": 0.4,
+    "seed": "demo-2405",
+    "dob_granularity": "shift_years"
+  },
+  "mcp_server": {
+    "enabled": false
+  },
+  "synonyms": {
+    "Cedarline Wealth": [
+      "Cedarline",
+      "CBW"
+    ],
+    "Harbor Brokerage": [
+      "Harbor",
+      "HB"
+    ],
+    "Varga Family Trust": [
+      "Varga Trust",
+      "VFRT",
+      "the Trust"
+    ],
+    "Kelerin Therapeutics, Inc.": [
+      "Kelerin",
+      "KLRN"
+    ],
+    "Ilona Varga": [
+      "Ilona"
+    ],
+    "Petros Varga": [
+      "Petros"
+    ],
+    "Zs\u00f3fia Varga": [
+      "Zs\u00f3fia",
+      "Zsofia"
+    ]
+  },
+  "entities": [],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "fd752403b6d831a3"
+  }
+}

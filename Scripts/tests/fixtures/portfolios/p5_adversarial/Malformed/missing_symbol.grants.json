@@ -1,0 +1,18 @@
+{
+  "institution": "Quill & Quire Securities",
+  "account_id": "QQ-0001",
+  "company_name": "Quixote Industries",
+  "award_type": "RSU",
+  "as_of_date": "2026-10-31",
+  "unvested_tranches": [
+    {
+      "grant_id": "QG-1",
+      "grant_date": "2025-01-15",
+      "vest_date": "2027-01-15",
+      "orig_qty": 100,
+      "total_qty": 100
+    }
+  ],
+  "releases_history": [],
+  "withdrawals": []
+}

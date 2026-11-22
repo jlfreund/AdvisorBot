@@ -1,0 +1,29 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Quill & Quire Securities",
+  "account_id": "QQ-0001",
+  "account_name": "Quill & Quire Taxable",
+  "account_type": "BROKERAGE",
+  "tax_status": "TAXABLE",
+  "display_order": 10,
+  "period_start": "2027-06-01",
+  "as_of_date": "2027-06-30",
+  "reported_total": 51000.0,
+  "positions": [
+    {
+      "security_id": "TICKER:QX",
+      "symbol_or_code": "QX",
+      "canonical_name": "Quixote Industries",
+      "asset_class": "EQUITY",
+      "stack_bucket": "stocks",
+      "risk_class": "single_stock",
+      "is_scrapeable": true,
+      "quote_symbol": "QX",
+      "quantity": 1500.0,
+      "stmt_price": 34.0,
+      "market_value": 51000.0,
+      "value_date": "2027-06-30"
+    }
+  ]
+}

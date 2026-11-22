@@ -1,0 +1,9 @@
+# Files allowed to contain account-number-shaped strings, with the reason.
+#
+# Paths are relative to Scripts/tests/. This list exists so that test files ported from
+# the pre-fixture suite do not block the hygiene scan while their fixtures are being
+# reshaped to the fixture convention (`HB-7001`, `CB-5100`, ...).
+#
+# The scan fails if a listed file becomes clean, so the list can only shrink.
+#
+# (empty: nothing is currently exempt)

@@ -1,0 +1,41 @@
+{
+  "_note": "Expected ParsedStatement for brokerage_basic.pages.txt. Real statement account ids are preserved in local storage/Live View and aliased dynamically in Demo Mode and AI Chat.",
+  "doc_type": "WFA_SNAPSHOT",
+  "institution": "Wells Fargo Advisors",
+  "account_id": "1111-2222",
+  "account_name": "WFA Large Cap Equity UMA (1111-2222)",
+  "account_type": "Personalized UMA (Equities)",
+  "tax_status": "TAXABLE",
+  "display_order": 30,
+  "period_start": "2026-01-01",
+  "as_of_date": "2026-01-31",
+  "reported_total": 17500.0,
+  "positions": [
+    {
+      "security_id": "CASH:1111-2222",
+      "symbol_or_code": "USD",
+      "canonical_name": "Cash & Sweep Balances (1111-2222)",
+      "asset_class": "CASH",
+      "risk_class": "cash_fixed",
+      "stack_bucket": "cash_sweeps",
+      "is_scrapeable": false,
+      "quantity": 1.0,
+      "market_value": 2500.0,
+      "value_date": "2026-01-31"
+    },
+    {
+      "security_id": "TICKER:HWGT",
+      "symbol_or_code": "HWGT",
+      "canonical_name": "Harbor Widgets Inc",
+      "asset_class": "EQUITY",
+      "risk_class": "single_stock",
+      "stack_bucket": "uma_equities",
+      "is_scrapeable": true,
+      "quote_symbol": "HWGT",
+      "quantity": 100.0,
+      "stmt_price": 150.0,
+      "market_value": 15000.0,
+      "value_date": "2026-01-31"
+    }
+  ]
+}

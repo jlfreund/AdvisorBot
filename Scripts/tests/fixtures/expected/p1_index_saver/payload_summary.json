@@ -1,0 +1,23 @@
+{
+  "_as_of": "2026-11-16",
+  "_generated_by": "tests.generate",
+  "_spec_sha": "f3c875157999152f",
+  "account.HB-7001.child_count": 3,
+  "account.HB-7001.current_value": 427243.37,
+  "account.HB-7001.institution": "Harbor Brokerage",
+  "account_count": 1,
+  "grant_symbols": [],
+  "has_portfolio": true,
+  "household_name": "Delacroix Household",
+  "institutions": [
+    "Harbor Brokerage"
+  ],
+  "investor_count": 1,
+  "sim_asset_count": 3,
+  "sim_asset_ids": [
+    "vti_HB_7001",
+    "bndx_HB_7001",
+    "cash_sweeps"
+  ],
+  "today_iso": "2026-11-16"
+}

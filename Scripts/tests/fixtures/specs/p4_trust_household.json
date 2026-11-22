@@ -1,0 +1,427 @@
+{
+  "spec_version": 1,
+  "name": "p4_trust_household",
+  "seed": 20260405,
+  "as_of": "2026-11-16",
+  "title": "Three-adult trust household with a minor beneficiary, two custodians and a rich alias table",
+  "purpose": "The scenario, privacy and demo-mode fixture. The same concentrated ticker is held at two different custodians, so any account label that comes from a two-custodian branch rather than from configuration is visible immediately. Three adults plus a minor beneficiary exercise milestone resolution and scheduled gifts, and a deliberately awkward set of names and scenario titles (apostrophes, diacritics, a hyphen) exercises the alias registry and the escaping path.",
+  "exercises": [
+    "scenarios.crud",
+    "scenarios.protected_names",
+    "scenarios.compare",
+    "demo_mode.projection",
+    "aliasing.round_trip",
+    "aliasing.synonyms",
+    "privacy_shield.wire_gate",
+    "payload.two_custodians_same_ticker",
+    "social_security.three_adults",
+    "beneficiary.scheduled_gift",
+    "server_auth.scenario_writes"
+  ],
+  "household": {
+    "name": "Varga Family Trust",
+    "state": "MA",
+    "state_label": "Massachusetts (flat 5%)",
+    "primary_equity_symbol": "KLRN",
+    "reference_annual_burn": 190000,
+    "retirement_annual_burn": 190000,
+    "tax_rates": {
+      "ltcg_top": 0.288,
+      "ordinary_top": 0.42,
+      "state_rate": 0.05,
+      "ssn_effective": 0.3145,
+      "ira_ordinary": 0.42,
+      "cash_interest": 0.42
+    },
+    "protected_saves": [
+      "Default",
+      "Ilona's Default"
+    ]
+  },
+  "investors": [
+    {
+      "id": "inv_ilona",
+      "name": "Ilona Varga",
+      "birth": "1968-12-02",
+      "milestone_age": 92,
+      "rmd_owner": true,
+      "ssa": {
+        "earnings": {
+          "start": 1992,
+          "end": 2026,
+          "profile": "cap_from_2010"
+        },
+        "claim_age": 67,
+        "fra_age": 67,
+        "emit_xml": false
+      }
+    },
+    {
+      "id": "inv_petros",
+      "name": "Petros Varga",
+      "birth": "1967-05-19",
+      "milestone_age": 92,
+      "ssa": {
+        "earnings": {
+          "start": 1990,
+          "end": 2024,
+          "profile": "mid_rising"
+        },
+        "claim_age": 70,
+        "fra_age": 67,
+        "emit_xml": false
+      }
+    },
+    {
+      "id": "inv_zsofia",
+      "name": "Zs\u00f3fia Varga",
+      "birth": "1996-08-08",
+      "milestone_age": 90,
+      "ssa": {
+        "earnings": {
+          "start": 2019,
+          "end": 2026,
+          "profile": "mid_rising"
+        },
+        "claim_age": 67,
+        "fra_age": 67,
+        "emit_xml": false
+      }
+    }
+  ],
+  "beneficiaries": [
+    {
+      "id": "ben_noa",
+      "name": "Noa Varga",
+      "birth": "2015-01-30",
+      "milestone_age": 21
+    }
+  ],
+  "accounts": [
+    {
+      "id": "CB-6200",
+      "institution": "Cedarline Wealth",
+      "account_name": "Varga Family Trust Brokerage",
+      "account_type": "BROKERAGE",
+      "tax_status": "TAXABLE",
+      "display_order": 10,
+      "periods": {
+        "from": "2026-01",
+        "to": "2026-10"
+      },
+      "positions": [
+        {
+          "kind": "ticker",
+          "symbol": "KLRN",
+          "name": "Kelerin Therapeutics, Inc.",
+          "asset_class": "EQUITY",
+          "risk_class": "single_stock",
+          "stack_bucket": "stocks",
+          "lots": [
+            {
+              "qty": 9000,
+              "acquired": "2017-04-03",
+              "cost_per_share": 18.4,
+              "label": "founder block"
+            },
+            {
+              "qty": 3000,
+              "acquired": "2021-10-12",
+              "cost_per_share": 61.2
+            }
+          ]
+        },
+        {
+          "kind": "ticker",
+          "symbol": "ITOT",
+          "name": "iShares Core S&P Total U.S. Stock Market ETF",
+          "asset_class": "ETF",
+          "risk_class": "broad_equity",
+          "stack_bucket": "stocks",
+          "lots": [
+            {
+              "qty": 1800,
+              "acquired": "2020-01-15",
+              "cost_per_share": 70.0
+            }
+          ]
+        },
+        {
+          "kind": "cash",
+          "name": "Cedarline Trust Cash Sweep",
+          "value": 96000.0,
+          "yield_pct": 3.7,
+          "monthly_drift": -2100.0
+        }
+      ]
+    },
+    {
+      "id": "HB-8800",
+      "institution": "Harbor Brokerage",
+      "account_name": "Varga Family Trust Secondary Brokerage",
+      "account_type": "BROKERAGE",
+      "tax_status": "TAXABLE",
+      "display_order": 20,
+      "periods": {
+        "from": "2026-01",
+        "to": "2026-10"
+      },
+      "positions": [
+        {
+          "kind": "ticker",
+          "symbol": "KLRN",
+          "name": "Kelerin Therapeutics, Inc.",
+          "asset_class": "EQUITY",
+          "risk_class": "single_stock",
+          "stack_bucket": "stocks",
+          "lots": [
+            {
+              "qty": 4200,
+              "acquired": "2023-06-20",
+              "cost_per_share": 88.5
+            }
+          ]
+        },
+        {
+          "kind": "ticker",
+          "symbol": "IEFA",
+          "name": "iShares Core MSCI EAFE ETF",
+          "asset_class": "ETF",
+          "risk_class": "broad_equity",
+          "stack_bucket": "stocks",
+          "lots": [
+            {
+              "qty": 2500,
+              "acquired": "2022-03-08",
+              "cost_per_share": 62.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HB-8801",
+      "institution": "Harbor Brokerage",
+      "account_name": "Harbor Roth IRA (Ilona)",
+      "account_type": "ROTH_IRA",
+      "tax_status": "ROTH_IRA",
+      "display_order": 30,
+      "periods": {
+        "from": "2026-01",
+        "to": "2026-10"
+      },
+      "positions": [
+        {
+          "kind": "ticker",
+          "symbol": "ITOT",
+          "name": "iShares Core S&P Total U.S. Stock Market ETF",
+          "asset_class": "ETF",
+          "risk_class": "broad_equity",
+          "stack_bucket": "stocks",
+          "lots": [
+            {
+              "qty": 700,
+              "acquired": "2019-11-04",
+              "cost_per_share": 66.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CB-6201",
+      "institution": "Cedarline Wealth",
+      "account_name": "Cedarline Traditional IRA (Petros)",
+      "account_type": "TRAD_IRA",
+      "tax_status": "TRAD_IRA",
+      "display_order": 40,
+      "periods": {
+        "from": "2026-01",
+        "to": "2026-10"
+      },
+      "positions": [
+        {
+          "kind": "ticker",
+          "symbol": "AGG",
+          "name": "iShares Core U.S. Aggregate Bond ETF",
+          "asset_class": "ETF",
+          "risk_class": "fixed_income",
+          "stack_bucket": "bonds",
+          "lots": [
+            {
+              "qty": 4000,
+              "acquired": "2017-02-01",
+              "cost_per_share": 108.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HB-8900",
+      "institution": "Harbor Brokerage",
+      "account_name": "Harbor Individual (Zs\u00f3fia)",
+      "account_type": "BROKERAGE",
+      "tax_status": "TAXABLE",
+      "display_order": 50,
+      "periods": {
+        "from": "2026-01",
+        "to": "2026-10"
+      },
+      "positions": [
+        {
+          "kind": "ticker",
+          "symbol": "ITOT",
+          "name": "iShares Core S&P Total U.S. Stock Market ETF",
+          "asset_class": "ETF",
+          "risk_class": "broad_equity",
+          "stack_bucket": "stocks",
+          "lots": [
+            {
+              "qty": 180,
+              "acquired": "2024-09-03",
+              "cost_per_share": 112.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "market_prices": {
+    "KLRN": {
+      "p0": 22.5,
+      "start": "2017-01-06",
+      "mu": 0.18,
+      "sigma": 0.42
+    },
+    "ITOT": {
+      "p0": 68.0,
+      "start": "2017-01-06",
+      "mu": 0.1,
+      "sigma": 0.17
+    },
+    "IEFA": {
+      "p0": 60.0,
+      "start": "2017-01-06",
+      "mu": 0.06,
+      "sigma": 0.18
+    },
+    "AGG": {
+      "p0": 108.0,
+      "start": "2017-01-06",
+      "mu": 0.02,
+      "sigma": 0.06
+    }
+  },
+  "scenarios": [
+    {
+      "name": "Default",
+      "protected": true,
+      "active": true,
+      "notes_md": "Generated baseline for the trust household.",
+      "settings": {
+        "simAnnualBurn": 190000
+      }
+    },
+    {
+      "name": "Ilona's Default",
+      "protected": true,
+      "notes_md": "Second protected baseline whose name is derived from an investor's first name, with an apostrophe.",
+      "settings": {
+        "simAnnualBurn": 180000
+      }
+    },
+    {
+      "name": "Gift To Noa At 21",
+      "notes_md": "## Upvotes & Concurrences\n- Scheduled gift when the youngest beneficiary reaches her milestone age.",
+      "settings_delta": {
+        "simScheduledActions": [
+          {
+            "kind": "gift",
+            "person": "Noa Varga",
+            "age": 21,
+            "amount": 500000,
+            "dollar_mode": "today",
+            "purpose": "Education and first home"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sell Concentrated Position 2028",
+      "notes_md": "Liquidate the concentrated single-stock holding in 2028.",
+      "settings_delta": {
+        "simScheduledActions": [
+          {
+            "kind": "sell",
+            "date": "2028-06",
+            "pct": 100,
+            "from_symbol": "KLRN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Compare Baseline",
+      "notes_md": "Duplicate of Default with exactly one slider changed, for the compare view.",
+      "settings_delta": {
+        "simInflationPct": 3.1
+      }
+    }
+  ],
+  "privacy": {
+    "ai_shield": "identity_aliased",
+    "demo_mode": {
+      "enabled": false,
+      "scale": 0.4,
+      "dob_granularity": "shift_years"
+    },
+    "synonyms": {
+      "Cedarline Wealth": [
+        "Cedarline",
+        "CBW"
+      ],
+      "Harbor Brokerage": [
+        "Harbor",
+        "HB"
+      ],
+      "Varga Family Trust": [
+        "Varga Trust",
+        "VFRT",
+        "the Trust"
+      ],
+      "Kelerin Therapeutics, Inc.": [
+        "Kelerin",
+        "KLRN"
+      ],
+      "Ilona Varga": [
+        "Ilona"
+      ],
+      "Petros Varga": [
+        "Petros"
+      ],
+      "Zs\u00f3fia Varga": [
+        "Zs\u00f3fia",
+        "Zsofia"
+      ]
+    }
+  },
+  "invariants": [
+    {
+      "path": "institutions",
+      "equals": [
+        "Cedarline Wealth",
+        "Harbor Brokerage"
+      ],
+      "note": "Two custodians, both read from config. A third name means a hard-coded branch fired (LL-02).",
+      "source": "payload_summary"
+    },
+    {
+      "path": "project.primary_equity_symbol",
+      "equals": "KLRN",
+      "note": "The concentrated ticker is configured, not assumed.",
+      "source": "payload"
+    }
+  ],
+  "notes": "Scenario names here deliberately include an apostrophe and the household includes a diacritic, which is what makes this the right fixture for the escaping and alias-boundary tests."
+}

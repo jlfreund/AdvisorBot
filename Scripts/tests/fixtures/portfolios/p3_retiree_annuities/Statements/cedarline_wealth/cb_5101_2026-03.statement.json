@@ -1,0 +1,136 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Cedarline Wealth",
+  "account_id": "CB-5101",
+  "account_name": "Cedarline Taxable Brokerage",
+  "account_type": "BROKERAGE",
+  "tax_status": "TAXABLE",
+  "display_order": 20,
+  "period_start": "2026-03-01",
+  "as_of_date": "2026-03-31",
+  "reported_total": 907760.24,
+  "positions": [
+    {
+      "security_id": "CONTRACT:ANN-A1",
+      "symbol_or_code": "ANN-A1",
+      "canonical_name": "Solstice Life 5-Year Guaranteed Annuity",
+      "asset_class": "FIXED_ANNUITY",
+      "stack_bucket": "annuity",
+      "risk_class": "fixed_income",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1.0,
+      "stmt_price": null,
+      "market_value": 282027.2,
+      "value_date": "2026-03-31",
+      "cost_basis": 250000.0,
+      "initial_premium": 250000.0,
+      "issue_date": "2023-06-01",
+      "surrender_value": 262285.29,
+      "maturity_date": "2028-06-01",
+      "credited_rate_pct": 4.35
+    },
+    {
+      "security_id": "CONTRACT:ANN-B2",
+      "symbol_or_code": "ANN-B2",
+      "canonical_name": "Granite Peak Assurance Indexed Annuity 7",
+      "asset_class": "INDEXED_ANNUITY",
+      "stack_bucket": "annuity",
+      "risk_class": "hybrid_buffered",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1.0,
+      "stmt_price": null,
+      "market_value": 356692.98,
+      "value_date": "2026-03-31",
+      "cost_basis": 300000.0,
+      "initial_premium": 300000.0,
+      "issue_date": "2022-10-07",
+      "surrender_value": 331724.47,
+      "maturity_date": "2029-10-07",
+      "credited_rate_pct": 5.1,
+      "metadata": {
+        "surrender_schedule": [
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          0
+        ]
+      }
+    },
+    {
+      "security_id": "CONTRACT:ANN-C3",
+      "symbol_or_code": "ANN-C3",
+      "canonical_name": "Northwind Variable Buffered Annuity 6",
+      "asset_class": "RILA_ANNUITY",
+      "stack_bucket": "annuity",
+      "risk_class": "hybrid_buffered",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1.0,
+      "stmt_price": null,
+      "market_value": 227790.06,
+      "value_date": "2026-03-31",
+      "cost_basis": 200000.0,
+      "initial_premium": 200000.0,
+      "issue_date": "2024-01-31",
+      "surrender_value": 211844.76,
+      "maturity_date": "2030-01-31",
+      "credited_rate_pct": 6.2,
+      "metadata": {
+        "sub_segments": [
+          {
+            "name": "BroadIndexDualDir6Yr-10pct",
+            "buffer_pct": -10.0,
+            "cap_pct": 48.0,
+            "pct": 40.0,
+            "value": 91116.02,
+            "units": 9111.602,
+            "maturity_date": "2030-01-31"
+          },
+          {
+            "name": "BroadIndexCapped2Yr-10pct",
+            "buffer_pct": -10.0,
+            "cap_pct": 18.0,
+            "pct": 35.0,
+            "value": 79726.52,
+            "units": 7972.652,
+            "maturity_date": "2030-01-31"
+          },
+          {
+            "name": "SmallCapCapped2Yr-15pct",
+            "buffer_pct": -15.0,
+            "cap_pct": 22.0,
+            "pct": 25.0,
+            "value": 56947.51,
+            "units": 5694.751,
+            "maturity_date": "2030-01-31"
+          }
+        ]
+      }
+    },
+    {
+      "security_id": "CASH:CB-5101",
+      "symbol_or_code": "USD",
+      "canonical_name": "Cedarline Taxable Cash Sweep",
+      "asset_class": "CASH",
+      "stack_bucket": "cash",
+      "risk_class": "cash_fixed",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1.0,
+      "stmt_price": null,
+      "market_value": 41250.0,
+      "value_date": "2026-03-31",
+      "yield_pct": 3.6
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "f26c4a1467b786b8"
+  }
+}

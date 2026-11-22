@@ -1,0 +1,67 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Harbor Brokerage",
+  "account_id": "HB-7001",
+  "account_name": "Harbor Individual Brokerage",
+  "account_type": "BROKERAGE",
+  "tax_status": "TAXABLE",
+  "display_order": 10,
+  "period_start": "2026-10-01",
+  "as_of_date": "2026-10-31",
+  "reported_total": 408581.65,
+  "positions": [
+    {
+      "security_id": "TICKER:VTI",
+      "symbol_or_code": "VTI",
+      "canonical_name": "Vanguard Total Stock Market ETF",
+      "asset_class": "ETF",
+      "stack_bucket": "stocks",
+      "risk_class": "broad_equity",
+      "is_scrapeable": true,
+      "quote_symbol": "VTI",
+      "quantity": 1250.0,
+      "stmt_price": 205.9951,
+      "market_value": 257493.88,
+      "value_date": "2026-10-31",
+      "cost_basis": 241200.0,
+      "acquisition_date": "2019-03-15",
+      "expense_ratio_pct": 0.03
+    },
+    {
+      "security_id": "TICKER:BNDX",
+      "symbol_or_code": "BNDX",
+      "canonical_name": "Vanguard Total International Bond ETF",
+      "asset_class": "ETF",
+      "stack_bucket": "bonds",
+      "risk_class": "fixed_income",
+      "is_scrapeable": true,
+      "quote_symbol": "BNDX",
+      "quantity": 2000.0,
+      "stmt_price": 52.9688,
+      "market_value": 105937.6,
+      "value_date": "2026-10-31",
+      "cost_basis": 101000.0,
+      "acquisition_date": "2022-05-10"
+    },
+    {
+      "security_id": "CASH:HB-7001",
+      "symbol_or_code": "USD",
+      "canonical_name": "Harbor Cash Sweep",
+      "asset_class": "CASH",
+      "stack_bucket": "cash",
+      "risk_class": "cash_fixed",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1.0,
+      "stmt_price": null,
+      "market_value": 45150.17,
+      "value_date": "2026-10-31",
+      "yield_pct": 3.9
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "f3c875157999152f"
+  }
+}

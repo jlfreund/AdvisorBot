@@ -1,0 +1,28 @@
+# Legacy code vocabulary that must not appear in generated output for arbitrary households.
+#
+# No fixture portfolio uses any of these terms, so a hit in a rendered dashboard, an LLM
+# wire payload or a generated artefact indicates a hardcoded parser/schema literal leaking
+# out of the code rather than coming from the configured portfolio data.
+#
+# Developer-specific household terms can be placed in the gitignored `Data/.household_terms`
+# file, which `tests/support/roots.py` merges automatically when running outside isolated
+# fixture roots.
+#
+# Matching is word-boundary and case-insensitive (see tests/support/scans.py).
+
+# --- legacy default equity / stock-plan schema tokens ------------------------
+GOOG
+GOOGL
+Alphabet
+Google
+GSU
+GSUs
+
+# --- built-in custodian parser labels that must not leak onto other FIs ------
+Wells Fargo
+WFA
+WFB
+Morgan Stanley
+MSSB
+StockPlan Connect
+UMA

@@ -1,0 +1,35 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Harbor Brokerage",
+  "account_id": "HB-7102",
+  "account_name": "Harbor Traditional IRA",
+  "account_type": "TRAD_IRA",
+  "tax_status": "TRAD_IRA",
+  "display_order": 30,
+  "period_start": "2026-06-01",
+  "as_of_date": "2026-06-30",
+  "reported_total": 35887.8,
+  "positions": [
+    {
+      "security_id": "TICKER:VBTLX",
+      "symbol_or_code": "VBTLX",
+      "canonical_name": "Vanguard Total Bond Market Index Admiral",
+      "asset_class": "MUTUAL_FUND",
+      "stack_bucket": "bonds",
+      "risk_class": "fixed_income",
+      "is_scrapeable": true,
+      "quote_symbol": "VBTLX",
+      "quantity": 3000.0,
+      "stmt_price": 11.9626,
+      "market_value": 35887.8,
+      "value_date": "2026-06-30",
+      "cost_basis": 31800.0,
+      "acquisition_date": "2018-06-01"
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "22d3d59ce37a565f"
+  }
+}

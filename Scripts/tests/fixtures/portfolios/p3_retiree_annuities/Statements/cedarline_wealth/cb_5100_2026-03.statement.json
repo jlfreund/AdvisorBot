@@ -1,0 +1,49 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Cedarline Wealth",
+  "account_id": "CB-5100",
+  "account_name": "Cedarline Traditional IRA",
+  "account_type": "TRAD_IRA",
+  "tax_status": "TRAD_IRA",
+  "display_order": 10,
+  "period_start": "2026-03-01",
+  "as_of_date": "2026-03-31",
+  "reported_total": 456500.0,
+  "positions": [
+    {
+      "security_id": "TICKER:CLGRX",
+      "symbol_or_code": "CLGRX",
+      "canonical_name": "Cedarline Growth Fund Class R",
+      "asset_class": "MUTUAL_FUND",
+      "stack_bucket": "stocks",
+      "risk_class": "broad_equity",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 7400.0,
+      "stmt_price": null,
+      "market_value": 418000.0,
+      "value_date": "2026-03-31",
+      "cost_basis": 302000.0
+    },
+    {
+      "security_id": "CASH:CB-5100",
+      "symbol_or_code": "USD",
+      "canonical_name": "Cedarline IRA Cash Reserve",
+      "asset_class": "CASH",
+      "stack_bucket": "cash",
+      "risk_class": "cash_fixed",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1.0,
+      "stmt_price": null,
+      "market_value": 38500.0,
+      "value_date": "2026-03-31",
+      "yield_pct": 3.6
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "f26c4a1467b786b8"
+  }
+}

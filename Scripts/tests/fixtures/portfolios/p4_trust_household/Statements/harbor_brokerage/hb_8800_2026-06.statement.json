@@ -1,0 +1,51 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Harbor Brokerage",
+  "account_id": "HB-8800",
+  "account_name": "Varga Family Trust Secondary Brokerage",
+  "account_type": "BROKERAGE",
+  "tax_status": "TAXABLE",
+  "display_order": 20,
+  "period_start": "2026-06-01",
+  "as_of_date": "2026-06-30",
+  "reported_total": 589245.69,
+  "positions": [
+    {
+      "security_id": "TICKER:KLRN",
+      "symbol_or_code": "KLRN",
+      "canonical_name": "Kelerin Therapeutics, Inc.",
+      "asset_class": "EQUITY",
+      "stack_bucket": "stocks",
+      "risk_class": "single_stock",
+      "is_scrapeable": true,
+      "quote_symbol": "KLRN",
+      "quantity": 4200.0,
+      "stmt_price": 97.1982,
+      "market_value": 408232.44,
+      "value_date": "2026-06-30",
+      "cost_basis": 371700.0,
+      "acquisition_date": "2023-06-20"
+    },
+    {
+      "security_id": "TICKER:IEFA",
+      "symbol_or_code": "IEFA",
+      "canonical_name": "iShares Core MSCI EAFE ETF",
+      "asset_class": "ETF",
+      "stack_bucket": "stocks",
+      "risk_class": "broad_equity",
+      "is_scrapeable": true,
+      "quote_symbol": "IEFA",
+      "quantity": 2500.0,
+      "stmt_price": 72.4053,
+      "market_value": 181013.25,
+      "value_date": "2026-06-30",
+      "cost_basis": 155000.0,
+      "acquisition_date": "2022-03-08"
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "fd752403b6d831a3"
+  }
+}

@@ -1,0 +1,31 @@
+# Private multi-portfolio data directory (_active.json, SQLite DBs, statements, scenarios, saves)
+/Portfolios/*
+!/Portfolios/.gitkeep
+
+# Private developer design & audit notes
+/.dev/
+
+# Runtime state, session token/secret, server logs, SQLite files, and global LLM configs (keep historical_cohorts.json)
+/Data/*
+/Data/.session_secret
+!/Data/historical_cohorts.json
+
+# SQLite databases & sidecar journals (-wal, -shm), atomic temp files, and local environment files anywhere in the tree
+*.sqlite*
+*.tmp
+.env*
+!.env.example
+
+# Generated dashboard (rebuilt by holdings.py render/refresh with portfolio payload)
+/index.html
+
+# Python & macOS caches
+__pycache__/
+/.pytest_cache/
+.DS_Store
+
+# Local Playwright symlink used by Scripts/tests/render_check.mjs
+/Scripts/node_modules
+
+# Local Python environment created by the quickstart
+/.venv/

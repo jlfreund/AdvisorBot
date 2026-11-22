@@ -1,0 +1,15 @@
+{
+  "_as_of": "2026-11-16",
+  "_generated_by": "tests.generate",
+  "_spec_sha": "f26c4a1467b786b8",
+  "external_script_srcs": [],
+  "html_has_payload": true,
+  "legacy_term_count": 5,
+  "legacy_term_hits": [
+    "GOOG",
+    "GSU",
+    "Google",
+    "UMA",
+    "WFB"
+  ]
+}

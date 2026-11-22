@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Top-Level README — AdvisorBot Documentation</title>
+  <link rel="icon" href="../Assets/default_badge.svg" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <span>🛡️ AdvisorBot</span>
+      <span style="color: var(--muted); font-weight: normal;">|</span>
+      <span>Documentation &amp; User Manual</span>
+    </div>
+    <nav class="topbar-links">
+      <a class="nav-pill" href="../index.html">← Live Dashboard</a>
+      <a class="nav-pill" href="index.html">User Guide</a>
+      <a class="nav-pill active" href="readme.html">Top-Level README</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar Table of Contents -->
+    <aside class="toc" id="doc-toc">
+      <div class="toc-header">
+        <div class="toc-heading">Documentation Chapters</div>
+        <button type="button" class="toc-toggle-all-btn" id="toc-toggle-all" onclick="toggleAllChapters()" title="Toggle all chapters">Expand All</button>
+      </div>
+
+      <div class="toc-item">
+        <a href="index.html" class="toc-nav-link">
+          <span style="font-size:14px;">📖</span>
+          <span>Overview &amp; Architecture</span>
+        </a>
+      </div>
+
+      <div class="toc-item">
+        <a href="readme.html" class="toc-nav-link active">
+          <span style="font-size:14px;">📄</span>
+          <span>Top-Level README</span>
+        </a>
+      </div>
+
+      <!-- Chapter 1 -->
+      <div class="toc-chapter-group" id="ch-group-1">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(1)" aria-label="Toggle Chapter 1 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch1-portfolio-setup.html" class="toc-chapter-link">
+            1. Setting Up Your Portfolio
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-dir">1.1 Create &amp; Complete Your Portfolio</a>
+          <a class="sub" href="ch1-portfolio-setup.html#llm-setup">1.2 Configuring AI &amp; Local LLMs</a>
+          <a class="sub" href="ch1-portfolio-setup.html#statements-drop">1.3 Dropping Financial Statements</a>
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-settings-audit">1.4 Settings Portfolio Audit</a>
+          <a class="sub" href="ch1-portfolio-setup.html#agent-plugins">1.5 Developing Custom Plugins</a>
+        </div>
+      </div>
+
+      <!-- Chapter 2 -->
+      <div class="toc-chapter-group" id="ch-group-2">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(2)" aria-label="Toggle Chapter 2 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch2-core-walkthrough.html" class="toc-chapter-link">
+            2. Core Application Walkthrough
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch2-core-walkthrough.html#page-positions">2.1 Positions &amp; Weekly Timeline</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-grants">2.2 Employee Stock &amp; Vesting</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-simulator">2.3 Retirement Simulator &amp; Drawdown</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-social-security">2.4 Income &amp; Expense (Social Security)</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-scenarios">2.5 Scenario Details &amp; Baselines</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-settings">2.6 Settings &amp; Preferences</a>
+          <a class="sub" href="ch2-core-walkthrough.html#holding-forecast-methodology">2.7 Holding Forecasts &amp; Baselines</a>
+        </div>
+      </div>
+
+      <!-- Chapter 3 -->
+      <div class="toc-chapter-group" id="ch-group-3">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(3)" aria-label="Toggle Chapter 3 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch3-security-privacy.html" class="toc-chapter-link">
+            3. Security &amp; Privacy Architecture
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch3-security-privacy.html#sec-local-first">3.1 Localhost &amp; Network Isolation</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-cross-tab">3.2 Protection From Browser Tabs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-profiles">3.3 The 3 AI Privacy Profiles</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-local-llm">3.4 100% Offline Local LLMs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-alias-table">3.5 Maintaining the Alias Table</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-unsupported-banks">3.6 Unsupported Banks &amp; Parsers</a>
+        </div>
+      </div>
+
+      <!-- Chapter 4 -->
+      <div class="toc-chapter-group" id="ch-group-4">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(4)" aria-label="Toggle Chapter 4 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch4-developer-agent.html" class="toc-chapter-link">
+            4. Developer &amp; Agent Integration
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp">4.1 External Agent MCP Integration</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp-security">4.2 MCP Security Boundaries</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-guardrails">4.3 Engineering Guardrails</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-testing">4.4 Fixture Test Suite</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      <h1>AdvisorBot &mdash; Tax-Aware Retirement Simulator &amp; Portfolio Analytics</h1>
+      <p class="subtitle">An interactive, local-first portfolio analytics, statement ingestion, and tax-aware retirement simulation platform for households and equity-compensated professionals.</p>
+
+      <p>Use AdvisorBot to explore whether your savings can support planned spending and how different retirement choices affect that outlook. Taxes, required withdrawals, and Social Security benefits are estimates used in those forecasts.</p>
+
+      <div class="callout callout-warn">
+        <strong>Financial, Tax &amp; AI Disclaimer:</strong> AdvisorBot is free, self-hosted software for <strong>educational and personal modeling purposes only</strong>&mdash;it is <strong>not</strong> financial, investment, tax, or legal advice, and does <strong>not</strong> create an RIA/fiduciary relationship. Tax logic, Monte Carlo paths, and AI Chat / MCP outputs are simplified or probabilistic and must be verified independently before acting. See <a href="#disclaimer">Section (D) &mdash; Full Disclaimer</a> below.
+      </div>
+
+      <!-- (A) Synopsis -->
+      <section class="chapter-section" id="synopsis">
+        <h2>(A) Synopsis</h2>
+        <p><strong>AdvisorBot</strong> is a privacy-first financial planning dashboard that runs locally on your computer. It imports PDF, Excel (XLSX), JSON, and Social Security (SSA XML) statements into a private local database, and supports custom parser plugins for additional institutions or file formats.</p>
+
+        <p>From this consolidated view of your accounts, AdvisorBot serves a self-contained web dashboard covering:</p>
+        <ol>
+          <li><strong>Portfolio Performance:</strong> Consolidated positions, account and strategy allocation breakdowns, Yahoo Finance market pricing, editable holding forecasts with tooltips showing the selected source, dates and available alternative rates, and a historical-through-forecast weekly portfolio timeline (<code>Nominal $</code> / <code>Today's $</code>).</li>
+          <li><strong>Stock Vesting:</strong> Multi-grant RSU/GSU tracking, historical release-date Fair Market Value (FMV) vs. current market value, tax withholding retention ratios, and future scheduled vesting timelines.</li>
+          <li><strong>Retirement Simulator:</strong> Monthly progressive-tax drawdown engine modeling high-basis vs. low-basis equity tranches, capital loss carryforwards, IRS &sect;72 LIFO non-qualified annuities, SECURE 2.0 Required Minimum Distributions (RMDs) starting at age 73 or 75, Roth vs. Traditional IRA wrappers, pre-retirement work/401(k) plans, and scheduled cashflow actions under <strong>Simulation Controls</strong>: <strong>Market Correction</strong> (<code>None</code>, crash presets, or custom downturn) and <strong>Simulation</strong> (<code>None</code>, <strong>Monte Carlo</strong>, or <strong>1929&ndash;2025 Multi-Asset Historical Cohorts</strong>). Holding Details charts 40 years of projected annual returns and lets you set multi-tier mean-reversion half-lives.</li>
+          <li><strong>SSN Visualizer:</strong> Social Security OASDI Primary Insurance Amount (PIA) bend-point calculations from official <code>ssa.gov</code> XML statements, claiming-age modeling (ages 62&ndash;70), COLA compounding, and retirement feeder integration.</li>
+          <li><strong>Scenarios:</strong> Interactive what-if scenario manager for saving, duplicating, comparing, recording AI Advisor concurrences under <code>## Upvotes &amp; Concurrences</code> in <strong>Details &amp; Notes &rarr;</strong>, and toggling <code>🔒 Protected</code> / <code>🔓 Unprotected</code> per scenario against accidental edits or deletion.</li>
+          <li><strong>In-App AI Assistant &amp; MCP Integration:</strong> Local (Ollama, LM Studio) and cloud (Gemini, Claude, OpenAI) AI support with configurable Privacy Shield modes (<strong>A. Clear Text</strong>, <strong>B. Obfuscated Names</strong>, and <strong>C. Obfuscated Names &amp; Values</strong>), read-only <strong>Demo Mode</strong> for screen shares, and a Model Context Protocol (MCP) server for connecting external AI assistants.</li>
+        </ol>
+
+        <p>All statement parsing, data storage, and portfolio math run strictly on your local machine (<code>localhost</code>). No brokerage login credentials or raw statements are sent anywhere. Market quotes fetch only public ticker symbols from Yahoo Finance; when using cloud AI providers, outbound messages follow your chosen Privacy Shield mode (<strong>A. Clear Text</strong>, <strong>B. Obfuscated Names</strong>, or <strong>C. Obfuscated Names &amp; Values</strong>).</p>
+      </section>
+
+      <!-- (B) Setup and Workflow -->
+      <section class="chapter-section" id="setup-workflow">
+        <h2>(B) Setup and Workflow</h2>
+
+        <h3>1. Quickstart Prerequisites</h3>
+        <ul>
+          <li><strong>Python 3.11+</strong> installed (the core valuation/simulator runs on the Python standard library)</li>
+          <li><strong>Git</strong> installed (or download and extract the repository ZIP archive)</li>
+          <li><strong>Modern web browser</strong> (Chrome, Firefox, Safari, Edge)</li>
+          <li><strong>Internet access at refresh time</strong> (optional &mdash; only needed to fetch public ticker quotes/10Y history from Yahoo Finance; offline tests and <code>--offline</code> plugin checks work without network access)</li>
+        </ul>
+
+        <p>On the GitHub repository page, choose <strong>Code</strong> and copy the HTTPS URL. Run <code>git clone</code> with that URL, then open a terminal in the cloned folder (or extracted ZIP folder). Create a virtual environment and install the optional extras (<code>ingest</code> for PDF/XLSX statement parsing via <code>pypdf</code>/<code>openpyxl</code>, <code>mcp</code> for external desktop agents, <code>ui</code> for <code>Pillow</code> badge image processing; add <code>dev</code> if running the <code>pytest</code> suite):</p>
+
+        <h4>macOS (Terminal &mdash; <code>zsh</code> / <code>bash</code>)</h4>
+        <pre><code># Verify Python 3.11+ (if needed, install via Homebrew: brew install python@3.12)
+python3 --version
+
+# Create &amp; activate a virtual environment, then install dependencies
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[mcp,ingest,ui]"</code></pre>
+
+        <h4>Linux (Terminal &mdash; <code>bash</code> / <code>zsh</code>)</h4>
+        <pre><code># Verify Python 3.11+ &amp; venv support
+# Ubuntu / Debian: sudo apt update &amp;&amp; sudo apt install -y python3 python3-venv python3-pip
+# Fedora / RHEL:   sudo dnf install -y python3 python3-pip
+python3 --version
+
+# Create &amp; activate a virtual environment, then install dependencies
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[mcp,ingest,ui]"</code></pre>
+
+        <h4>Windows (PowerShell or Command Prompt)</h4>
+        <pre><code># Verify Python 3.11+ (if needed, install via winget: winget install Python.Python.3.12)
+py -3 --version
+
+# Create &amp; activate a virtual environment, then install dependencies
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1   # In Command Prompt (cmd.exe): .venv\Scripts\activate.bat
+python -m pip install -e ".[mcp,ingest,ui]"</code></pre>
+        <p class="muted" style="font-size: 13px;"><em>Windows PowerShell note:</em> If script activation is blocked, run <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> once in PowerShell, or invoke <code>.\.venv\Scripts\python.exe</code> directly without activating.</p>
+
+        <h3>2. Standard User Workflow</h3>
+        <ol>
+          <li>
+            <strong>Start &amp; Open the Dashboard:</strong><br />
+            Run the local dashboard server from the <code>AdvisorBot</code> repo root:
+            <ul>
+              <li><strong>macOS / Linux:</strong> <code>.venv/bin/python Scripts/advisorbot_server.py --open</code> <em>(on headless or WSL setups without a desktop browser opener, omit <code>--open</code> and open the printed <code>http://127.0.0.1:8765/?token=...</code> URL manually)</em></li>
+              <li><strong>Windows:</strong> <code>.\.venv\Scripts\python.exe Scripts\advisorbot_server.py --open</code></li>
+            </ul>
+            <em>(If your <code>.venv</code> virtual environment is already activated in the current terminal, <code>python Scripts/advisorbot_server.py --open</code> works on all platforms.)</em> This starts the local dashboard on <code>http://127.0.0.1:8765/</code> and opens an authenticated session in your browser.
+            <div class="callout callout-info" style="margin-top:10px;">
+              <strong>Local session:</strong> Use AdvisorBot on a trusted personal device. Run <code>--open</code> to start the server or open the verified instance already running on that port. The browser automatically exchanges the launch link for a signed, year-long cookie. Bookmark the clean dashboard URL for later visits.
+            </div>
+          </li>
+          <li>
+            <strong>Create &amp; Configure Your Portfolio (<code>Settings ⚙️</code>):</strong><br />
+            Open <strong>Portfolio Settings (⚙️) &gt; Portfolio</strong>, click <strong>+ New Portfolio</strong> (or initialize <code>Portfolios/&lt;PortfolioName&gt;/</code> manually per <a href="ch1-portfolio-setup.html#portfolio-dir">Chapter 1</a>), and complete the required fields (<strong>Portfolio Name</strong>, <strong>Annual Burn Rate</strong>, <strong>Tax Jurisdiction &amp; Ceilings</strong>, and at least one <strong>Family Member Name &amp; Birthdate</strong>) so the portfolio moves from <strong>Incomplete</strong> to ready and <strong>Select Portfolio</strong> activates. Use the remaining Settings tabs to set <strong>Symbols</strong>, <strong>Prompts</strong>, and <strong>Privacy</strong>.
+          </li>
+          <li>
+            <strong>Add Statements &amp; Refresh:</strong><br />
+            Drop brokerage statements into <code>Portfolios/&lt;PortfolioName&gt;/Statements/</code> (supports Wells Fargo <code>.pdf</code>, Morgan Stanley <code>.pdf</code>/<code>.xlsx</code>, <code>*.statement.json</code>, and <code>*.grants.json</code>), then click <strong>↻ Rescan</strong> and <strong>⚙ Portfolio Refresh</strong> in <strong>Settings &gt; Portfolio</strong>. Upload official <code>ssa.gov</code> <code>.xml</code> earnings statements per investor inside <strong>Settings &gt; Family Members</strong>. For unsupported institutions, see <a href="ch1-portfolio-setup.html#agent-plugins">Chapter 1, Section 1.5</a>.
+          </li>
+          <li>
+            <strong>Explore &amp; Model:</strong>
+            <ul>
+              <li>Inspect aggregated holdings, asset allocation, and vesting timelines.</li>
+              <li>Experiment in the <strong>Retirement Simulator</strong> using <strong>Simulation Controls</strong> (<strong>Market Correction</strong> + <strong>Simulation</strong>: <code>None</code>, <code>Monte Carlo</code>, <code>Historical</code>), <strong>Inclusions</strong>, and <strong>Overrides</strong>.</li>
+              <li>Save what-if scenarios, toggle <code>🔒 Protected</code> / <code>🔓 Unprotected</code> on benchmark plans, or consult the in-page AI Financial Assistant.</li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+
+      <!-- (C) Index of User Documentation -->
+      <section class="chapter-section" id="docs-index">
+        <h2>(C) Index of User Documentation</h2>
+        <p>Comprehensive guides and reference manuals live in the <code>Docs/</code> directory:</p>
+        <ul>
+          <li>
+            <a href="index.html"><strong>User &amp; System Guide Portal (<code>Docs/index.html</code>)</strong></a>:
+            <ul>
+              <li><a href="ch1-portfolio-setup.html"><strong>Chapter 1: Setting Up Your Portfolio</strong></a> &mdash; Creating a portfolio folder, configuring portfolio settings, adding statements, reviewing status indicators, and writing custom statement plugins.</li>
+              <li><a href="ch2-core-walkthrough.html"><strong>Chapter 2: Core Application Walkthrough</strong></a> &mdash; Portfolio Performance, Stock Vesting, Retirement Simulator, SSN Visualizer, Scenario Management, and Holding Forecast Methodology.</li>
+              <li><a href="ch3-security-privacy.html"><strong>Chapter 3: Security &amp; Privacy Architecture</strong></a> &mdash; Local-only architecture, session authentication, Privacy Shield profiles, Demo Mode, and local AI setup.</li>
+              <li><a href="ch4-developer-agent.html"><strong>Chapter 4: Developer &amp; Agent Integration</strong></a> &mdash; Model Context Protocol (MCP) server setup, privacy boundaries, engineering guardrails, and isolated fixture test suite reference.</li>
+            </ul>
+          </li>
+          <li>
+            <strong><code>Examples/</code> Starter Templates:</strong>
+            <ul>
+              <li><code>Examples/project.example.json</code> &amp; <code>Examples/grants.example.json</code>: Starter templates for portfolio configuration and equity-grant schedules.</li>
+              <li><code>Examples/llm_config.gemini.json</code>, <code>llm_config.claude.json</code>, <code>llm_config.openai.json</code>, <code>Examples/llm_config.local_ollama.json</code> (and <a href="ch1-portfolio-setup.html#llm-setup">Chapter 1.2 LLM Configuration Guide</a>): Starter templates for cloud and local AI providers.</li>
+              <li><code>Examples/mcp_config.example.json</code>: Starter configuration for connecting external MCP clients.</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <!-- (D) License, Attribution & Disclaimer -->
+      <section class="chapter-section" id="disclaimer">
+        <h2>(D) License, Attribution &amp; Disclaimer</h2>
+        <ul>
+          <li><strong>License:</strong> Released under the <strong>BSD 3-Clause License</strong> (<code>LICENSE</code> in the repository root).</li>
+          <li><strong>Attribution:</strong> Derivative works and redistributions must preserve the copyright/license notice and should acknowledge <strong>AdvisorBot</strong> per <code>NOTICE</code>. Per Clause 3 of the BSD 3-Clause License, neither the name <strong>AdvisorBot</strong> nor contributor names may be used to endorse or promote derived products without prior written permission.</li>
+          <li><strong>Disclaimer:</strong> Review the full Financial, Tax, AI &amp; Security Disclaimer below before using simulations, tax estimates, market quotes, or AI Chat / MCP outputs.</li>
+        </ul>
+
+        <details class="doc-details" open>
+          <summary>
+            <span class="doc-details-title">
+              <span class="doc-details-chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+              <span>Full Financial, Tax, AI &amp; Security Disclaimer (<code>DISCLAIMER.md</code>)</span>
+            </span>
+            <span class="doc-details-tag">Important</span>
+          </summary>
+          <div class="doc-details-body">
+            <h4>1. No Financial, Investment, Tax, or Legal Advice</h4>
+            <p><strong>AdvisorBot</strong> is free, open-source, self-hosted software provided strictly for <strong>personal educational, informational, and exploratory modeling purposes</strong>. Nothing in this repository, its dashboard, simulations, charts, liquidation optimizer, Social Security projections, documentation, or AI assistant outputs constitutes financial, investment, tax, legal, accounting, or estate-planning advice. Neither <strong>AdvisorBot</strong> nor its author(s) or contributors are a Registered Investment Advisor (RIA), broker-dealer, fiduciary, Certified Public Accountant (CPA), enrolled agent, or attorney. Your use of AdvisorBot does not create an advisor-client, fiduciary, or professional relationship of any kind.</p>
+
+            <h4>2. Simulation, Tax &amp; Regulatory Approximation Limits</h4>
+            <p>Financial planning rules and brokerage accounting are complex and change frequently. AdvisorBot's calculations&mdash;including capital gains lot matching, loss carryforwards, federal/state tax rate modeling, non-qualified annuity IRS Section 72 LIFO logic, SECURE 2.0 Required Minimum Distributions (RMDs), Social Security PIA/claiming adjustments, Monte Carlo sampling, and historical cohort replays&mdash;are <strong>simplified mathematical models</strong> that may omit edge cases, local rules, fees, wash-sale adjustments, AMT/NIIT interactions, early-withdrawal penalties, or brokerage execution constraints. Always independently verify figures against official brokerage statements, SSA records, IRS guidance, and qualified licensed professionals before making any financial, tax, retirement, or investment decision.</p>
+
+            <h4>3. AI / LLM &amp; Agent Uncertainty</h4>
+            <p>AdvisorBot includes optional <strong>AI Chat</strong> and <strong>Model Context Protocol (MCP)</strong> integrations. Large language models (local or cloud-hosted) are probabilistic systems that can hallucinate numbers, misread tool schemas, cite outdated tax law, omit material caveats, or generate flawed reasoning. You are <strong>solely responsible</strong> for independently reviewing, verifying, and approving every AI-generated summary, calculation, response, or saved what-if scenario before relying upon it.</p>
+
+            <h4>4. Market Data &amp; External APIs</h4>
+            <p>Live quotes (such as Yahoo Finance lookups via the local sidecar) come from third-party public feeds and may be delayed, incomplete, stale, or inaccurate. Optional remote LLM providers (Google Gemini, Anthropic Claude, OpenAI, or others you configure) operate under their own respective Terms of Service and privacy policies, and are governed by the <strong>Privacy Shield</strong> profile that you choose to enable.</p>
+
+            <h4>5. Self-Hosted Security &amp; User Responsibility</h4>
+            <p>AdvisorBot is engineered for local-first operation and includes built-in privacy translation and host/token controls, <strong>but no software guarantees complete security</strong>. You remain solely responsible for securing your operating system, local network, API keys, financial statements, SQLite databases, scenario files, and backups, and for evaluating which Privacy Shield or MCP settings match your risk tolerance.</p>
+
+            <h4>6. Assumption of Risk &amp; No Liability</h4>
+            <p>By running, modifying, or distributing AdvisorBot, you acknowledge that all investment, retirement, tax, and operational risks rest solely with you. In no event shall the copyright holders, authors, or contributors be liable for any investment loss, tax penalty, missed opportunity, data loss, security incident, or any direct, indirect, incidental, special, exemplary, or consequential damages arising from use of this software or its outputs.</p>
+          </div>
+        </details>
+      </section>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      initDocsPage(0);
+    });
+  </script>
+</body>
+</html>

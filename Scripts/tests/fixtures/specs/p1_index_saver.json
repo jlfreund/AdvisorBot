@@ -1,0 +1,212 @@
+{
+  "spec_version": 1,
+  "name": "p1_index_saver",
+  "seed": 20260102,
+  "as_of": "2026-11-16",
+  "title": "Single investor, one taxable brokerage, index funds and cash",
+  "purpose": "The simplest portfolio that still runs the whole pipeline. One investor, one custodian, no employer stock, no annuities, no municipal bonds, and a state with no income tax. Anything the dashboard says about a concentrated position, an equity plan or a state tax clause on this fixture is a legacy literal rather than a fact about the data.",
+  "exercises": [
+    "ingest.monthly_statements",
+    "ingest.anchors",
+    "ingest.dedupe",
+    "payload.account_labels",
+    "wrappers.taxable",
+    "cash_interest.ordinary_income",
+    "social_security.single_investor",
+    "simulator.simple_model",
+    "solver.annual_burn",
+    "monte_carlo.broad_equity_only",
+    "render.no_state_tax_clause"
+  ],
+  "household": {
+    "name": "Delacroix Household",
+    "state": "TX",
+    "state_label": "Texas (no state income tax)",
+    "primary_equity_symbol": "",
+    "reference_annual_burn": 72000,
+    "retirement_annual_burn": 72000,
+    "tax_rates": {
+      "ltcg_top": 0.238,
+      "ordinary_top": 0.37,
+      "state_rate": 0.0,
+      "ssn_effective": 0.3145,
+      "cash_interest": 0.37,
+      "ira_ordinary": 0.37
+    },
+    "sim_asset_rates": {
+      "cash_sweeps": {
+        "rate_model": "fixed",
+        "annual_rate_pct": 3.9
+      }
+    }
+  },
+  "investors": [
+    {
+      "id": "inv_simone",
+      "name": "Simone Delacroix",
+      "birth": "1990-04-22",
+      "milestone_age": 90,
+      "rmd_owner": true,
+      "ssa": {
+        "earnings": {
+          "start": 2012,
+          "end": 2026,
+          "profile": "mid_rising"
+        },
+        "claim_age": 67,
+        "fra_age": 67,
+        "emit_xml": false
+      }
+    }
+  ],
+  "beneficiaries": [],
+  "accounts": [
+    {
+      "id": "HB-7001",
+      "institution": "Harbor Brokerage",
+      "account_name": "Harbor Individual Brokerage",
+      "account_type": "BROKERAGE",
+      "tax_status": "TAXABLE",
+      "display_order": 10,
+      "periods": {
+        "from": "2026-03",
+        "to": "2026-10"
+      },
+      "positions": [
+        {
+          "kind": "ticker",
+          "symbol": "VTI",
+          "name": "Vanguard Total Stock Market ETF",
+          "asset_class": "ETF",
+          "risk_class": "broad_equity",
+          "stack_bucket": "stocks",
+          "expense_ratio_pct": 0.03,
+          "lots": [
+            {
+              "qty": 600,
+              "acquired": "2019-03-15",
+              "cost_per_share": 145.0,
+              "label": "initial"
+            },
+            {
+              "qty": 400,
+              "acquired": "2021-07-01",
+              "cost_per_share": 228.0,
+              "label": "add"
+            },
+            {
+              "qty": 250,
+              "acquired": "2024-02-20",
+              "cost_per_share": 252.0,
+              "label": "add"
+            }
+          ]
+        },
+        {
+          "kind": "ticker",
+          "symbol": "BNDX",
+          "name": "Vanguard Total International Bond ETF",
+          "asset_class": "ETF",
+          "risk_class": "fixed_income",
+          "stack_bucket": "bonds",
+          "lots": [
+            {
+              "qty": 2000,
+              "acquired": "2022-05-10",
+              "cost_per_share": 50.5
+            }
+          ]
+        },
+        {
+          "kind": "cash",
+          "name": "Harbor Cash Sweep",
+          "value": 51450.17,
+          "yield_pct": 3.9,
+          "monthly_drift": -900.0
+        }
+      ]
+    }
+  ],
+  "market_prices": {
+    "VTI": {
+      "p0": 130.55,
+      "start": "2019-01-04",
+      "mu": 0.09,
+      "sigma": 0.16
+    },
+    "BNDX": {
+      "p0": 50.1,
+      "start": "2019-01-04",
+      "mu": 0.02,
+      "sigma": 0.05
+    }
+  },
+  "scenarios": [
+    {
+      "name": "Default",
+      "protected": true,
+      "active": true,
+      "notes_md": "Generated baseline: $72k real burn, 2.5% inflation, simple deterministic model.",
+      "settings": {
+        "simAnnualBurn": 72000,
+        "simInflationPct": 2.5,
+        "simActiveModel": "simple"
+      }
+    },
+    {
+      "name": "Lean Retirement",
+      "settings_delta": {
+        "simAnnualBurn": 48000
+      }
+    },
+    {
+      "name": "Early Crash Stress",
+      "settings_delta": {
+        "simActiveModel": "stress",
+        "simCustomShockPct": -35
+      }
+    }
+  ],
+  "privacy": {
+    "ai_shield": "identity_aliased",
+    "demo_mode": {
+      "enabled": false,
+      "scale": 0.6
+    },
+    "synonyms": {
+      "Harbor Brokerage": [
+        "Harbor",
+        "HB"
+      ]
+    }
+  },
+  "invariants": [
+    {
+      "path": "institutions",
+      "equals": [
+        "Harbor Brokerage"
+      ],
+      "note": "Exactly one custodian exists; a second name would mean a hard-coded institution branch fired (LL-02, fixed).",
+      "source": "payload_summary"
+    },
+    {
+      "path": "grant_symbols",
+      "equals": [],
+      "note": "No equity plan exists, so no grant bucket and no placeholder grant (LL-22).",
+      "source": "payload_summary"
+    },
+    {
+      "path": "account_count",
+      "equals": 1,
+      "note": "One statement-bearing account.",
+      "source": "payload_summary"
+    },
+    {
+      "path": "project.primary_equity_symbol",
+      "equals": "",
+      "note": "No concentrated position is configured, so none should be designated.",
+      "source": "payload"
+    }
+  ],
+  "notes": "Twelve-month statement history would also cover year-boundary logic; eight months is enough for anchors, staleness and dedupe, which is what this fixture is for."
+}

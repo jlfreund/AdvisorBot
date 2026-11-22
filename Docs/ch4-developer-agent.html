@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 4: Developer &amp; Agent Integration — AdvisorBot Documentation</title>
+  <link rel="icon" href="../Assets/default_badge.svg" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <span>🛡️ AdvisorBot</span>
+      <span style="color: var(--muted); font-weight: normal;">|</span>
+      <span>Documentation &amp; User Manual</span>
+    </div>
+    <nav class="topbar-links">
+      <a class="nav-pill" href="../index.html">← Live Dashboard</a>
+      <a class="nav-pill active" href="index.html">User Guide</a>
+      <a class="nav-pill" href="readme.html">Top-Level README</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar Table of Contents -->
+    <aside class="toc" id="doc-toc">
+      <div class="toc-header">
+        <div class="toc-heading">Documentation Chapters</div>
+        <button type="button" class="toc-toggle-all-btn" id="toc-toggle-all" onclick="toggleAllChapters()" title="Toggle all chapters">Expand All</button>
+      </div>
+
+      <div class="toc-item">
+        <a href="index.html" class="toc-nav-link">
+          <span style="font-size:14px;">📖</span>
+          <span>Overview &amp; Architecture</span>
+        </a>
+      </div>
+
+      <!-- Chapter 1 -->
+      <div class="toc-chapter-group" id="ch-group-1">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(1)" aria-label="Toggle Chapter 1 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch1-portfolio-setup.html" class="toc-chapter-link">
+            1. Setting Up Your Portfolio
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-dir">1.1 Create &amp; Complete Your Portfolio</a>
+          <a class="sub" href="ch1-portfolio-setup.html#llm-setup">1.2 Configuring AI &amp; Local LLMs</a>
+          <a class="sub" href="ch1-portfolio-setup.html#statements-drop">1.3 Dropping Financial Statements</a>
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-settings-audit">1.4 Settings Portfolio Audit</a>
+          <a class="sub" href="ch1-portfolio-setup.html#agent-plugins">1.5 Developing Custom Plugins</a>
+        </div>
+      </div>
+
+      <!-- Chapter 2 -->
+      <div class="toc-chapter-group" id="ch-group-2">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(2)" aria-label="Toggle Chapter 2 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch2-core-walkthrough.html" class="toc-chapter-link">
+            2. Core Application Walkthrough
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch2-core-walkthrough.html#page-positions">2.1 Positions &amp; Weekly Timeline</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-grants">2.2 Employee Stock &amp; Vesting</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-simulator">2.3 Retirement Simulator &amp; Drawdown</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-social-security">2.4 Income &amp; Expense (Social Security)</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-scenarios">2.5 Scenario Details &amp; Baselines</a>
+          <a class="sub" href="ch2-core-walkthrough.html#page-settings">2.6 Settings &amp; Preferences</a>
+          <a class="sub" href="ch2-core-walkthrough.html#holding-forecast-methodology">2.7 Holding Forecasts &amp; Baselines</a>
+        </div>
+      </div>
+
+      <!-- Chapter 3 -->
+      <div class="toc-chapter-group" id="ch-group-3">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(3)" aria-label="Toggle Chapter 3 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch3-security-privacy.html" class="toc-chapter-link">
+            3. Security &amp; Privacy Architecture
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch3-security-privacy.html#sec-local-first">3.1 Localhost &amp; Network Isolation</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-cross-tab">3.2 Protection From Browser Tabs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-profiles">3.3 The 3 AI Privacy Profiles</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-local-llm">3.4 100% Offline Local LLMs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-alias-table">3.5 Maintaining the Alias Table</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-unsupported-banks">3.6 Unsupported Banks &amp; Parsers</a>
+        </div>
+      </div>
+
+      <!-- Chapter 4 -->
+      <div class="toc-chapter-group" id="ch-group-4">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(4)" aria-label="Toggle Chapter 4 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch4-developer-agent.html" class="toc-chapter-link active">
+            4. Developer &amp; Agent Integration
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="#adv-mcp">4.1 External Agent MCP Integration</a>
+          <a class="sub" href="#adv-mcp-security">4.2 MCP Security &amp; Injection Defense</a>
+          <a class="sub" href="#adv-guardrails">4.3 Engineering &amp; Privacy Guardrails</a>
+          <a class="sub" href="#adv-testing">4.4 Isolated Test Suite &amp; Verification</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      <div class="chapter-banner">
+        <div class="chapter-badge-wrap">
+          <span class="badge badge-amber">Chapter 4</span>
+          <span class="badge badge-purple">Developer &amp; MCP</span>
+        </div>
+        <h1 style="margin-bottom:6px;">Developer &amp; Agent Integration</h1>
+        <p class="subtitle" style="margin-bottom:0;">Model Context Protocol (MCP) server, external tool calls, threat modeling, and prompt injection defense.</p>
+      </div>
+
+      <section id="ch4-advanced">
+        <h3 id="adv-mcp">4.1 External Agent MCP Integration</h3>
+        <p>AdvisorBot includes a high-performance Model Context Protocol (MCP) server (<code>Scripts/mcp_server.py</code>). This enables AI agents in Claude Desktop, Cursor, or Gemini CLI to safely interact with your portfolio using the Python interpreter inside your virtual environment (<code>.venv</code>):</p>
+        <div class="os-filter-bar" role="region" aria-label="Filter MCP configuration by operating system">
+          <span class="os-filter-label">Platform Commands:</span>
+          <button type="button" class="os-filter-btn active" data-os-filter="all">All Platforms</button>
+          <button type="button" class="os-filter-btn" data-os-filter="macos">macOS</button>
+          <button type="button" class="os-filter-btn" data-os-filter="linux">Linux</button>
+          <button type="button" class="os-filter-btn" data-os-filter="windows">Windows</button>
+        </div>
+        <div class="platform-variants">
+          <div class="platform-variant" data-os="macos">
+            <div class="platform-variant-header">
+              <span>macOS</span>
+              <span class="platform-variant-shell">~/Library/Application Support/Claude/claude_desktop_config.json</span>
+            </div>
+            <pre><code>{
+  "mcpServers": {
+    "holdings-tools": {
+      "command": "/absolute/path/to/AdvisorBot/.venv/bin/python",
+      "args": ["/absolute/path/to/AdvisorBot/Scripts/mcp_server.py"]
+    }
+  }
+}</code></pre>
+          </div>
+          <div class="platform-variant" data-os="linux">
+            <div class="platform-variant-header">
+              <span>Linux</span>
+              <span class="platform-variant-shell">~/.config/Claude/claude_desktop_config.json (or .cursor/mcp.json)</span>
+            </div>
+            <pre><code>{
+  "mcpServers": {
+    "holdings-tools": {
+      "command": "/absolute/path/to/AdvisorBot/.venv/bin/python",
+      "args": ["/absolute/path/to/AdvisorBot/Scripts/mcp_server.py"]
+    }
+  }
+}</code></pre>
+          </div>
+          <div class="platform-variant" data-os="windows">
+            <div class="platform-variant-header">
+              <span>Windows</span>
+              <span class="platform-variant-shell">%APPDATA%\Claude\claude_desktop_config.json</span>
+            </div>
+            <pre><code>{
+  "mcpServers": {
+    "holdings-tools": {
+      "command": "C:\\path\\to\\AdvisorBot\\.venv\\Scripts\\python.exe",
+      "args": ["C:\\path\\to\\AdvisorBot\\Scripts\\mcp_server.py"]
+    }
+  }
+}</code></pre>
+            <div class="platform-variant-note">Remember to escape backslashes (<code>\\</code>) in Windows JSON paths. Cursor (<code>.cursor\mcp.json</code>) and Gemini CLI (<code>%USERPROFILE%\.gemini\settings.json</code>) use the same <code>mcpServers</code> schema.</div>
+          </div>
+        </div>
+        <p>The MCP server (<code>holdings-tools</code>) honors the active <strong>Privacy Shield mode</strong> (automatically upgrading to <code>identity_and_values</code> scaled by <code>demo_mode.scale_factor</code> whenever Demo Mode is enabled, even if <code>ai_shield.mode</code> is <code>off</code>) and exposes seven tools over local <code>stdio</code> IPC: read/analysis tools (<code>holdings__get_overview</code>, <code>holdings__query_positions</code>, <code>holdings__run_simulation</code>, <code>holdings__compute_non_primary_growth</code>, and <code>holdings__solve_simulation</code>) plus stateful scenario and browser tools (<code>holdings__manage_saves</code> for creating, loading, renaming, deleting, and upvoting scenarios, and <code>holdings__control_live_ui</code>). Protected scenarios reject overwrites/deletions unless <code>overwrite_existing=True</code> and <code>confirmed_by_user=True</code> are explicitly passed (and Demo Mode blocks all scenario/UI mutations).</p>
+
+        <h3 id="adv-mcp-security">4.2 MCP Security &amp; Prompt Injection Defense</h3>
+        <p>While the MCP protocol allows desktop agents to provide deep insights on your wealth, exposing personal financial data to LLM agents requires careful attention to the threat model:</p>
+
+        <h4>Transport Isolation &amp; Zero Network Surface</h4>
+        <p>AdvisorBot's MCP server communicates <strong>strictly over local <code>stdio</code> IPC</strong> (standard input / standard output). It opens no listening network ports, accepts no HTTP connections, and cannot be accessed from web browsers or LAN devices. Furthermore, the server contains zero network egress tools—it cannot send outbound HTTP requests or exfiltrate data on its own.</p>
+
+        <h4>Understanding the Indirect Prompt Injection Risk</h4>
+        <p>The security risk with MCP does not originate in the MCP server itself; it arises from the <strong>capabilities of the host CLI agent</strong> running in your terminal:</p>
+        <div class="callout callout-warning">
+          <strong>The Dual-Tool Threat Vector:</strong>
+          If an external agent (e.g. Claude Code or Gemini CLI) has access to <strong>both</strong>:
+          <ol style="margin: 6px 0 0; padding-left: 20px;">
+            <li><strong>AdvisorBot's MCP Tools</strong> (which read sensitive portfolio balances, accounts, and holdings), and</li>
+            <li><strong>General-purpose execution tools</strong> (like <code>curl</code>, bash, or web search/browsing),</li>
+          </ol>
+          an attacker could embed an <em>indirect prompt injection</em> in an untrusted document (PDF, webpage, or email) that you ask the agent to inspect. The injection could trick the LLM into treating hidden text as system instructions, prompting it to call <code>holdings__get_overview</code> and exfiltrate your financial records to an external server via <code>curl</code>.
+        </div>
+
+        <h4>Best Practices &amp; In-App Management</h4>
+        <ul>
+          <li><strong>Master Privacy Toggle &amp; Shield Enforcement</strong>: Under <strong>Settings &gt; Privacy</strong>, the <strong>Model Context Protocol (MCP)</strong> row allows you to enable or disable the service with a single click. When disabled or when privacy configuration fails to parse (fail-closed), the server strictly blocks all tool invocations. When MCP is enabled, <code>identity_aliased</code> aliases identities and <code>identity_and_values</code> also scales values (and enabling Demo Mode upgrades even <code>off</code> / <code>identity_aliased</code> to <code>identity_and_values</code> scaled by <code>demo_mode.scale_factor</code>). <code>off</code> permits clear results in Live View, while <code>local_only</code> blocks MCP calls. Overwriting or deleting protected scenarios requires both <code>overwrite_existing=True</code> and <code>confirmed_by_user=True</code>.</li>
+          <li><strong>Decoupled Runtime</strong>: The in-app web dashboard and built-in AI Chat do not use MCP. You can keep the MCP server <strong>Disabled</strong> full-time without losing any browser features.</li>
+          <li><strong>Context Isolation</strong>: Never instruct a CLI agent that has access to financial MCP tools to read untrusted third-party web content or untrusted attachments within the same conversation session.</li>
+          <li><strong>Sandboxed Agents</strong>: Configure financial agents in desktop containers (e.g. Claude Desktop) that do not have unrestricted terminal/bash access or arbitrary outbound networking.</li>
+        </ul>
+
+        <h3 id="adv-guardrails">4.3 Security, Privacy &amp; Portability Engineering Guardrails</h3>
+        <p>Contributors modifying server, LLM, ingest, simulator, or UI templates must uphold these non-negotiable invariants:</p>
+        <ul>
+          <li><strong>Fail-Closed Privacy Shield &amp; Leak Check</strong>: Cloud LLM requests and MCP tools must always resolve the active Privacy Shield (defaulting to blocked on config read errors) and validate scrubbed payloads via <code>_assert_wire_leak_free()</code> before transmission. In Mode C (<code>identity_and_values</code>), scale every numeric field unless its key is explicitly allowlisted as non-monetary.</li>
+          <li><strong>Credential Hygiene &amp; Dynamic Aliasing</strong>: Pass Gemini API keys strictly via the <code>x-goog-api-key</code> HTTP header (never URL query strings), never place secrets into CLI flags or shell commands, and enforce <code>0o600</code> permissions / <code>0o077</code> umask on tokens, configs, SQLite DBs, badges, snapshots, and <code>privacy_registry.json</code> (real account/contract IDs display in Live View and are dynamically aliased in Demo Mode and Privacy Shield Modes B/C).</li>
+          <li><strong>Safe Subprocesses &amp; Auth Gates</strong>: Never invoke CLI agents with <code>--dangerously-skip-permissions</code> or <code>shell=True</code>; pass untrusted prompts via <code>stdin</code> with <code>--disable-slash-commands</code>. Bind <code>ThreadingHTTPServer</code> to <code>127.0.0.1</code> before writing <code>Data/.session_token</code> and gate all API routes behind host + token validation.</li>
+          <li><strong>Parser, XSS &amp; Portability Hardening</strong>: Use defused/bounded XML/XLSX/PDF limits, reject symlink escapes outside the workspace, escape dynamic HTML with <code>escHtml()</code>, never hardcode household-specific tickers, dates, or dollar fallbacks in <code>Scripts/</code>, and keep Python (<code>simulator.py</code>) and browser JS (<code>app_simulator.js</code>) simulation engines in 1:1 parity.</li>
+        </ul>
+
+        <h3 id="adv-testing">4.4 Isolated Test Suite &amp; Verification</h3>
+        <p>Every test under <code>Scripts/tests/</code> runs strictly against six synthetic fixture portfolios (<code>p0_empty_household</code>, <code>p1_index_saver</code>, <code>p2_equity_comp_rsu</code>, <code>p3_retiree_annuities</code>, <code>p4_trust_household</code>, and <code>p5_adversarial</code>) inside ephemeral scratch directories. Autouse runtime guards in <code>conftest.py</code> refuse to run against non-fixture roots and block outbound non-loopback network calls, guaranteeing that running tests never touches your real <code>Portfolios/</code> directory.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:115px;">Tier</th>
+              <th>Scope &amp; Verification Coverage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>unit</code></td>
+              <td>Pure functions: progressive tax models, 7-class risk taxonomy, Privacy Shield translator, and fixture determinism.</td>
+            </tr>
+            <tr>
+              <td><code>parsers</code></td>
+              <td>Institution statement parsers against golden page text plus canonical <code>*.statement.json</code> and <code>*.grants.json</code> plugins.</td>
+            </tr>
+            <tr>
+              <td><code>pipeline</code></td>
+              <td>Statement ingestion &rarr; SQLite persistence &rarr; forecast enrichment &rarr; view-model assembly on synthetic fixture roots.</td>
+            </tr>
+            <tr>
+              <td><code>engine</code></td>
+              <td>40-year / 100-year solvency simulator, goal-seek bisection solver, Monte Carlo bands, and 1929&ndash;2025 historical cohorts.</td>
+            </tr>
+            <tr>
+              <td><code>parity</code></td>
+              <td>1:1 milestone, tax, optimizer, Monte Carlo, and cohort equality between Python (<code>simulator.py</code>) and browser JS via Node VM.</td>
+            </tr>
+            <tr>
+              <td><code>server</code></td>
+              <td><code>advisorbot_server.py</code> loopback Host/Port guards, session cookie bootstrap, CSRF checks, Demo Mode projection, and protected scenario locks.</td>
+            </tr>
+            <tr>
+              <td><code>llm</code></td>
+              <td>Privacy Shield Modes A/B/C, bidirectional alias round-trips, and outbound wire-leak gates against a fake provider.</td>
+            </tr>
+            <tr>
+              <td><code>render</code> &amp; <code>scans</code></td>
+              <td>Template JS syntax checks, dirty-state tracking, zero-PII/home-path hygiene, zero literal fallbacks, and portability denylist checks.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Install the optional test extra (<code>pip install -e ".[dev]"</code>) and run the suite from the repository root:</p>
+        <div class="platform-variants">
+          <div class="platform-variant" data-os="macos">
+            <div class="platform-variant-header">
+              <span>macOS</span>
+              <span class="platform-variant-shell">Terminal (zsh / bash)</span>
+            </div>
+            <pre><code># Full default suite (~2 min) or a single tier / security subset
+make test PYTHON=.venv/bin/python
+make test-tier T=server PYTHON=.venv/bin/python
+make test-security PYTHON=.venv/bin/python
+
+# Verify fixture determinism, parser golden fixtures &amp; hygiene scans, or dry-run a plugin
+make fixtures-check PYTHON=.venv/bin/python
+.venv/bin/python -m pytest -q Scripts/tests/parsers Scripts/tests/scans
+.venv/bin/python Scripts/holdings.py inspect-statement path/to/statement.pdf
+.venv/bin/python Scripts/holdings.py test-plugin path/to/statement.pdf --offline</code></pre>
+          </div>
+          <div class="platform-variant" data-os="linux">
+            <div class="platform-variant-header">
+              <span>Linux</span>
+              <span class="platform-variant-shell">Terminal (bash / zsh)</span>
+            </div>
+            <pre><code># Full default suite (~2 min) or a single tier / security subset
+make test PYTHON=.venv/bin/python
+make test-tier T=server PYTHON=.venv/bin/python
+make test-security PYTHON=.venv/bin/python
+
+# Verify fixture determinism, parser golden fixtures &amp; hygiene scans, or dry-run a plugin
+make fixtures-check PYTHON=.venv/bin/python
+.venv/bin/python -m pytest -q Scripts/tests/parsers Scripts/tests/scans
+.venv/bin/python Scripts/holdings.py inspect-statement path/to/statement.pdf
+.venv/bin/python Scripts/holdings.py test-plugin path/to/statement.pdf --offline</code></pre>
+          </div>
+          <div class="platform-variant" data-os="windows">
+            <div class="platform-variant-header">
+              <span>Windows</span>
+              <span class="platform-variant-shell">PowerShell / Command Prompt</span>
+            </div>
+            <pre><code># Full default suite (~2 min) or a single tier / security subset
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m pytest -q Scripts\tests\server
+.\.venv\Scripts\python.exe -m pytest -q -m security
+
+# Verify parser golden fixtures &amp; hygiene scans, or inspect / dry-run a statement plugin
+.\.venv\Scripts\python.exe -m pytest -q Scripts\tests\parsers Scripts\tests\scans
+.\.venv\Scripts\python.exe Scripts\holdings.py inspect-statement path\to\statement.pdf
+.\.venv\Scripts\python.exe Scripts\holdings.py test-plugin path\to\statement.pdf --offline</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chapter Pagination Footer -->
+      <div class="chapter-nav-footer">
+        <a href="ch3-security-privacy.html" class="chapter-nav-btn prev">
+          <span class="dir-label">← Previous Chapter</span>
+          <span class="title-label">Chapter 3: Security &amp; Privacy Architecture</span>
+        </a>
+        <a href="index.html" class="chapter-nav-btn next">
+          <span class="dir-label">Documentation Hub →</span>
+          <span class="title-label">Overview &amp; Table of Contents</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      initDocsPage(4);
+    });
+  </script>
+</body>
+</html>

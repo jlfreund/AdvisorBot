@@ -1,0 +1,66 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Harbor Brokerage",
+  "account_id": "HB-7101",
+  "account_name": "Harbor Joint Brokerage",
+  "account_type": "BROKERAGE",
+  "tax_status": "TAXABLE",
+  "display_order": 20,
+  "period_start": "2026-10-01",
+  "as_of_date": "2026-10-31",
+  "reported_total": 275814.04,
+  "positions": [
+    {
+      "security_id": "TICKER:VNTG",
+      "symbol_or_code": "VNTG",
+      "canonical_name": "Vantage Robotics, Inc. Class A",
+      "asset_class": "EQUITY",
+      "stack_bucket": "stocks",
+      "risk_class": "single_stock",
+      "is_scrapeable": true,
+      "quote_symbol": "VNTG",
+      "quantity": 1000.0,
+      "stmt_price": 54.0766,
+      "market_value": 54076.6,
+      "value_date": "2026-10-31",
+      "cost_basis": 48120.0,
+      "acquisition_date": "2024-11-15"
+    },
+    {
+      "security_id": "TICKER:VOO",
+      "symbol_or_code": "VOO",
+      "canonical_name": "Vanguard S&P 500 ETF",
+      "asset_class": "ETF",
+      "stack_bucket": "stocks",
+      "risk_class": "broad_equity",
+      "is_scrapeable": true,
+      "quote_symbol": "VOO",
+      "quantity": 400.0,
+      "stmt_price": 370.0936,
+      "market_value": 148037.44,
+      "value_date": "2026-10-31",
+      "cost_basis": 142000.0,
+      "acquisition_date": "2023-01-10"
+    },
+    {
+      "security_id": "CASH:HB-7101",
+      "symbol_or_code": "USD",
+      "canonical_name": "Harbor Cash Sweep",
+      "asset_class": "CASH",
+      "stack_bucket": "cash",
+      "risk_class": "cash_fixed",
+      "is_scrapeable": false,
+      "quote_symbol": null,
+      "quantity": 1.0,
+      "stmt_price": null,
+      "market_value": 73700.0,
+      "value_date": "2026-10-31",
+      "yield_pct": 3.9
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "22d3d59ce37a565f"
+  }
+}

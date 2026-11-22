@@ -1,0 +1,50 @@
+{
+  "id": "003",
+  "name": "Gift To Noa At 21",
+  "is_protected": false,
+  "created_at": "2026-11-16T09:00:00+00:00",
+  "updated_at": "2026-11-16T09:00:00+00:00",
+  "author": {
+    "type": "fixture",
+    "model": null,
+    "prompt_type": null
+  },
+  "notes_md": "## Upvotes & Concurrences\n- Scheduled gift when the youngest beneficiary reaches her milestone age.",
+  "settings": {
+    "simActiveModel": "simple",
+    "simAnnualBurn": 190000,
+    "simInflationPct": 2.5,
+    "simIncludeSSN": true,
+    "simIncludeUnvested": true,
+    "simIncludeScheduledActions": true,
+    "simScaleMode": "real",
+    "simStressScenario": "gfc2008",
+    "simCustomShockPct": -30,
+    "simOrderPreset": "diversified_first",
+    "simAssetOrder": [],
+    "simHypotheticalAssets": [],
+    "simScheduledActions": [
+      {
+        "kind": "gift",
+        "person": "Noa Varga",
+        "age": 21,
+        "amount": 500000,
+        "dollar_mode": "today",
+        "purpose": "Education and first home"
+      }
+    ],
+    "mcReturnModel": "normal",
+    "mcSimulations": 500,
+    "mcSingleStockVolPct": 32.0,
+    "mcBroadEquityVolPct": 16.0,
+    "mcSingleStockCorr": 0.5,
+    "taxMode": "net",
+    "pastReleaseValMode": "net",
+    "cohortStartFrom": 1929,
+    "cohortCenterMode": "median",
+    "cohortInflationMode": "cpi",
+    "holdingForecasts": {}
+  },
+  "kpi_summary": {},
+  "snapshot": null
+}

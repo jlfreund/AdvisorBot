@@ -1,0 +1,41 @@
+{
+  "_schema_version": "1.0",
+  "_instructions": {
+    "quick_start": "Copy this file to Data/Config/LLM/gemini.json (for global use) or Portfolios/<PortfolioName>/LLM/gemini.json (portfolio-specific) and paste your Google API key into 'api_key'.",
+    "key_types": {
+      "paid_pay_as_you_go": "RECOMMENDED. Create an API key at https://aistudio.google.com/apikey linked to a Google Cloud Billing account (Pay-As-You-Go Tier 1/2). This tier gives high RPM/TPM rate limits without the strict 20-request/day Free Tier cap.",
+      "free_tier": "Google AI Studio Free Tier keys are supported, but have a strict limit of 20 requests per day for gemini-2.5-flash. Exceeding 20 requests produces HTTP 429 errors and displays a red '🔴 (quota/429)' dot in the UI. If you use a Free Tier key, consider using gemini-2.5-flash-lite for higher free limits.",
+      "external_cli_agents": "NOTE: External terminal agents ('agy', Claude Code, Gemini CLI) connect via the opt-in 'holdings-tools' MCP server rather than this file. In-app AI Chat and Saved Prompts use the HTTP API key configured here (or GEMINI_API_KEY) and enforce your active Privacy Shield mode.",
+      "vertex_ai": "For Google Cloud Vertex AI enterprise endpoints, you can update 'api_base_url' to your regional Vertex AI endpoint and provide a Google Cloud Service Account Bearer token or Gateway API key."
+    },
+    "environment_variable_alternative": "Instead of pasting your key here, you can set export GEMINI_API_KEY='AIzaSy...' in your shell (~/.bashrc or ~/.zshrc). If 'api_key' in this file is empty or starts with 'PASTE_YOUR_', AdvisorBot will automatically read GEMINI_API_KEY from your environment.",
+    "privacy_shield": "When Privacy Shield is enabled (Portfolio Settings -> Privacy), account names, trust titles, and holdings are aliased locally before sending to Google, and re-translated upon response."
+  },
+  "provider": "gemini",
+  "api_key": "PASTE_YOUR_GEMINI_API_KEY_HERE",
+  "model": "gemini-2.5-flash",
+  "display_name": "Gemini 2.5 Flash",
+  "api_base_url": "https://generativelanguage.googleapis.com/v1beta",
+  "max_tool_rounds": 8,
+  "temperature": 0.2,
+  "models": [
+    {
+      "id": "gemini-2.5-pro",
+      "display_name": "Gemini 2.5 Pro",
+      "tier": "flagship",
+      "description": "Gemini 2.5 Pro deep reasoning model"
+    },
+    {
+      "id": "gemini-2.5-flash",
+      "display_name": "Gemini 2.5 Flash",
+      "tier": "fast",
+      "description": "Default Gemini 2.5 Flash workhorse model"
+    },
+    {
+      "id": "gemini-2.5-flash-lite",
+      "display_name": "Gemini 2.5 Flash-Lite",
+      "tier": "lite",
+      "description": "Low-latency cost-efficient Gemini 2.5 Flash-Lite"
+    }
+  ]
+}

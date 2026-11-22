@@ -1,0 +1,49 @@
+{
+  "id": "002",
+  "name": "Diversify At Vest",
+  "is_protected": false,
+  "created_at": "2026-11-16T09:00:00+00:00",
+  "updated_at": "2026-11-16T09:00:00+00:00",
+  "author": {
+    "type": "fixture",
+    "model": null,
+    "prompt_type": null
+  },
+  "notes_md": "Sell half of every future release into the broad-market ETF on the vest date.",
+  "settings": {
+    "simActiveModel": "simple",
+    "simAnnualBurn": 150000,
+    "simInflationPct": 2.5,
+    "simIncludeSSN": true,
+    "simIncludeUnvested": true,
+    "simIncludeScheduledActions": true,
+    "simScaleMode": "real",
+    "simStressScenario": "gfc2008",
+    "simCustomShockPct": -30,
+    "simOrderPreset": "diversified_first",
+    "simAssetOrder": [],
+    "simHypotheticalAssets": [],
+    "simScheduledActions": [
+      {
+        "kind": "sell_at_vest",
+        "pct": 50,
+        "target_symbol": "VOO",
+        "cadence": "on_vest",
+        "purpose": "Reduce single-stock concentration"
+      }
+    ],
+    "mcReturnModel": "normal",
+    "mcSimulations": 500,
+    "mcSingleStockVolPct": 32.0,
+    "mcBroadEquityVolPct": 16.0,
+    "mcSingleStockCorr": 0.5,
+    "taxMode": "net",
+    "pastReleaseValMode": "net",
+    "cohortStartFrom": 1929,
+    "cohortCenterMode": "median",
+    "cohortInflationMode": "cpi",
+    "holdingForecasts": {}
+  },
+  "kpi_summary": {},
+  "snapshot": null
+}

@@ -1,0 +1,1 @@
+Use a scheduled gift or purchase I identify, or ask me for its amount and date. Compare the same plan without the expense, with it as scheduled, and with it delayed two years. Show how much of the expense gets funded and whether it creates a later shortfall in regular household spending. Report the difference in milestone wealth in today’s dollars.

@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "household_name": "Brennan-Castillo Household",
+  "badge_image": "Assets/default_badge.svg",
+  "reference_annual_burn": 110000,
+  "retirement_annual_burn": 110000,
+  "primary_equity_symbol": "",
+  "symbols": [],
+  "ticker_aliases": {
+    "BRK/B": "BRK-B"
+  },
+  "google_finance_aliases": {
+    "BRK/B": "BRK.B"
+  },
+  "investors": [
+    {
+      "id": "inv_maeve",
+      "name": "Maeve Brennan",
+      "birth_date": "1952-03-09",
+      "milestone_age": 95,
+      "is_rmd_owner": true,
+      "ssn": {
+        "fra_age": 66,
+        "default_claim_age": 70,
+        "work_span_label": "1978 - 2020",
+        "earnings_note": "",
+        "external_file": "Statements/ssa/inv_maeve_ssa_statement.xml",
+        "annual_earnings": {}
+      }
+    },
+    {
+      "id": "inv_rafael",
+      "name": "Rafael Castillo",
+      "birth_date": "1955-11-27",
+      "milestone_age": 95,
+      "is_rmd_owner": false,
+      "ssn": {
+        "fra_age": 66,
+        "default_claim_age": 70,
+        "work_span_label": "1980 - 2022",
+        "earnings_note": "",
+        "external_file": "Statements/ssa/inv_rafael_ssa_statement.xml",
+        "annual_earnings": {}
+      }
+    }
+  ],
+  "beneficiaries": [],
+  "gsu_forecast": {
+    "default_net_retention_rate": 0.5,
+    "retention_trailing_months": 24,
+    "target_vested_account_id": "",
+    "target_vested_security_id": "",
+    "in_kind_transfer_target_account_id": "",
+    "in_kind_transfer_vest_date": "",
+    "high_basis_split_threshold": null
+  },
+  "accounts": {
+    "CB-5100": {
+      "institution": "Cedarline Wealth",
+      "account_name": "Cedarline Traditional IRA",
+      "account_type": "TRAD_IRA",
+      "tax_status": "TRAD_IRA",
+      "display_order": 10
+    },
+    "CB-5101": {
+      "institution": "Cedarline Wealth",
+      "account_name": "Cedarline Taxable Brokerage",
+      "account_type": "BROKERAGE",
+      "tax_status": "TAXABLE",
+      "display_order": 20
+    },
+    "CB-5102": {
+      "institution": "Cedarline Wealth",
+      "account_name": "Cedarline Municipal Bond Ladder",
+      "account_type": "BROKERAGE",
+      "tax_status": "TAXABLE",
+      "display_order": 30
+    }
+  },
+  "sim_asset_rates": {
+    "cash_sweeps": {
+      "rate_model": "fixed",
+      "annual_rate_pct": 3.6
+    }
+  },
+  "sim_cash_interest_tax_rate": 0.469,
+  "sim_ira_ordinary_tax_rate": 0.469,
+  "tax_rates": {
+    "state_code": "OR",
+    "ltcg_top": 0.288,
+    "ordinary_top": 0.469,
+    "state_rate": 0.099,
+    "ssn_effective": 0.3145
+  },
+  "historical_defaults": {
+    "default_start_date": "2024-01-01",
+    "default_forecast_end_date": "2029-12-28",
+    "backcast_before_earliest_statement": true,
+    "interpolate_between_anchors": true
+  },
+  "principal_overrides": {},
+  "stack_buckets": [],
+  "sim_buckets": {},
+  "advisor_prompts": {},
+  "saved_prompts_version": 1,
+  "saved_prompts": [
+    {
+      "id": "preferred_forecast",
+      "title": "Preferred Simulation Settings",
+      "prompt": "You are an educational retirement scenario assistant analyzing this household's portfolio and retirement simulator. Answer the core question: \"What is your preferred simulation setting to produce the most informative range of projections for this portfolio?\"\n\nState the as-of date, scenario, and assumptions, and identify when the tested differences are immaterial.\n\nFollow this 5-step research protocol using the `holdings-tools` MCP tools:\n\n1. DISCOVER PORTFOLIO & HOUSEHOLD PECULIARITIES\n   - Call `holdings__get_overview` and `holdings__query_positions(has_maturity=True)`.\n   - Identify configured investors (ages, milestone horizons, RMD rules, Social Security schedules), beneficiaries, tax rates, annual spending burn, and every asset bucket.\n   - Diagnose structural characteristics that govern forecast behavior: single-stock or sector concentration, unvested equity release schedules, fixed-income/muni maturity ladders, locked or buffered annuities, and taxable vs. tax-advantaged account mix.\n\n2. REVIEW THE OPEN SCENARIO LIBRARY\n   - Call `holdings__manage_saves(action=\"list\")` and inspect existing Scenarios and their `notes_md` rationales so you understand prior human and AI assumptions, caveats, and open questions.\n\n3. GROUND ASSUMPTIONS IN CURRENT MARKET CONDITIONS\n   - Evaluate current risk-free Treasury yields, inflation expectations, broad equity risk premia, and valuation/consensus fundamentals for any concentrated holdings rather than mechanically extrapolating trailing bull-market CAGR.\n   - Account explicitly for realized volatility drag (the gap between arithmetic mean return and geometric compounded return under sequence-of-returns risk while funding living expenses).\n\n4. EXPERIMENT ACROSS SIMULATION LENSES\n   - Use `holdings__run_simulation` across deterministic (`single_path`), sequence-shock (`stress`), probabilistic (`range` Monte-Carlo Normal & Historical Bootstrap), and `historical` cohort modes.\n   - Determine which projection lens, per-holding growth rates (`holdingForecasts`), inflation rate, risk/volatility profiles, and horizon framing give the clearest, least misleading forecast through the primary investor's milestone birthday.\n\n5. PRESENT THE RESULT\n   - Explain the tested scenario, assumptions, differences and uncertainty. An analysis can stand on its own.\n   - If warranted, prepare one optional new scenario or concurrence with an existing scenario. The user chooses whether to save it or record the vote after reading the answer."
+    },
+    {
+      "id": "portfolio_improvements",
+      "title": "Recommended Portfolio Improvements",
+      "prompt": "You are an educational retirement scenario assistant analyzing this household's portfolio. Answer the core question: \"Can you recommend any concrete changes to improve this portfolio's risk-adjusted and after-tax retirement outlook?\"\n\nState the as-of date, scenario, and assumptions, and identify when the tested differences are immaterial.\n\nFollow this 5-step research protocol using the `holdings-tools` MCP tools:\n\n1. AUDIT POSITIONS, TAX BASIS, LIQUIDITY & EXISTING SCENARIOS\n   - Call `holdings__get_overview`, `holdings__query_positions(has_maturity=True)`, and inspect all saved Scenarios and their `notes_md` rationales via `holdings__manage_saves(action=\"list\")`.\n   - Examine each holding's custodian/institution, asset class, yield/return profile, cost basis, unrealized gain/loss ratio, tax wrapper, fee drag, lockup or surrender-free date, and scheduled cashflow commitments.\n\n2. IDENTIFY BOTH INTERNAL LEVERS & OUTSIDE-THE-BOX REAL-WORLD PRODUCTS\n   - Do NOT restrict yourself to shuffling money among existing buckets if the overall allocation is too conservative (e.g., excess idle cash in low-interest checking), over-concentrated, high-fee, or missing a superior asset class or tax wrapper.\n   - Evaluate internal structural levers:\n     * Concentration & sequence-of-returns mitigation (diversifying newly vesting equity or high-basis lots vs. preserving ultra-low-basis lots for deferral / IRC \u00a71014 step-up).\n     * Asset liquidation priority ordering, capital-loss harvesting, Social Security timing, and reallocating maturing bonds or post-surrender annuities.\n   - Think outside the box with real-world product synthesis (`simHypotheticalAssets`):\n     * When a new product or account wrapper would materially improve the portfolio, recommend a concrete, named real-world product grounded in actual market/custodian data (preferring low/no-fee offerings available at the investor's existing financial institutions first\u2014e.g., a custodian's zero-fee S&P 500 index ETF like SPY/VOO, state-tax-exempt US Treasury/TIPS ladder or SGOV, tax-exempt muni sleeve, or low-fee direct-indexing SMA).\n     * Instantiate the hypothetical account (`simHypotheticalAssets`) at `$0` initial value with realistic market return/yield, volatility, expense ratio, and statutory tax rules (never invent \"magic alpha\"), and fund it via one-time or recurring `simScheduledActions` transfers/deposits.\n\n3. RUN CONTROLLED SCRATCH A/B SIMULATIONS (APPLES-TO-APPLES COMPARABILITY)\n   - Choose a realistic baseline configuration (informed by current markets and existing Scenarios) and HOLD BOTH ITS SIMULATION MODE (`simActiveModel`) AND MACRO ASSUMPTIONS (`holdingForecasts` growth rates, inflation, volatility) CONSTANT across scratch `holdings__run_simulation` and `holdings__solve_simulation` experiments so cause-and-effect is never muddied and Scenario Cards compare apples-to-apples.\n   - Test one-time and recurring `simScheduledActions` (transfers, cash deposits, annual/milestone gifts) alongside any `simHypotheticalAssets`, measuring milestone P25 / P50 / P75 real wealth (or deterministic value), % paths funded, and lifetime tax efficiency.\n\n4. APPLY A STRICT AFTER-TAX & OPPORTUNITY-COST HURDLE\n   - Weigh downside protection, yield pickup, and lifetime tax savings honestly against upfront LTCG/ordinary tax checks, surrender penalties, and foregone upside. Reject trades that generate tax drag without clear risk-adjusted benefit.\n\n5. PRESENT THE RESULT\n   - Explain the tested scenario, assumptions, differences and uncertainty. An analysis can stand on its own.\n   - If warranted, prepare one optional new scenario or concurrence with an existing scenario. The user chooses whether to save it or record the vote after reading the answer."
+    },
+    {
+      "id": "monthly_spending",
+      "title": "How much can we spend each month?",
+      "prompt": "Starting from our current scenario, test several monthly spending levels above and below our plan. Show each amount in today\u2019s dollars and how many of the tested historical periods funded it through our milestone age, out of the periods that cover that horizon. Keep scheduled gifts and other assumptions fixed. Where does an extra few hundred dollars a month start to make a meaningful difference?"
+    },
+    {
+      "id": "growth_sensitivity",
+      "title": "Which growth assumption matters most?",
+      "prompt": "Find up to three holdings whose projected growth could materially affect our plan, considering both their size and their assumed return. Show each holding\u2019s current rate and the source and dates behind its reference rate where available. Then lower one holding at a time by two percentage points from its current rate, keeping the simulation multiplier and everything else fixed. Rank the results by impact on funded spending, then by wealth at our milestone age."
+    },
+    {
+      "id": "gift_affordability",
+      "title": "Can we afford a gift or major purchase?",
+      "prompt": "Use a scheduled gift or purchase I identify, or ask me for its amount and date. Compare the same plan without the expense, with it as scheduled, and with it delayed two years. Show how much of the expense gets funded and whether it creates a later shortfall in regular household spending. Report the difference in milestone wealth in today\u2019s dollars."
+    }
+  ],
+  "household_state": "OR"
+}

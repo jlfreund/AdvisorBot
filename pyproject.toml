@@ -1,0 +1,51 @@
+[project]
+name = "advisorbot"
+version = "1.0.0"
+description = "AdvisorBot — Retirement Simulator, portfolio analytics, and AI assistant dashboard"
+license = { text = "BSD-3-Clause" }
+requires-python = ">=3.11"
+# The core pipeline (ingest -> SQLite -> view-model -> render) and the simulator use
+# only the standard library. The MCP stdio server additionally needs `mcp`; the PDF/XLSX
+# ingesters need `pypdf`/`openpyxl`; badge icon processing uses `Pillow`.
+# Install with:  pip install -e ".[mcp,ingest,ui]"
+dependencies = []
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0"]
+ingest = ["pypdf>=4.0", "openpyxl>=3.1"]
+ui = ["Pillow>=10.0"]
+# The test suite itself is stdlib + pytest: fixture portfolios are generated as canonical
+# statement JSON, so no PDF/XLSX toolchain is needed to run it. Parser tiers that do need
+# `pypdf`/`openpyxl` skip cleanly when those are absent.
+dev = ["pytest>=7.0"]
+
+[tool.setuptools]
+package-dir = {"" = "Scripts"}
+
+[tool.setuptools.packages.find]
+where = ["Scripts"]
+
+[tool.pytest.ini_options]
+# Keep a bare `pytest` safe: real network calls and slow jobs are opt-in.
+minversion = "7.0"
+testpaths = ["Scripts/tests"]
+pythonpath = ["Scripts", "."]
+addopts = "-m 'not network and not slow' --strict-markers -ra"
+markers = [
+  "unit: pure functions, no fixture root needed",
+  "parsers: institution parsers against golden page text",
+  "pipeline: ingest -> SQLite -> view-model on a fixture portfolio",
+  "engine: simulator, solver, Monte Carlo, cohorts",
+  "parity: Python <-> JS engine equality (needs Node)",
+  "render: generated dashboard structure and smoke",
+  "server: sidecar HTTP endpoints, auth and writes",
+  "llm: privacy shield, aliasing, tool routing (fake provider)",
+  "scans: portability, PII and hygiene scans",
+  "security: regression test for a security/privacy finding",
+  "slow: takes more than a few seconds",
+  "network: needs real outbound network access",
+  "legacy: ported from the pre-fixture suite",
+  "portfolio: portfolio(*slugs): fixture portfolios this test needs",
+  "regression: regression(finding_id): links the test to a review finding",
+  "feature: feature(key): product area this test covers",
+]

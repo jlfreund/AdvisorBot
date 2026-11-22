@@ -1,0 +1,44 @@
+{
+  "_schema_version": "1.0",
+  "_instructions": {
+    "quick_start": "Copy this file to Data/Config/LLM/ollama.json (or Portfolios/<PortfolioName>/LLM/ollama.json) to run free, 100% private, local models via Ollama (https://ollama.com).",
+    "prerequisites": [
+      "1. Install Ollama: https://ollama.com/download (or 'brew install ollama')",
+      "2. Pull your desired models: 'ollama pull llama3.3' or 'ollama pull qwen2.5:14b'",
+      "3. Start the Ollama server: 'ollama serve' (runs on http://localhost:11434)"
+    ],
+    "privacy_shield_compatibility": "Because http://localhost:11434 is a loopback URL, AdvisorBot recognizes it as local and allows it to run under 'Local-Only' Privacy Shield mode without sending any data over the internet.",
+    "other_local_backends": {
+      "lm_studio": "Start LM Studio's Local Server on port 1234 and set 'api_base_url' to 'http://localhost:1234/v1/chat/completions'.",
+      "vllm": "Set 'api_base_url' to 'http://localhost:8000/v1/chat/completions'.",
+      "localai": "Set 'api_base_url' to 'http://localhost:8080/v1/chat/completions'."
+    }
+  },
+  "provider": "openai",
+  "api_key": "ollama",
+  "model": "llama3.3",
+  "display_name": "Ollama Llama 3.3 (Local)",
+  "api_base_url": "http://localhost:11434/v1/chat/completions",
+  "max_tool_rounds": 6,
+  "temperature": 0.2,
+  "models": [
+    {
+      "id": "llama3.3",
+      "display_name": "Llama 3.3 70B (Local)",
+      "tier": "flagship",
+      "description": "Local high-capability Llama 3.3 model running privately via Ollama"
+    },
+    {
+      "id": "qwen2.5:14b",
+      "display_name": "Qwen 2.5 14B (Local)",
+      "tier": "balanced",
+      "description": "Local analytical reasoning model running privately via Ollama"
+    },
+    {
+      "id": "mistral:7b",
+      "display_name": "Mistral 7B (Local)",
+      "tier": "fast",
+      "description": "Fast lightweight local model running privately via Ollama"
+    }
+  ]
+}

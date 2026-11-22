@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "ai_shield": {
+    "mode": "identity_aliased",
+    "block_inapp_agy_cli": true,
+    "dob_granularity": "year_month",
+    "notes_policy": "translate"
+  },
+  "demo_mode": {
+    "enabled": false,
+    "scale_factor": 0.35,
+    "seed": "demo-2203",
+    "dob_granularity": "shift_years"
+  },
+  "mcp_server": {
+    "enabled": false
+  },
+  "synonyms": {
+    "Meridian Equity Services": [
+      "Meridian",
+      "MES"
+    ],
+    "Vantage Robotics, Inc.": [
+      "Vantage",
+      "Vantage Robotics"
+    ]
+  },
+  "entities": [],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "22d3d59ce37a565f"
+  }
+}

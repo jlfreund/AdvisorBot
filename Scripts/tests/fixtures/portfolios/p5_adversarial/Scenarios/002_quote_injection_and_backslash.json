@@ -1,0 +1,41 @@
+{
+  "id": "002",
+  "name": "Quote \"Injection\" And \\Backslash",
+  "is_protected": false,
+  "created_at": "2026-11-16T09:00:00+00:00",
+  "updated_at": "2026-11-16T09:00:00+00:00",
+  "author": {
+    "type": "fixture",
+    "model": null,
+    "prompt_type": null
+  },
+  "notes_md": "Scenario name with a double quote and a backslash.",
+  "settings": {
+    "simActiveModel": "simple",
+    "simAnnualBurn": 95000,
+    "simInflationPct": 2.9,
+    "simIncludeSSN": true,
+    "simIncludeUnvested": true,
+    "simIncludeScheduledActions": true,
+    "simScaleMode": "real",
+    "simStressScenario": "gfc2008",
+    "simCustomShockPct": -30,
+    "simOrderPreset": "diversified_first",
+    "simAssetOrder": [],
+    "simHypotheticalAssets": [],
+    "simScheduledActions": [],
+    "mcReturnModel": "normal",
+    "mcSimulations": 500,
+    "mcSingleStockVolPct": 32.0,
+    "mcBroadEquityVolPct": 16.0,
+    "mcSingleStockCorr": 0.5,
+    "taxMode": "net",
+    "pastReleaseValMode": "net",
+    "cohortStartFrom": 1929,
+    "cohortCenterMode": "median",
+    "cohortInflationMode": "cpi",
+    "holdingForecasts": {}
+  },
+  "kpi_summary": {},
+  "snapshot": null
+}

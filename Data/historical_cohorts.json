@@ -1,0 +1,983 @@
+{
+"generated_at": "2026-11-11",
+"source": "S&P 500 Total Return (price + reinvested dividends, Shiller/Yahoo ^GSPC), 10-Year US Treasury Total Return & 3-Month T-Bill Yield (Damodaran NYU Stern / FRED), Gold USD Return (LBMA / World Gold Council), and BLS CPI-U annual average (1929\u20132025).",
+"note": "3-Tier Historical Specificity Cascade: Tier 1 uses exact ticker / constituent calendar-year adj_close total return where trading history exists; Tier 2 applies contractual fixed rates (MYGA/CD) and structural RILA/FIA cap-buffer formulas; Tier 3 maps each risk class to its historical asset-class series (S&P 500 Total Return, 10Y US Treasury, 3M T-Bill, Gold) with holding-specific realized beta/volatility.",
+"sp_annual_vol_pct": 19.34,
+"sp_annual_mean_pct": 7.79,
+"sp_total_annual_mean_pct": 11.56,
+"single_stock_amplification_k": 1.809,
+"first_year": 1929,
+"last_year": 2025,
+"years": [
+{
+"year": 1929,
+"sp_ret_pct": -11.91,
+"sp_total_ret_pct": -8.8,
+"ust_10y_ret_pct": 4.2,
+"tbill_3m_pct": 4.75,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -21.481,
+"inflation_pct": 0.0
+},
+{
+"year": 1930,
+"sp_ret_pct": -28.485,
+"sp_total_ret_pct": -25.16,
+"ust_10y_ret_pct": 4.54,
+"tbill_3m_pct": 2.41,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -45.093,
+"inflation_pct": -2.907
+},
+{
+"year": 1931,
+"sp_ret_pct": -47.066,
+"sp_total_ret_pct": -43.811,
+"ust_10y_ret_pct": -2.56,
+"tbill_3m_pct": 1.07,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -67.312,
+"inflation_pct": -8.982
+},
+{
+"year": 1932,
+"sp_ret_pct": -14.778,
+"sp_total_ret_pct": -8.446,
+"ust_10y_ret_pct": 8.79,
+"tbill_3m_pct": 0.88,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -20.928,
+"inflation_pct": -10.526
+},
+{
+"year": 1933,
+"sp_ret_pct": 44.075,
+"sp_total_ret_pct": 50.429,
+"ust_10y_ret_pct": 1.86,
+"tbill_3m_pct": 0.52,
+"gold_ret_pct": 26.7,
+"single_stock_ret_pct": 94.19,
+"inflation_pct": -5.147
+},
+{
+"year": 1934,
+"sp_ret_pct": -4.714,
+"sp_total_ret_pct": -0.798,
+"ust_10y_ret_pct": 7.96,
+"tbill_3m_pct": 0.27,
+"gold_ret_pct": 33.4,
+"single_stock_ret_pct": -8.574,
+"inflation_pct": 3.876
+},
+{
+"year": 1935,
+"sp_ret_pct": 41.368,
+"sp_total_ret_pct": 46.853,
+"ust_10y_ret_pct": 4.47,
+"tbill_3m_pct": 0.17,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 85.919,
+"inflation_pct": 2.239
+},
+{
+"year": 1936,
+"sp_ret_pct": 27.923,
+"sp_total_ret_pct": 33.488,
+"ust_10y_ret_pct": 5.02,
+"tbill_3m_pct": 0.17,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 56.436,
+"inflation_pct": 1.46
+},
+{
+"year": 1937,
+"sp_ret_pct": -38.591,
+"sp_total_ret_pct": -35.263,
+"ust_10y_ret_pct": 1.38,
+"tbill_3m_pct": 0.45,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -57.766,
+"inflation_pct": 3.597
+},
+{
+"year": 1938,
+"sp_ret_pct": 24.55,
+"sp_total_ret_pct": 29.931,
+"ust_10y_ret_pct": 4.21,
+"tbill_3m_pct": 0.05,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 48.975,
+"inflation_pct": -2.083
+},
+{
+"year": 1939,
+"sp_ret_pct": -5.175,
+"sp_total_ret_pct": -0.908,
+"ust_10y_ret_pct": 4.41,
+"tbill_3m_pct": 0.02,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -8.757,
+"inflation_pct": -1.418
+},
+{
+"year": 1940,
+"sp_ret_pct": -15.088,
+"sp_total_ret_pct": -10.35,
+"ust_10y_ret_pct": 5.4,
+"tbill_3m_pct": 0.01,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -23.878,
+"inflation_pct": 0.719
+},
+{
+"year": 1941,
+"sp_ret_pct": -17.864,
+"sp_total_ret_pct": -12.262,
+"ust_10y_ret_pct": -2.02,
+"tbill_3m_pct": 0.1,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -26.791,
+"inflation_pct": 5.0
+},
+{
+"year": 1942,
+"sp_ret_pct": 12.428,
+"sp_total_ret_pct": 20.062,
+"ust_10y_ret_pct": 2.29,
+"tbill_3m_pct": 0.32,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 29.134,
+"inflation_pct": 10.884
+},
+{
+"year": 1943,
+"sp_ret_pct": 19.447,
+"sp_total_ret_pct": 25.539,
+"ust_10y_ret_pct": 2.49,
+"tbill_3m_pct": 0.37,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 39.989,
+"inflation_pct": 6.135
+},
+{
+"year": 1944,
+"sp_ret_pct": 13.796,
+"sp_total_ret_pct": 19.326,
+"ust_10y_ret_pct": 2.58,
+"tbill_3m_pct": 0.38,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 27.706,
+"inflation_pct": 1.734
+},
+{
+"year": 1945,
+"sp_ret_pct": 30.723,
+"sp_total_ret_pct": 36.174,
+"ust_10y_ret_pct": 3.8,
+"tbill_3m_pct": 0.38,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 62.179,
+"inflation_pct": 2.273
+},
+{
+"year": 1946,
+"sp_ret_pct": -11.866,
+"sp_total_ret_pct": -8.473,
+"ust_10y_ret_pct": 3.13,
+"tbill_3m_pct": 0.38,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -20.97,
+"inflation_pct": 8.333
+},
+{
+"year": 1947,
+"sp_ret_pct": 0.0,
+"sp_total_ret_pct": 4.93,
+"ust_10y_ret_pct": 0.92,
+"tbill_3m_pct": 0.59,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 1.2,
+"inflation_pct": 14.359
+},
+{
+"year": 1948,
+"sp_ret_pct": -0.654,
+"sp_total_ret_pct": 4.85,
+"ust_10y_ret_pct": 1.95,
+"tbill_3m_pct": 1.04,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 1.06,
+"inflation_pct": 7.623
+},
+{
+"year": 1949,
+"sp_ret_pct": 10.461,
+"sp_total_ret_pct": 17.74,
+"ust_10y_ret_pct": 4.66,
+"tbill_3m_pct": 1.1,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 24.651,
+"inflation_pct": -0.833
+},
+{
+"year": 1950,
+"sp_ret_pct": 21.68,
+"sp_total_ret_pct": 29.674,
+"ust_10y_ret_pct": 0.43,
+"tbill_3m_pct": 1.22,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 48.444,
+"inflation_pct": 1.261
+},
+{
+"year": 1951,
+"sp_ret_pct": 16.349,
+"sp_total_ret_pct": 23.481,
+"ust_10y_ret_pct": -0.3,
+"tbill_3m_pct": 1.55,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 35.865,
+"inflation_pct": 7.884
+},
+{
+"year": 1952,
+"sp_ret_pct": 11.78,
+"sp_total_ret_pct": 18.263,
+"ust_10y_ret_pct": 2.27,
+"tbill_3m_pct": 1.77,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 25.655,
+"inflation_pct": 2.308
+},
+{
+"year": 1953,
+"sp_ret_pct": -6.624,
+"sp_total_ret_pct": -1.208,
+"ust_10y_ret_pct": 4.14,
+"tbill_3m_pct": 1.93,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -9.257,
+"inflation_pct": 0.752
+},
+{
+"year": 1954,
+"sp_ret_pct": 45.022,
+"sp_total_ret_pct": 52.201,
+"ust_10y_ret_pct": 3.29,
+"tbill_3m_pct": 0.95,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 98.349,
+"inflation_pct": 0.373
+},
+{
+"year": 1955,
+"sp_ret_pct": 26.404,
+"sp_total_ret_pct": 31.561,
+"ust_10y_ret_pct": -1.34,
+"tbill_3m_pct": 1.75,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 52.375,
+"inflation_pct": -0.372
+},
+{
+"year": 1956,
+"sp_ret_pct": 2.617,
+"sp_total_ret_pct": 6.814,
+"ust_10y_ret_pct": -2.26,
+"tbill_3m_pct": 2.66,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 4.512,
+"inflation_pct": 1.493
+},
+{
+"year": 1957,
+"sp_ret_pct": -14.313,
+"sp_total_ret_pct": -10.586,
+"ust_10y_ret_pct": 6.8,
+"tbill_3m_pct": 3.27,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -24.24,
+"inflation_pct": 3.309
+},
+{
+"year": 1958,
+"sp_ret_pct": 38.06,
+"sp_total_ret_pct": 43.541,
+"ust_10y_ret_pct": -2.1,
+"tbill_3m_pct": 1.84,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 78.401,
+"inflation_pct": 2.847
+},
+{
+"year": 1959,
+"sp_ret_pct": 8.477,
+"sp_total_ret_pct": 11.981,
+"ust_10y_ret_pct": -2.65,
+"tbill_3m_pct": 3.41,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 13.837,
+"inflation_pct": 1.038
+},
+{
+"year": 1960,
+"sp_ret_pct": -2.972,
+"sp_total_ret_pct": 0.395,
+"ust_10y_ret_pct": 11.64,
+"tbill_3m_pct": 2.93,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -6.575,
+"inflation_pct": 1.37
+},
+{
+"year": 1961,
+"sp_ret_pct": 23.129,
+"sp_total_ret_pct": 26.798,
+"ust_10y_ret_pct": 2.06,
+"tbill_3m_pct": 2.38,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 42.54,
+"inflation_pct": 1.014
+},
+{
+"year": 1962,
+"sp_ret_pct": -11.81,
+"sp_total_ret_pct": -8.838,
+"ust_10y_ret_pct": 5.69,
+"tbill_3m_pct": 2.78,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -21.54,
+"inflation_pct": 1.338
+},
+{
+"year": 1963,
+"sp_ret_pct": 18.891,
+"sp_total_ret_pct": 22.66,
+"ust_10y_ret_pct": 1.68,
+"tbill_3m_pct": 3.16,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 34.234,
+"inflation_pct": 0.99
+},
+{
+"year": 1964,
+"sp_ret_pct": 12.97,
+"sp_total_ret_pct": 16.37,
+"ust_10y_ret_pct": 3.73,
+"tbill_3m_pct": 3.55,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 22.039,
+"inflation_pct": 1.307
+},
+{
+"year": 1965,
+"sp_ret_pct": 9.062,
+"sp_total_ret_pct": 12.334,
+"ust_10y_ret_pct": 0.72,
+"tbill_3m_pct": 3.95,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 14.488,
+"inflation_pct": 1.613
+},
+{
+"year": 1966,
+"sp_ret_pct": -13.091,
+"sp_total_ret_pct": -10.136,
+"ust_10y_ret_pct": 2.91,
+"tbill_3m_pct": 4.88,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": -23.549,
+"inflation_pct": 3.175
+},
+{
+"year": 1967,
+"sp_ret_pct": 20.092,
+"sp_total_ret_pct": 23.935,
+"ust_10y_ret_pct": -1.58,
+"tbill_3m_pct": 4.32,
+"gold_ret_pct": 0.0,
+"single_stock_ret_pct": 36.77,
+"inflation_pct": 2.769
+},
+{
+"year": 1968,
+"sp_ret_pct": 7.66,
+"sp_total_ret_pct": 10.965,
+"ust_10y_ret_pct": 3.27,
+"tbill_3m_pct": 5.34,
+"gold_ret_pct": 19.86,
+"single_stock_ret_pct": 11.976,
+"inflation_pct": 4.192
+},
+{
+"year": 1969,
+"sp_ret_pct": -11.361,
+"sp_total_ret_pct": -8.489,
+"ust_10y_ret_pct": -5.01,
+"tbill_3m_pct": 6.68,
+"gold_ret_pct": -16.07,
+"single_stock_ret_pct": -20.995,
+"inflation_pct": 5.46
+},
+{
+"year": 1970,
+"sp_ret_pct": 0.098,
+"sp_total_ret_pct": 3.932,
+"ust_10y_ret_pct": 16.75,
+"tbill_3m_pct": 6.46,
+"gold_ret_pct": 6.2,
+"single_stock_ret_pct": -0.535,
+"inflation_pct": 5.722
+},
+{
+"year": 1971,
+"sp_ret_pct": 10.787,
+"sp_total_ret_pct": 14.266,
+"ust_10y_ret_pct": 9.79,
+"tbill_3m_pct": 4.35,
+"gold_ret_pct": 16.71,
+"single_stock_ret_pct": 18.075,
+"inflation_pct": 4.381
+},
+{
+"year": 1972,
+"sp_ret_pct": 15.633,
+"sp_total_ret_pct": 18.917,
+"ust_10y_ret_pct": 2.82,
+"tbill_3m_pct": 4.07,
+"gold_ret_pct": 49.02,
+"single_stock_ret_pct": 26.914,
+"inflation_pct": 3.21
+},
+{
+"year": 1973,
+"sp_ret_pct": -17.366,
+"sp_total_ret_pct": -14.837,
+"ust_10y_ret_pct": 3.66,
+"tbill_3m_pct": 7.04,
+"gold_ret_pct": 72.96,
+"single_stock_ret_pct": -30.633,
+"inflation_pct": 6.22
+},
+{
+"year": 1974,
+"sp_ret_pct": -29.718,
+"sp_total_ret_pct": -26.576,
+"ust_10y_ret_pct": 1.99,
+"tbill_3m_pct": 7.89,
+"gold_ret_pct": 66.07,
+"single_stock_ret_pct": -46.96,
+"inflation_pct": 11.036
+},
+{
+"year": 1975,
+"sp_ret_pct": 31.549,
+"sp_total_ret_pct": 37.219,
+"ust_10y_ret_pct": 3.61,
+"tbill_3m_pct": 5.84,
+"gold_ret_pct": -24.8,
+"single_stock_ret_pct": 64.437,
+"inflation_pct": 9.128
+},
+{
+"year": 1976,
+"sp_ret_pct": 19.148,
+"sp_total_ret_pct": 23.64,
+"ust_10y_ret_pct": 15.98,
+"tbill_3m_pct": 4.99,
+"gold_ret_pct": -4.1,
+"single_stock_ret_pct": 36.181,
+"inflation_pct": 5.762
+},
+{
+"year": 1977,
+"sp_ret_pct": -11.502,
+"sp_total_ret_pct": -7.413,
+"ust_10y_ret_pct": 1.29,
+"tbill_3m_pct": 5.27,
+"gold_ret_pct": 22.64,
+"single_stock_ret_pct": -19.307,
+"inflation_pct": 6.503
+},
+{
+"year": 1978,
+"sp_ret_pct": 1.062,
+"sp_total_ret_pct": 6.398,
+"ust_10y_ret_pct": -0.78,
+"tbill_3m_pct": 7.22,
+"gold_ret_pct": 37.01,
+"single_stock_ret_pct": 3.776,
+"inflation_pct": 7.591
+},
+{
+"year": 1979,
+"sp_ret_pct": 12.309,
+"sp_total_ret_pct": 18.452,
+"ust_10y_ret_pct": 0.67,
+"tbill_3m_pct": 10.04,
+"gold_ret_pct": 126.55,
+"single_stock_ret_pct": 26.018,
+"inflation_pct": 11.35
+},
+{
+"year": 1980,
+"sp_ret_pct": 25.774,
+"sp_total_ret_pct": 32.39,
+"ust_10y_ret_pct": -2.99,
+"tbill_3m_pct": 11.51,
+"gold_ret_pct": 15.19,
+"single_stock_ret_pct": 54.116,
+"inflation_pct": 13.499
+},
+{
+"year": 1981,
+"sp_ret_pct": -9.73,
+"sp_total_ret_pct": -5.036,
+"ust_10y_ret_pct": 8.2,
+"tbill_3m_pct": 14.03,
+"gold_ret_pct": -32.6,
+"single_stock_ret_pct": -15.519,
+"inflation_pct": 10.316
+},
+{
+"year": 1982,
+"sp_ret_pct": 14.761,
+"sp_total_ret_pct": 21.429,
+"ust_10y_ret_pct": 32.81,
+"tbill_3m_pct": 10.69,
+"gold_ret_pct": 14.89,
+"single_stock_ret_pct": 31.806,
+"inflation_pct": 6.161
+},
+{
+"year": 1983,
+"sp_ret_pct": 17.271,
+"sp_total_ret_pct": 22.431,
+"ust_10y_ret_pct": 3.2,
+"tbill_3m_pct": 8.63,
+"gold_ret_pct": -16.3,
+"single_stock_ret_pct": 33.781,
+"inflation_pct": 3.212
+},
+{
+"year": 1984,
+"sp_ret_pct": 1.401,
+"sp_total_ret_pct": 6.106,
+"ust_10y_ret_pct": 13.73,
+"tbill_3m_pct": 9.58,
+"gold_ret_pct": -19.24,
+"single_stock_ret_pct": 3.261,
+"inflation_pct": 4.317
+},
+{
+"year": 1985,
+"sp_ret_pct": 26.333,
+"sp_total_ret_pct": 31.702,
+"ust_10y_ret_pct": 25.71,
+"tbill_3m_pct": 7.48,
+"gold_ret_pct": 5.83,
+"single_stock_ret_pct": 52.671,
+"inflation_pct": 3.561
+},
+{
+"year": 1986,
+"sp_ret_pct": 14.62,
+"sp_total_ret_pct": 18.62,
+"ust_10y_ret_pct": 24.28,
+"tbill_3m_pct": 5.98,
+"gold_ret_pct": 18.96,
+"single_stock_ret_pct": 26.342,
+"inflation_pct": 1.859
+},
+{
+"year": 1987,
+"sp_ret_pct": 2.028,
+"sp_total_ret_pct": 5.17,
+"ust_10y_ret_pct": -4.96,
+"tbill_3m_pct": 5.82,
+"gold_ret_pct": 24.46,
+"single_stock_ret_pct": 1.62,
+"inflation_pct": 3.65
+},
+{
+"year": 1988,
+"sp_ret_pct": 12.401,
+"sp_total_ret_pct": 16.492,
+"ust_10y_ret_pct": 8.22,
+"tbill_3m_pct": 6.69,
+"gold_ret_pct": -15.69,
+"single_stock_ret_pct": 22.271,
+"inflation_pct": 4.137
+},
+{
+"year": 1989,
+"sp_ret_pct": 27.25,
+"sp_total_ret_pct": 31.64,
+"ust_10y_ret_pct": 17.69,
+"tbill_3m_pct": 8.12,
+"gold_ret_pct": -2.23,
+"single_stock_ret_pct": 52.541,
+"inflation_pct": 4.818
+},
+{
+"year": 1990,
+"sp_ret_pct": -6.559,
+"sp_total_ret_pct": -3.186,
+"ust_10y_ret_pct": 6.24,
+"tbill_3m_pct": 7.51,
+"gold_ret_pct": -3.69,
+"single_stock_ret_pct": -12.517,
+"inflation_pct": 5.403
+},
+{
+"year": 1991,
+"sp_ret_pct": 26.307,
+"sp_total_ret_pct": 30.399,
+"ust_10y_ret_pct": 15.0,
+"tbill_3m_pct": 5.42,
+"gold_ret_pct": -8.56,
+"single_stock_ret_pct": 49.949,
+"inflation_pct": 4.208
+},
+{
+"year": 1992,
+"sp_ret_pct": 4.464,
+"sp_total_ret_pct": 7.587,
+"ust_10y_ret_pct": 9.36,
+"tbill_3m_pct": 3.45,
+"gold_ret_pct": -5.73,
+"single_stock_ret_pct": 5.885,
+"inflation_pct": 3.01
+},
+{
+"year": 1993,
+"sp_ret_pct": 7.055,
+"sp_total_ret_pct": 10.031,
+"ust_10y_ret_pct": 14.21,
+"tbill_3m_pct": 3.02,
+"gold_ret_pct": 17.68,
+"single_stock_ret_pct": 10.276,
+"inflation_pct": 2.994
+},
+{
+"year": 1994,
+"sp_ret_pct": -1.539,
+"sp_total_ret_pct": 1.238,
+"ust_10y_ret_pct": -8.04,
+"tbill_3m_pct": 4.29,
+"gold_ret_pct": -2.17,
+"single_stock_ret_pct": -5.152,
+"inflation_pct": 2.561
+},
+{
+"year": 1995,
+"sp_ret_pct": 34.111,
+"sp_total_ret_pct": 37.544,
+"ust_10y_ret_pct": 23.48,
+"tbill_3m_pct": 5.51,
+"gold_ret_pct": 0.98,
+"single_stock_ret_pct": 65.144,
+"inflation_pct": 2.834
+},
+{
+"year": 1996,
+"sp_ret_pct": 20.264,
+"sp_total_ret_pct": 22.898,
+"ust_10y_ret_pct": 1.43,
+"tbill_3m_pct": 5.02,
+"gold_ret_pct": -4.55,
+"single_stock_ret_pct": 34.706,
+"inflation_pct": 2.953
+},
+{
+"year": 1997,
+"sp_ret_pct": 31.008,
+"sp_total_ret_pct": 33.327,
+"ust_10y_ret_pct": 9.94,
+"tbill_3m_pct": 5.07,
+"gold_ret_pct": -21.74,
+"single_stock_ret_pct": 56.096,
+"inflation_pct": 2.294
+},
+{
+"year": 1998,
+"sp_ret_pct": 26.669,
+"sp_total_ret_pct": 28.556,
+"ust_10y_ret_pct": 14.92,
+"tbill_3m_pct": 4.81,
+"gold_ret_pct": -0.83,
+"single_stock_ret_pct": 46.136,
+"inflation_pct": 1.558
+},
+{
+"year": 1999,
+"sp_ret_pct": 19.526,
+"sp_total_ret_pct": 21.02,
+"ust_10y_ret_pct": -8.25,
+"tbill_3m_pct": 4.66,
+"gold_ret_pct": 0.85,
+"single_stock_ret_pct": 31.005,
+"inflation_pct": 2.209
+},
+{
+"year": 2000,
+"sp_ret_pct": -10.139,
+"sp_total_ret_pct": -9.106,
+"ust_10y_ret_pct": 16.66,
+"tbill_3m_pct": 5.85,
+"gold_ret_pct": -5.44,
+"single_stock_ret_pct": -21.956,
+"inflation_pct": 3.361
+},
+{
+"year": 2001,
+"sp_ret_pct": -13.043,
+"sp_total_ret_pct": -11.895,
+"ust_10y_ret_pct": 5.57,
+"tbill_3m_pct": 3.45,
+"gold_ret_pct": 2.46,
+"single_stock_ret_pct": -26.236,
+"inflation_pct": 2.846
+},
+{
+"year": 2002,
+"sp_ret_pct": -23.366,
+"sp_total_ret_pct": -22.132,
+"ust_10y_ret_pct": 15.12,
+"tbill_3m_pct": 1.62,
+"gold_ret_pct": 24.78,
+"single_stock_ret_pct": -41.009,
+"inflation_pct": 1.581
+},
+{
+"year": 2003,
+"sp_ret_pct": 26.38,
+"sp_total_ret_pct": 28.617,
+"ust_10y_ret_pct": 0.38,
+"tbill_3m_pct": 1.02,
+"gold_ret_pct": 19.37,
+"single_stock_ret_pct": 46.261,
+"inflation_pct": 2.279
+},
+{
+"year": 2004,
+"sp_ret_pct": 8.993,
+"sp_total_ret_pct": 10.868,
+"ust_10y_ret_pct": 4.49,
+"tbill_3m_pct": 1.38,
+"gold_ret_pct": 5.54,
+"single_stock_ret_pct": 11.798,
+"inflation_pct": 2.663
+},
+{
+"year": 2005,
+"sp_ret_pct": 3.001,
+"sp_total_ret_pct": 4.886,
+"ust_10y_ret_pct": 2.87,
+"tbill_3m_pct": 3.16,
+"gold_ret_pct": 17.92,
+"single_stock_ret_pct": 1.123,
+"inflation_pct": 3.388
+},
+{
+"year": 2006,
+"sp_ret_pct": 13.619,
+"sp_total_ret_pct": 15.744,
+"ust_10y_ret_pct": 1.96,
+"tbill_3m_pct": 4.73,
+"gold_ret_pct": 23.16,
+"single_stock_ret_pct": 20.853,
+"inflation_pct": 3.226
+},
+{
+"year": 2007,
+"sp_ret_pct": 3.53,
+"sp_total_ret_pct": 5.456,
+"ust_10y_ret_pct": 10.21,
+"tbill_3m_pct": 4.41,
+"gold_ret_pct": 30.98,
+"single_stock_ret_pct": 2.119,
+"inflation_pct": 2.827
+},
+{
+"year": 2008,
+"sp_ret_pct": -38.486,
+"sp_total_ret_pct": -37.028,
+"ust_10y_ret_pct": 20.1,
+"tbill_3m_pct": 1.48,
+"gold_ret_pct": 5.53,
+"single_stock_ret_pct": -59.827,
+"inflation_pct": 3.859
+},
+{
+"year": 2009,
+"sp_ret_pct": 23.454,
+"sp_total_ret_pct": 26.417,
+"ust_10y_ret_pct": -11.12,
+"tbill_3m_pct": 0.16,
+"gold_ret_pct": 24.37,
+"single_stock_ret_pct": 41.766,
+"inflation_pct": -0.372
+},
+{
+"year": 2010,
+"sp_ret_pct": 12.783,
+"sp_total_ret_pct": 15.016,
+"ust_10y_ret_pct": 8.46,
+"tbill_3m_pct": 0.14,
+"gold_ret_pct": 29.52,
+"single_stock_ret_pct": 19.482,
+"inflation_pct": 1.678
+},
+{
+"year": 2011,
+"sp_ret_pct": -0.003,
+"sp_total_ret_pct": 2.047,
+"ust_10y_ret_pct": 16.04,
+"tbill_3m_pct": 0.06,
+"gold_ret_pct": 10.06,
+"single_stock_ret_pct": -3.775,
+"inflation_pct": 3.118
+},
+{
+"year": 2012,
+"sp_ret_pct": 13.406,
+"sp_total_ret_pct": 15.946,
+"ust_10y_ret_pct": 2.97,
+"tbill_3m_pct": 0.09,
+"gold_ret_pct": 7.14,
+"single_stock_ret_pct": 21.236,
+"inflation_pct": 2.09
+},
+{
+"year": 2013,
+"sp_ret_pct": 29.601,
+"sp_total_ret_pct": 32.374,
+"ust_10y_ret_pct": -9.1,
+"tbill_3m_pct": 0.06,
+"gold_ret_pct": -28.04,
+"single_stock_ret_pct": 54.084,
+"inflation_pct": 1.481
+},
+{
+"year": 2014,
+"sp_ret_pct": 11.391,
+"sp_total_ret_pct": 13.563,
+"ust_10y_ret_pct": 10.75,
+"tbill_3m_pct": 0.03,
+"gold_ret_pct": -1.72,
+"single_stock_ret_pct": 16.764,
+"inflation_pct": 1.588
+},
+{
+"year": 2015,
+"sp_ret_pct": -0.727,
+"sp_total_ret_pct": 1.368,
+"ust_10y_ret_pct": 1.28,
+"tbill_3m_pct": 0.05,
+"gold_ret_pct": -10.42,
+"single_stock_ret_pct": -4.931,
+"inflation_pct": 0.127
+},
+{
+"year": 2016,
+"sp_ret_pct": 9.535,
+"sp_total_ret_pct": 11.868,
+"ust_10y_ret_pct": 0.69,
+"tbill_3m_pct": 0.32,
+"gold_ret_pct": 8.56,
+"single_stock_ret_pct": 13.63,
+"inflation_pct": 1.266
+},
+{
+"year": 2017,
+"sp_ret_pct": 19.42,
+"sp_total_ret_pct": 21.737,
+"ust_10y_ret_pct": 2.8,
+"tbill_3m_pct": 0.93,
+"gold_ret_pct": 13.09,
+"single_stock_ret_pct": 32.412,
+"inflation_pct": 2.125
+},
+{
+"year": 2018,
+"sp_ret_pct": -6.237,
+"sp_total_ret_pct": -4.456,
+"ust_10y_ret_pct": -0.02,
+"tbill_3m_pct": 1.94,
+"gold_ret_pct": -1.56,
+"single_stock_ret_pct": -14.582,
+"inflation_pct": 2.448
+},
+{
+"year": 2019,
+"sp_ret_pct": 28.878,
+"sp_total_ret_pct": 31.365,
+"ust_10y_ret_pct": 9.64,
+"tbill_3m_pct": 2.06,
+"gold_ret_pct": 18.31,
+"single_stock_ret_pct": 51.965,
+"inflation_pct": 1.832
+},
+{
+"year": 2020,
+"sp_ret_pct": 16.259,
+"sp_total_ret_pct": 18.328,
+"ust_10y_ret_pct": 11.33,
+"tbill_3m_pct": 0.37,
+"gold_ret_pct": 25.12,
+"single_stock_ret_pct": 25.78,
+"inflation_pct": 1.212
+},
+{
+"year": 2021,
+"sp_ret_pct": 26.893,
+"sp_total_ret_pct": 28.644,
+"ust_10y_ret_pct": -4.42,
+"tbill_3m_pct": 0.04,
+"gold_ret_pct": -3.64,
+"single_stock_ret_pct": 46.317,
+"inflation_pct": 4.714
+},
+{
+"year": 2022,
+"sp_ret_pct": -19.443,
+"sp_total_ret_pct": -18.178,
+"ust_10y_ret_pct": -17.83,
+"tbill_3m_pct": 2.02,
+"gold_ret_pct": -0.28,
+"single_stock_ret_pct": -35.478,
+"inflation_pct": 8.007
+},
+{
+"year": 2023,
+"sp_ret_pct": 24.231,
+"sp_total_ret_pct": 26.144,
+"ust_10y_ret_pct": 3.88,
+"tbill_3m_pct": 5.07,
+"gold_ret_pct": 13.1,
+"single_stock_ret_pct": 41.213,
+"inflation_pct": 4.1
+},
+{
+"year": 2024,
+"sp_ret_pct": 23.309,
+"sp_total_ret_pct": 24.937,
+"ust_10y_ret_pct": -1.64,
+"tbill_3m_pct": 4.97,
+"gold_ret_pct": 27.22,
+"single_stock_ret_pct": 38.776,
+"inflation_pct": 2.954
+},
+{
+"year": 2025,
+"sp_ret_pct": 16.388,
+"sp_total_ret_pct": 17.854,
+"ust_10y_ret_pct": 5.95,
+"tbill_3m_pct": 4.18,
+"gold_ret_pct": 38.4,
+"single_stock_ret_pct": 24.87,
+"inflation_pct": 2.614
+}
+]
+}

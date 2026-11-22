@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chapter 2: Core Application Walkthrough — AdvisorBot Documentation</title>
+  <link rel="icon" href="../Assets/default_badge.svg" />
+  <link rel="stylesheet" href="docs.css" />
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-title">
+      <span>🛡️ AdvisorBot</span>
+      <span style="color: var(--muted); font-weight: normal;">|</span>
+      <span>Documentation &amp; User Manual</span>
+    </div>
+    <nav class="topbar-links">
+      <a class="nav-pill" href="../index.html">← Live Dashboard</a>
+      <a class="nav-pill active" href="index.html">User Guide</a>
+      <a class="nav-pill" href="readme.html">Top-Level README</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar Table of Contents -->
+    <aside class="toc" id="doc-toc">
+      <div class="toc-header">
+        <div class="toc-heading">Documentation Chapters</div>
+        <button type="button" class="toc-toggle-all-btn" id="toc-toggle-all" onclick="toggleAllChapters()" title="Toggle all chapters">Expand All</button>
+      </div>
+
+      <div class="toc-item">
+        <a href="index.html" class="toc-nav-link">
+          <span style="font-size:14px;">📖</span>
+          <span>Overview &amp; Architecture</span>
+        </a>
+      </div>
+
+      <!-- Chapter 1 -->
+      <div class="toc-chapter-group" id="ch-group-1">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(1)" aria-label="Toggle Chapter 1 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch1-portfolio-setup.html" class="toc-chapter-link">
+            1. Setting Up Your Portfolio
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-dir">1.1 Create &amp; Complete Your Portfolio</a>
+          <a class="sub" href="ch1-portfolio-setup.html#llm-setup">1.2 Configuring AI &amp; Local LLMs</a>
+          <a class="sub" href="ch1-portfolio-setup.html#statements-drop">1.3 Dropping Financial Statements</a>
+          <a class="sub" href="ch1-portfolio-setup.html#portfolio-settings-audit">1.4 Settings Portfolio Audit</a>
+          <a class="sub" href="ch1-portfolio-setup.html#agent-plugins">1.5 Developing Custom Plugins</a>
+        </div>
+      </div>
+
+      <!-- Chapter 2 -->
+      <div class="toc-chapter-group" id="ch-group-2">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(2)" aria-label="Toggle Chapter 2 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch2-core-walkthrough.html" class="toc-chapter-link active">
+            2. Core Application Walkthrough
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="#page-positions">2.1 Positions &amp; Weekly Timeline</a>
+          <a class="sub" href="#page-grants">2.2 Employee Stock &amp; Vesting</a>
+          <a class="sub" href="#page-simulator">2.3 Retirement Simulator &amp; Drawdown</a>
+          <a class="sub" href="#scheduled-events-hypotheticals">&nbsp;&nbsp;&bull; Scheduled Events &amp; Hypothetical Accounts</a>
+          <a class="sub" href="#liquidation-strategies">&nbsp;&nbsp;&bull; Liquidation Strategies &amp; Bear Shield</a>
+          <a class="sub" href="#page-social-security">2.4 Income &amp; Expense (Social Security)</a>
+          <a class="sub" href="#page-scenarios">2.5 Scenario Details &amp; Baselines</a>
+          <a class="sub" href="#page-settings">2.6 Settings &amp; Preferences</a>
+          <a class="sub" href="#holding-forecast-methodology">2.7 Holding Forecasts &amp; Baselines</a>
+        </div>
+      </div>
+
+      <!-- Chapter 3 -->
+      <div class="toc-chapter-group" id="ch-group-3">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(3)" aria-label="Toggle Chapter 3 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch3-security-privacy.html" class="toc-chapter-link">
+            3. Security &amp; Privacy Architecture
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch3-security-privacy.html#sec-local-first">3.1 Localhost &amp; Network Isolation</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-cross-tab">3.2 Protection From Browser Tabs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-profiles">3.3 The 3 AI Privacy Profiles</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-local-llm">3.4 100% Offline Local LLMs</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-alias-table">3.5 Maintaining the Alias Table</a>
+          <a class="sub" href="ch3-security-privacy.html#sec-unsupported-banks">3.6 Unsupported Banks &amp; Parsers</a>
+        </div>
+      </div>
+
+      <!-- Chapter 4 -->
+      <div class="toc-chapter-group" id="ch-group-4">
+        <div class="toc-chapter-header">
+          <button type="button" class="toc-caret-btn" onclick="toggleChapter(4)" aria-label="Toggle Chapter 4 sub-sections">
+            <svg class="toc-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <a href="ch4-developer-agent.html" class="toc-chapter-link">
+            4. Developer &amp; Agent Integration
+          </a>
+        </div>
+        <div class="toc-subsections">
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp">4.1 External Agent MCP Integration</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-mcp-security">4.2 MCP Security &amp; Injection Defense</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-guardrails">4.3 Engineering &amp; Privacy Guardrails</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-testing">4.4 Isolated Test Suite &amp; Verification</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+      <div class="chapter-banner">
+        <div class="chapter-badge-wrap">
+          <span class="badge badge-green">Chapter 2</span>
+          <span class="badge badge-blue">Walkthrough</span>
+        </div>
+        <h1 style="margin-bottom:6px;">Core Application Walkthrough</h1>
+        <p class="subtitle" style="margin-bottom:0;">Deep-dive into all five screens: saved scenarios, mark-to-market positions, equity vesting, retirement solvency, Social Security modeling, and empirical holding forecasts.</p>
+      </div>
+
+      <!-- CHAPTER 2 CONTENT -->
+      <section id="ch2-page-walkthrough">
+        <p>AdvisorBot provides <strong>five primary analytics screens</strong>—opening by default on your <strong>Saved Scenarios Library</strong>—plus a five-tab <strong>Portfolio Settings</strong> workspace:</p>
+
+        <div class="callout callout-info" style="margin:12px 0 18px;">
+          <strong>Visual Convention &mdash; &#9881; Portfolio Settings vs. &#9670; Purple Inputs vs. &#9733; Gold KPIs:</strong>
+          <ul style="margin:6px 0 0;padding-left:20px;">
+            <li><strong>&#9881; Portfolio Settings &amp; Holding Metadata (Slate):</strong> Household facts, ingested statements, filing status, friendly names, and management fees are stored at the portfolio level and <em>apply across every scenario</em>.</li>
+            <li><strong style="color:#c4b5fd;">&#9670; Scenario Inputs (Purple Boxes &amp; Capsules):</strong> What-if controls&mdash;per-holding projected returns &amp; half-lives, Market Correction sliders, simulation mode, spending/inflation overrides, hypothetical accounts, scheduled events, and liquidation order&mdash;<em>save exclusively to the active Scenario</em> (<code>&#8984;S</code> / <code>Ctrl+S</code>) without altering your other scenarios.</li>
+            <li><strong style="color:#fcd34d;">&#9733; Scenario Outcomes (Gold-Crested KPI Boxes):</strong> The three headline evaluation metrics&mdash;<em>Milestone Wealth</em>, <em>Funded Solvency</em>, and <em>Tax Efficiency</em>&mdash;are computed directly from the active Scenario&#39;s purple <strong>&#9670;</strong> inputs and appear on every Saved Scenario card for side-by-side comparison.</li>
+          </ul>
+        </div>
+
+        <h3 id="page-positions">2.1 Positions &amp; Weekly Timeline</h3>
+        <p>The Positions &amp; Timeline dashboard provides a mark-to-market view of your consolidated vested net worth:</p>
+        <ul>
+          <li><strong>Live Market Pricing</strong>: Automatic quote updates via the local server refresh equity values, 1-week market changes, and unrealized capital gains.</li>
+          <li><strong>Weekly Timeline Bars &amp; 30-Yr Goal Curve</strong>: Stacked weekly balance bars displaying historical snapshots and projected near-term vesting in <strong>Nominal $</strong>, overlaid with your <code>30 &times; Annual Burn</code> target labeled in <strong>Today&#39;s $</strong> (while the dashed curve compounds forward with inflation to show the matching future nominal balance).</li>
+          <li><strong>Strategy &amp; Account Rollups</strong>: Interactive tables and pie views grouping holdings by investment strategy or account tax wrapper (Taxable, Roth IRA, Traditional IRA, Annuity).</li>
+        </ul>
+
+        <h3 id="page-grants">2.2 Employee Stock &amp; Vesting</h3>
+        <p>Dedicated tracking for employer equity compensation (Restricted Stock Units, Performance Stock Units, and Stock Grants):</p>
+        <ul>
+          <li><strong>Stacked Monthly Vesting Chart &amp; Tables</strong>: Interactive monthly stacked release bars paired with per-year and per-grant breakdown tables projecting upcoming vests through the end of your grant schedule.</li>
+          <li><strong>Release Date FMV vs. Current Value</strong>: Compares cost-basis Fair Market Value on each vest date against live market price to track post-vest appreciation.</li>
+          <li><strong>Tax Withholding &amp; Lot Creation</strong>: Tracks net shares retained after statutory W-2 share withholding to establish exact acquisition dates and cost basis for 1-year short-term vs. long-term capital gains rules.</li>
+        </ul>
+
+        <h3 id="page-simulator">2.3 Retirement Simulator &amp; Asset Drawdown Buckets</h3>
+        <p>A deterministic and stochastic 40-year monthly (plus 100-year solvency) drawdown engine modeling statutory tax and account rules:</p>
+        <ul>
+          <li><strong>Progressive Federal &amp; State Tax Engine</strong>: Computes CPI-indexed progressive ordinary income brackets, Married Filing Jointly (when two or more family members exist) vs. Single status, an optional <em>Minimum Tax Bracket Floor</em> for households with external retirement income, stacked <code>0% / 15% / 20%</code> Long-Term Capital Gains tiers, the unindexed <code>$250k</code> MFJ / <code>$200k</code> Single <code>3.8%</code> Net Investment Income Tax (NIIT), and <code>0%</code> state tax on US Treasuries and exempt-state Social Security.</li>
+          <li><strong>HIFO Lot Depletion &amp; IRC §1222 Holding Periods</strong>: Sells lowest-gain tranches first while distinguishing Short-Term Capital Gains (held through the first anniversary, taxed at ordinary rates) from Long-Term Capital Gains (sold after the first anniversary).</li>
+          <li><strong>IRS §72 LIFO Annuities, Maturity Locks &amp; Pre-59&frac12; Rules</strong>: Isolates non-qualified deferred annuities (earnings taxed as ordinary income first, then 0%-tax principal recovery), enforces surrender-free maturity dates on fixed MYGAs and CDs (transitioning matured fixed contracts to a <code>3.5%</code> prevailing rollover rate less fees unless overridden), recovers Roth IRA contribution basis tax- and penalty-free before earnings, and applies the statutory <code>+10%</code> early-withdrawal penalty prior to age 59&frac12; on taxable IRA and annuity earnings.</li>
+          <li><strong>SECURE 2.0 RMD Schedules</strong>: Triggers annual January Required Minimum Distributions from Traditional IRAs (including locked IRA contracts in the balance denominator) starting at <strong>age 73</strong> (birth years &le; 1959) or <strong>age 75</strong> (birth years &ge; 1960) per the IRS Uniform Lifetime Table, routing net RMD cash directly toward that year's spending before selling other holdings.</li>
+          <li><strong>Capital Loss Carryforwards (IRC §1211)</strong>: Harvested capital losses offset realized short- and long-term capital gains dollar-for-dollar plus up to <code>$3,000/year</code> against ordinary income, carrying unused losses forward indefinitely.</li>
+          <li><strong>Four Simulation Lenses Across 7 Risk Classes</strong>:
+            <ul>
+              <li><em>Simple</em>: Deterministic projection compounding each holding at its configured <em>◆ Proj. Growth</em> rate net of expense ratios and management fees.</li>
+              <li><em>Market Correction</em>: Models a 3-phase early downturn (<strong>Downfall</strong> to trough, independent <strong>Broad-Equity</strong> and <strong>Single-Stock Bounce-Back</strong> durations back to pre-crash par or <em>No Bounce</em>, then normal growth) across all 7 holding risk profiles via presets (<em>2008 GFC</em>, <em>Dot-com</em>, <em>COVID</em>, <em>2022 Rate Shock</em>) or custom 4-slider controls.</li>
+              <li><em>Monte Carlo</em>: Runs 1,000 correlated multi-asset paths (parameterized so <em>◆ Proj. Growth</em> sets each holding's <strong>median compound CAGR</strong> while empirical volatility and S&amp;P 500 correlation govern P10–P90 dispersion and sequence-of-returns drag).</li>
+              <li><em>Historical Cohorts (1929–2025)</em>: Replays every historical start year through a 3-Tier specificity cascade: (1) exact ticker or direct-indexing sleeve annual total returns where trading history exists, (2) contractual MYGA/CD rates and RILA/FIA cap-and-buffer payoffs, and (3) bundled 1929–2025 reconstructed S&amp;P 500 total returns (annual price change combined with annual dividend yield, including reinvested dividends), 10-Year US Treasury total returns, 3-Month T-Bills, Gold, and actual CPI inflation. Cohorts starting after 1986 stop at 2025 rather than extrapolating synthetic future years.</li>
+            </ul>
+          </li>
+          <li><strong>Chart Dollar Basis &amp; Scale Transparency</strong>: Toggle charts and tables between <strong>Nominal $</strong> (future face dollars including cumulative inflation or COLA) and <strong>Today&#39;s $</strong> (constant purchasing-power dollars deflated by CPI inflation). In <em>Log</em> and <em>Auto</em> scale modes, the Y-axis uses a smooth pseudo-logarithmic curve with a <code>$2.5M</code> transition knee (<code>log10(1 + value / $2.5M)</code>) so zero/depletion bars remain visible while multi-decade compounding stays legible.</li>
+        </ul>
+
+        <h4>Interactive Drawdown Bucket Management &amp; Tools</h4>
+        <p>The Retirement Simulator organizes all portfolio holdings into discrete drawdown buckets (cash sweeps, municipal bonds, direct indexing UMAs, concentrated equity tranches, annuities, and retirement wrappers). The interface provides comprehensive in-page tools to inspect, prioritize, and customize how every bucket behaves during retirement:</p>
+        <ul>
+          <li><strong>Drag-and-Drop Liquidation Priority</strong>: The <em>Asset Liquidation Priority</em> table lets you drag any row to reorder the drawdown sequence on the fly. Solvency calculations recompute live as you adjust the priority from #1 downward.</li>
+          <li><strong>Preset Priority Strategies &amp; Dynamic Bear Shield</strong>: Quick-apply buttons for <em>Tax-Optimal</em>, <em>⚡ Auto-Optimize</em>, <em>🏛 Heir Legacy (§1014)</em>, <em>Concentrated First</em>, and the <em>🛡 Bear Shield</em> dynamic market-downturn guard (explained in detail below).</li>
+          <li><strong>Projected Growth &amp; Risk Class Modals</strong>: Click any <em>◆ Proj. Growth</em> capsule to customize real compounding rates, asset volatility, advisory fees, and custom bucket notes.</li>
+          <li><strong>Hypothetical Accounts &amp; Scheduled Events</strong>: Click <em>&#10022; + Add Hypothetical Account</em> to synthesize new accounts or ETF/bond products at a <code>$0</code> initial balance, then fund them through <em>Scheduled Events</em> (<em>&#8644; Account Transfer</em> or <em>&uarr; Cash Deposit</em>) to visualize their impact on retirement projections (detailed below).</li>
+          <li><strong>Global Friendly Names &amp; Notes</strong>: Set clean display names (e.g. <em>"5-Year Fixed MYGA"</em> or <em>"US Large Cap Direct-Indexing"</em>) and holding notes via Settings or direct table interaction.</li>
+        </ul>
+
+        <h4 id="scheduled-events-hypotheticals">Scheduled Events &amp; Modeling Hypothetical Accounts</h4>
+        <p>To test portfolio moves without double-counting existing wealth, <strong>Hypothetical Accounts</strong> and <strong>Scheduled Events</strong> work together as a two-part workflow inside each Scenario:</p>
+        <ul>
+          <li><strong>1. Create a <code>$0</code>-Balance Hypothetical Account</strong>: Click <em>&#10022; + Add Hypothetical Account</em> in the <em>Asset Liquidation Priority</em> panel (or click <em>+ Hypothetical</em> directly inside the <em>Add Scheduled Event</em> modal). Give the account a <em>Friendly Account / Product Name</em>, optional custodian and real-world ticker reference, and configure its <em>&#9670; Proj. Growth</em> rate, 7-tier <em>Risk / Volatility Class</em>, <em>Expense Ratio</em>, and <em>Tax Wrapper</em> (Taxable Brokerage, US Treasuries, Tax-Exempt Municipal Bonds, Cash / Money Market, Roth, Traditional IRA, or Deferred Annuity). Every hypothetical account starts at <strong><code>$0</code> initial balance</strong> so total Day-0 net worth stays exact until a scheduled event moves money into it.</li>
+          <li><strong>2. Optional Maturity Lockups (<code>MM-YYYY</code>)</strong>: Leave <em>Maturity Date</em> blank (<em>None (Liquid)</em>) for liquid ETFs, brokerage accounts, or money markets, or enter a future <code>MM-YYYY</code> month to model CDs, fixed MYGAs, or structured lockups. Until that month arrives, incoming transfers and deposits compound normally while retirement spending withdrawals automatically skip the locked account.</li>
+          <li><strong>3. Route Money via Scheduled Events (<em>+ Add Event</em>)</strong>: Expand the <em>Scheduled Events</em> drawer and add one or more cashflow rules in either <em>Today&#39;s $</em> (inflation-adjusted) or <em>Nominal $</em>:
+            <ul>
+              <li><strong>&#8644; Account Transfer</strong>: Move a dollar amount or <em>% of Source</em> from an existing holding into your hypothetical (or another existing) account on a <em>One-Time</em>, <em>Monthly</em>, <em>Quarterly</em>, <em>Annual</em>, or automatic <em>On Equity Vest</em> schedule. The simulator sells from the source bucket, computes and deducts any realized short-/long-term capital gains or ordinary income taxes from proceeds, and deposits the net after-tax proceeds into the destination account with a fresh stepped-up cost basis.</li>
+              <li><strong>&uarr; Cash Deposit</strong>: Route external one-time or recurring inflows—such as home-sale proceeds, consulting income, or an inheritance—directly into a hypothetical or existing account.</li>
+              <li><strong>&darr; Withdrawal / Gift</strong>: Schedule planned future outflows (college tuition, home down-payment gifts, or major purchases) from a specific bucket or from your active liquidation order. The simulation can use available cash to fund a gift, even if that draws the cash balance to zero. Hover over the scheduled month in the deterministic chart to see the amount requested, the amount funded and any shortfall.</li>
+            </ul>
+          </li>
+          <li><strong>4. Visualize the Simulation Impact Immediately</strong>: As soon as you save the event, the stacked <em>Retirement Asset &amp; Burn Simulator</em> chart, drawdown waterfall, and top KPI cards (<em>Milestone Wealth</em>, <em>Funded / Solvency</em>, and <em>Tax Efficiency</em>) recompute live across all <em>Simulation Controls</em> modes (<strong>Market Correction</strong> presets/custom shocks and <strong>Simulation</strong> = <em>None</em>, <em>Monte Carlo</em>, or <em>Historical</em>). Toggle <em>Scheduled Events</em> under <strong>Inclusions</strong> (or clone the Scenario) to compare your baseline plan side-by-side against the hypothetical rollover or deposit strategy. To prevent breaking multi-step transfer chains or silently dropping planned deposits and gifts, <em>Delete Hypothetical</em> stays disabled whenever one or more Scheduled Events still reference that account—hovering over the button lists the exact events to edit or remove first.</li>
+        </ul>
+
+        <h4 id="pre-retirement-work">Pre-Retirement Work, Staggered Retirement Dates &amp; 401(k) / IRA Contributions</h4>
+        <p>Households still in their earning years can model active employment and staggered retirement dates without cluttering <em>Scheduled Events</em>:</p>
+        <ul>
+          <li><strong>1. Configure Work Plans in <em>Portfolio Settings &rarr; Family Members</em></strong>: Switch an adult contributor from <em>Retired Now</em> to <em>Working Until Retirement</em>, choose a <em>Default Target Retirement Age</em> (bounded at or below their <em>Milestone Age</em>), and configure household budget coverage while working—either <strong>Paycheck covers 100% of household burn</strong> (default) or a partial <strong>Net Paycheck Toward Household Burn ($/yr, Today&#39;s $)</strong> so staggered spouse retirements draw only the monthly bridge shortfall from the portfolio (while never suppressing explicit <em>Scheduled Withdrawals / Gifts</em>).</li>
+          <li><strong>2. Target Ongoing Contributions to Ingested Accounts</strong>: Add one or more contribution targets pointing directly to your ingested 401(k), Roth, IRA, or taxable brokerage holdings, with 1-click IRS presets (<code>401(k) Max $24,500</code>, <code>IRA Max $7,500</code>), optional <strong>Age 50+ IRS Catch-Up</strong> (<code>+$8,000/yr</code> at attained ages 50&ndash;59 &amp; 64+, and <code>+$11,250/yr</code> SECURE 2.0 super catch-up at ages 60&ndash;63), and optional separate employer-match routing (for example, employee Roth 401(k) deferrals paired with a Pre-Tax 401(k) employer match). Contributions index with CPI and honor tax-wrapper cost-basis rules automatically.</li>
+          <li><strong>3. Per-Scenario Retirement Age Sliders &amp; Crash Anchoring</strong>: Expand <em>Overrides</em> in the Simulator to test earlier or later retirement ages per Scenario (with <code>Ref: Age X</code> reset pills). When employment defers portfolio withdrawals, active <em>Market Correction</em> downturns (and their <em>Bear Shield</em> window) automatically anchor to the first living-expense drawdown month so sequence-of-returns stress tests hit right when retirement withdrawals begin.</li>
+        </ul>
+
+        <h4 id="liquidation-strategies">Liquidation Order Strategies &amp; Dynamic Bear Shield</h4>
+        <p>The order tells the simulator which eligible holdings to sell when it needs cash for spending. Hover over a button to see its rule. Selecting a preset immediately applies it to the open scenario.</p>
+
+        <div class="card-grid">
+          <div class="card">
+            <h4><span class="badge badge-blue">Default</span> 1. Tax-Optimal</h4>
+            <p>Restores the holdings’ configured default ranks. High-basis shares typically come early, so a sale can fund spending with a smaller taxable gain. Cash reserves and tax-free holdings typically come later. The tax result depends on the portfolio.</p>
+          </div>
+          <div class="card">
+            <h4><span class="badge badge-green">Optimizer</span> 2. &#9889; Auto-Optimize</h4>
+            <p>Searches candidate orders with spending first. Deterministic runs (<em>Simulation: None</em>, with or without an active <em>Market Correction</em>) favor the order that delays depletion or a spending shortfall longest over the 40-year run. Monte Carlo uses four shared paths. Historical uses up to four selected cohorts, each through the milestone or the end of its available history. In these modes the first priority is the number of runs that cover every modeled month of spending.</p>
+            <p>When funding ties, the search considers after-tax milestone wealth. For Monte Carlo and Historical it first averages the lower-quartile and median results. Cash and tax-free buckets stay at the end of the candidate orders. The result can change when spending, growth assumptions or the market sample changes.</p>
+          </div>
+          <div class="card">
+            <h4><span class="badge badge-cyan">Family Estate</span> 3. &#127963; Heir Legacy (&sect;1014)</h4>
+            <p>This preset starts with high-basis and newly vested shares, then annuities with projected growth below 5%. Diversified taxable pools, municipal bonds and pretax retirement holdings generally come ahead of low-basis single stock. Keeping appreciated taxable shares can preserve a potential basis step-up for heirs. Earlier pretax withdrawals can increase lifetime income tax.</p>
+          </div>
+          <div class="card">
+            <h4><span class="badge badge-amber">De-Risk</span> 4. Concentrated First</h4>
+            <p>Moves single-stock holdings and the primary-equity bucket to the front, retaining default priority within each group. Sales occur as spending requires and as shares become available. This can reduce concentration and bring forward capital gains on low-basis shares.</p>
+          </div>
+        </div>
+        <div class="callout callout-info" style="margin-top:12px;">
+          <strong>Bear Shield (Downturn Drawdown Guard):</strong> When enabled, monthly spending temporarily routes through <strong>Cash</strong> &rarr; <strong>Municipal Bonds</strong> &rarr; <strong>Unlocked Fixed Income / Annuities</strong> ahead of <strong>Equities</strong>, keeping <strong>Traditional IRAs</strong> behind stocks and <strong>Roth IRAs</strong> strictly last (preserving your relative order within each tier while still honoring surrender locks, mandatory RMDs, and Scheduled Events).
+          <ul style="margin:6px 0 0;padding-left:20px;">
+            <li><strong>Backward-Looking Triggers (Zero Look-Ahead):</strong> Activates for the calendar year <em>after</em> broad equities drop <code>&lt; -5%</code> or primary stock drops <code>&lt; -10%</code> in <em>Historical Cohorts</em> and <em>Bootstrap Monte Carlo</em>, or after a <code>&lt; -0.5&sigma;</code> market draw in <em>Normal Monte Carlo</em>; active during Months 1&ndash;12 in <em>Early Crash</em>; inactive in <em>Simple</em>.</li>
+            <li><strong>Real-World Execution:</strong> Requires no market prediction&mdash;whenever equities sit materially (&gt;5&ndash;10%) below their prior-year close or high, fund monthly living expenses from cash and short-term bonds until stocks recover.</li>
+          </ul>
+        </div>
+        <p>The <strong>Most tax efficient</strong> star uses a separate 40-year deterministic check of the four presets, including any active <em>Market Correction</em> shock. It ranks later depletion or shortfall first, then lower total tax. When funding ties and tax differs by $100 or less, it favors higher ending after-tax wealth. Click the star to apply that preset.</p>
+
+        <h3 id="page-social-security">2.4 Income &amp; Expense (Social Security OASDI)</h3>
+        <p>Comprehensive Social Security Primary Insurance Amount (PIA) and household benefit engine:</p>
+        <ul>
+          <li><strong>Official <code>ssa.gov</code> XML Earnings History</strong>: Computes Average Indexed Monthly Earnings (AIME) and statutory PIA bend points strictly from official <code>ssa.gov</code> XML statements uploaded in <em>Portfolio Settings &rarr; Family Members</em> (using the worker’s age-62 retirement formula and historical COLAs through 2026. Future eligibility years use a fixed 2026 wage and formula basis; <code>$0</code> Social Security income is modeled until an official XML statement is uploaded).</li>
+          <li><strong>Birth-Cohort FRA, Claiming Multipliers &amp; Spousal Top-Up</strong>: Honors statutory Full Retirement Age (<code>66</code> to <code>67</code> by birth year), early filing reductions (ages 62–FRA), Delayed Retirement Credits (+8%/yr up to age 70), and the SSA §202(b) 50% spousal benefit floor when both spouses have claimed.</li>
+          <li><strong>Provisional Income Taxation &amp; Dollar Toggle</strong>: Switch the Social Security chart and claiming matrix between <strong>Nominal $</strong> (COLA-compounded future checks) and <strong>Today&#39;s $</strong> (CPI-deflated purchasing power). On the standalone Income screen, a reference net line previews benefits at your configured reference tax rate; when fed into the <strong>Retirement Simulator</strong>, Social Security benefits flow through the annual IRC §86 provisional-income formula (<code>0% / 50% / 85%</code> federal inclusion based on combined income plus tax-exempt municipal interest, and <code>0%</code> state tax in exempt states).</li>
+        </ul>
+
+        <p>January required minimum distributions use the preceding December closing balances. The simulator groups eligible IRAs by owner, treats each 401(k) separately and pools eligible 403(b) assets only for the same owner. If your forecast starts midyear, the first modeled required withdrawal occurs the following January. Any amount still due for the starting year is omitted, so first-year cash flow and estimated taxes can differ from your actual figures. You can compare long-term spending plans using your current balances without entering past withdrawals. The tax estimate uses the 2026 federal basic standard deduction ($32,200 joint or $16,100 single) and 2026 brackets. The forecast starts with Married Filing Jointly when it counts at least two adults in the family, including adult beneficiaries. Otherwise it uses Single. Review the checkbox under Federal Filing Status in Portfolio Settings. With two or more family members listed, you can change the household setting or override it for one scenario.</p>
+        <p>Reopening a dated plan preserves each event’s original month and recurrence. For example, a past one-time deposit is already in the opening balance if it occurred and will not be added again. A quarterly withdrawal keeps its original three-month cycle.</p>
+        <h3 id="page-scenarios">2.5 Saved Scenarios Library &amp; Golden Baselines</h3>
+        <p>Open <strong>AI Chat → Saved Prompts</strong> to run a household planning question. <em>How much can we spend each month?</em> compares spending levels across historical periods. <em>Which growth assumption matters most?</em> tests lower returns one holding at a time. <em>Can we afford a gift or major purchase?</em> compares making the purchase or gift on schedule, delaying it two years, and leaving it out. You can edit or remove these questions in Portfolio Settings.</p>
+        <p>Saved Advisor workflows explain their comparisons in the chat drawer. If the Advisor prepares a new scenario or a vote/concurrence for an existing scenario, the completed run shows a button naming that action and its target. Choose it to apply the proposal: a proposed new scenario is added to the library while leaving your active scenario selected, and an Advisor vote appends a timestamped concurrence signature under <code>## Upvotes &amp; Concurrences</code> inside <strong>Details &amp; Notes &rarr;</strong> without altering scenario settings. Demo Mode supports the read-only analysis only.</p>
+        <p>If the server disconnects while you edit, keep the tab open. After reconnecting, retry Save. A failed quick-save displays its status next to the scenario name. Background library refreshes preserve unsaved settings in the open tab. Closing the tab can discard them.</p>
+        <p>AdvisorBot opens directly to your <strong>Saved Scenarios Library</strong>, storing each scenario configuration in your portfolio's local <code>Scenarios/</code> folder:</p>
+        <ul>
+          <li><strong>&#9670; Inputs &rarr; &#9733; Outcomes</strong>: Each scenario file stores all purple <strong>&#9670;</strong> what-if controls and summarizes its simulated performance in three gold <strong>&#9733;</strong> KPI cells (<em>Milestone Worth</em>, <em>Solvency</em>, and <em>Tax Efficiency</em>) on the scenario card.</li>
+          <li><strong>Protected Scenario Toggle</strong>: Every scenario card includes a user-controlled <strong>🔒 Protected</strong> / <strong>🔓 Unprotected</strong> toggle so benchmark plans cannot be accidentally overwritten, renamed, or deleted until unlocked or explicitly confirmed.</li>
+          <li><strong>Active Scenario Sync</strong>: Switching or saving a scenario updates all five screens, charts, and AI context in real time.</li>
+          <li><strong>Branching &amp; Comparison</strong>: Clone any scenario to compare alternative retirement dates, spending levels, tax floors, hypothetical rollovers, or liquidation strategies side-by-side in Today's $.</li>
+          <li><strong>Scenario Overrides Inspection</strong>: Inspect every holding growth and volatility override—including explicit <code>0.0%</code> conservative overrides—in the Scenario Details view.</li>
+        </ul>
+
+        <h3 id="page-settings">2.6 Portfolio Settings Workspace (5 Tabs)</h3>
+        <p>Click <strong>Settings (⚙️)</strong> in the header to configure your household across five dedicated tabs:</p>
+        <ul>
+          <li><strong>1. Portfolio</strong>: Household name, badge icon, baseline spending &amp; inflation references, Married Filing Jointly &amp; Minimum Tax Bracket Floor defaults, account tax wrappers, and the live <em>Statement Inventory &amp; Audit</em> table (<code>Processed</code>, <em>Available</em>, <em>Unknown</em>).</li>
+          <li><strong>2. Family Members</strong>: Investors and beneficiaries, birthdates, milestone ages, pre-retirement work status &amp; targeted 401(k)/IRA contribution plans, RMD owner designation, and per-investor Social Security earnings/XML configuration.</li>
+          <li><strong>3. Symbols</strong>: Primary concentrated equity ticker, tracked grant symbols, and live market quote refresh controls.</li>
+          <li><strong>4. Prompts</strong>: Customizable quick-action prompts for the in-page AI Assistant drawer.</li>
+          <li><strong>5. Privacy</strong>: AI provider &amp; API key management, Privacy Shield profile selection (Modes A, B, C), read-only <em>Demo Mode</em> toggle (which aliases names and scales values for safe screen sharing while blocking scenario writes), desktop MCP enable/disable toggle, and the editable <em>Alias &amp; Synonym Registry</em>.</li>
+        </ul>
+
+        <h3 id="holding-forecast-methodology">2.7 Holding Forecasts, Ingested Baselines &amp; Valuation Provenance</h3>
+        <p>Hover over <strong>Proj. Growth</strong> in Current Vested Holdings or the Retirement Simulator’s Asset Liquidation Priority table. In Holding Details, hover over the projected annual return or its reference button. The tooltip shows the scenario rate above a three-row table ordered from most holding-specific to broad secular equilibrium. The highlighted row marked <strong>Used</strong> supplied the baseline; unavailable tiers show a dash. The <strong>Hist. Ref</strong> button applies the highlighted rate to two decimal places. For a multi-holding group, each tier weights the holdings covered in that tier by relative value and reports the covered share. Any secondary account-level or lot-basis return appears inside Tier 1 as an informational comparison without replacing the peer-market benchmark in Tier 2.</p>
+        <p><strong>Three-tier return hierarchy:</strong> <strong>Tier 1 (Holding or contractual rate)</strong> uses the security’s own 10-year dividend- and split-adjusted total-return CAGR (or shorter &ge;180-day market record), a bond or contract’s forward YTM / credited APY, or a non-public annuity/RILA’s carrier-reported / inception CAGR. <strong>Tier 2 (Peer market benchmark)</strong> measures the holding’s parent market index—10-year total return for equities, balanced/buffered strategies, and real assets (such as S&amp;P 500, global equity, 60/40 balanced, or gold benchmarks), or trailing 1-year cash distribution yield for taxable bonds, municipal bonds, and T-bills. <strong>Tier 3 (Asset-class equilibrium)</strong> reflects long-run 50&ndash;100 year secular asset-class returns (e.g. <code>8.50%</code> equity, <code>6.50%</code> buffered/hybrid, <code>4.50%</code> taxable fixed income, <code>3.50%</code> tax-exempt municipal bonds, <code>4.00%</code> cash).</p>
+        <p><strong>Holding Details &amp; two-stage mean reversion.</strong> Statement Metadata and Friendly Name appear at the top, followed by Projected Annual Return and the three-tier table. Variable-rate holdings begin Year 1 at the scenario rate and transition across two timescales: idiosyncratic alpha over <strong>Tier 2</strong> halves every <em>H</em> years, while peer-market excess over <strong>Tier 3</strong> halves every <em>2H</em> years. Contractual fixed-term holdings (such as MYGAs, CDs, and individual bonds) remain locked at their contractual rate through their maturity date and then roll into Tier 2 &rarr; Tier 3.</p>
+        <p><strong>Return half-life.</strong> Choose 1–30 years (default 5), or drag all the way right to <strong>Flat (no decay)</strong> to hold the Year-1 rate constant across all 40 years. The 40-year chart redraws live as you adjust either slider, plotting the Scenario curve against dashed Tier 1, Tier 2, and Tier 3 reference lines (before fees and the simulation multiplier). Single-tier holdings, perpetual cash sweeps, and flat zero settings hide the decay chart. Save the scenario to persist half-life settings.</p>
+        <p>Deterministic single-path, Market Correction after its downfall and bounce-back window, Monte Carlo, and forecast-centered historical cohorts use this path. Raw historical replay uses historical returns.</p>
+        <p>The table-header <strong>Reset</strong> restores each holding’s selected reference in the active scenario. In Holding Details, <strong>Hist. Ref</strong> copies the highlighted rate into the editor. <strong>Reset All</strong> also restores the other defaults listed in that button’s tooltip. A holding can use its own reference even when its parent or a constituent has a custom rate. Contract segments open their parent contract’s forecast. For a hypothetical account, Tier 3 shows its risk-class assumption. The simulated RMD cash sweep identifies its built-in interest assumption. Both tables show the holding’s growth setting. The simulator applies the multiplier when projecting variable-rate holdings. For example, a holding set to 2.75% still displays 2.75% at a 0.45× multiplier. Its simulated annual return is 1.24% before fees.</p>
+        <p>Use those alternatives to judge how much your plan relies on a holding’s past performance. For example, you can lower a stock’s rate in a saved scenario and compare how long it funds your spending. The Asset Liquidation Priority tooltip shows the multiplier calculation on a separate line and identifies any fees deducted from the projection.</p>
+
+        <h4>1. The 3-Tier Forecast Enrichment Waterfall</h4>
+        <p>During portfolio refresh, the available sources depend on the holding’s asset type. The three tracks below describe which inputs qualify.</p>
+
+        <div class="card-grid">
+          <div class="card">
+            <h4><span class="badge badge-green">Track A</span> Public Securities &amp; Tickers</h4>
+            <p><strong>Applies to:</strong> Single stocks, direct-indexing UMA baskets, and public ETFs/mutual funds.<br>
+            <strong>Growth Calculation:</strong> 10-Year split- and dividend-adjusted weekly total-return CAGR from Yahoo Finance:<br>
+            <code>CAGR = (P_latest / P_10y_start) ^ (1 / years) - 1</code><br>
+            <strong>Volatility:</strong> 10-Year annualized weekly log-return standard deviation (<code>weekly stdev &times; &radic;52</code>), S&amp;P 500 sensitivity (beta), and S&amp;P 500 correlation.<br>
+            <strong>Cash Exception:</strong> Money-market / T-bill tickers in <em>Fixed / Cash</em> use trailing 1-year return to reflect prevailing yields.<br>
+            <strong>Short History (180d&ndash;3y):</strong> Uses the ticker’s annualized return over the actual observation dates.</p>
+          </div>
+
+          <div class="card">
+            <h4><span class="badge badge-blue">Track B</span> Fixed Assets, Bonds &amp; Sweeps</h4>
+            <p><strong>Applies to:</strong> Municipal bonds, US Treasuries, CDs, cash sweep deposits, and fixed MYGAs.<br>
+            <strong>Contractual Credited APY (Primary):</strong> Forward contractual credited rate (e.g. 4.50% on a multi-year guaranteed annuity) or bank sweep APY.<br>
+            <strong>Statement Nominal YTM (Secondary):</strong> Yield to Maturity reported on brokerage custody statements.<br>
+            <strong>Current Coupon Yield (Tertiary):</strong> Annual coupon divided by statement market value.<br>
+            <strong>Post-Maturity Rollover:</strong> Fixed-term contracts remain locked at their contractual rate through maturity, then roll into their Tier 2 peer market yield and converge toward Tier 3 equilibrium (or cohort T-bill rates in Historical Cohorts).</p>
+          </div>
+
+          <div class="card">
+            <h4><span class="badge badge-purple">Track C</span> Non-Public Hybrid Contracts</h4>
+            <p><strong>Applies to:</strong> Variable annuities, Registered Index-Linked Annuities (RILAs), Fixed Indexed Annuities (FIAs), and private funds.<br>
+            <strong>Statement Reported Return (Tier 1 Primary):</strong> Official annualized carrier return where reported on contract summaries.<br>
+            <strong>Inception Compound CAGR (Tier 1 Secondary):</strong> Derived from initial premium/cost basis and current contract value when holding age &ge; 180 days:<br>
+            <code>CAGR = (Current MV / Initial Premium) ^ (1 / age_years) - 1</code><br>
+            <strong>Peer &amp; Equilibrium Fallbacks (Tiers 2 &amp; 3):</strong> Unseasoned positions (&lt; 180 days) adopt their Tier 2 peer market benchmark when available, or Tier 3 secular equilibrium (e.g. <code>+8.50%</code> equity, <code>+6.50%</code> hybrid/buffered).</p>
+          </div>
+        </div>
+
+        <h4>2. How Confidence Ratings Are Determined</h4>
+        <p>In the deterministic monthly chart tooltip, each scheduled withdrawal shows requested and funded spending, any shortfall and attributed tax. A direct sale belongs to its event. The ledger allocates pooled proceeds to regular spending first, then to the remaining withdrawals in simulation order, with pooled tax allocated in proportion to net proceeds. This attribution leaves the amounts actually sold unchanged.</p>
+        <p>The historical S&amp;P proxy combines annual price change with dividend yield to approximate total return. A holding’s confidence rating describes the history behind its input. Even a long, directly observed history leaves future growth uncertain.</p>
+        <p>Hovering any holding's <em>Hist. Growth</em> cell on the Positions table displays its provenance badge and confidence rating (<code>HIGH</code>, <code>MEDIUM</code>, <code>LOW</code>):</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:130px;">Confidence</th>
+              <th>Underlying Provenance &amp; Qualification Criteria</th>
+              <th>Typical Holdings</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-green">HIGH</span></td>
+              <td>
+                &bull; Public ticker with <strong>&ge; 5.0 years</strong> of weekly market price observations (10Y total-return CAGR).<br>
+                &bull; Direct contractual credited APY or guaranteed MYGA fixed return.<br>
+                &bull; Statement-reported nominal Yield to Maturity (YTM) on municipal or Treasury bonds.<br>
+                &bull; Statement-reported carrier return or seasoned statement inception CAGR with <strong>&ge; 2.0 years</strong> of history.
+              </td>
+              <td><code>AAPL</code> (+20.4% 10Y), <code>5-Year MYGA</code> (4.50% APY), <code>Tax-Exempt Munis</code> (4.20% YTM), <code>Buffered RILA</code> (+10.5% Inception CAGR)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">MEDIUM</span></td>
+              <td>
+                &bull; Public ticker with at least 180 days and less than five years of qualifying price history.<br>
+                &bull; Bond current coupon yield (when explicit YTM is omitted from statement).<br>
+                &bull; Cash sweep benchmark proxy (when explicit APY is omitted).<br>
+                &bull; Statement inception CAGR with <strong>180 days to 2.0 years</strong> of seasoned holding history.
+              </td>
+              <td>Newer ETF issuances, corporate bonds without explicit YTM, recently established annuities (6&ndash;24 months)</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-rose">LOW</span></td>
+              <td>
+                &bull; Unseasoned positions with <strong>&lt; 180 days</strong> of history and no public ticker, contractual rate, or cost-basis age.<br>
+                &bull; Adopts the risk-class benchmark proxy return (<code>+9.00%</code> single stock, <code>+8.50%</code> broad equity).
+              </td>
+              <td>Recent spin-offs, unpriced private tranches, or newly dropped unseasoned lots</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>3. Valuation Provenance: Live Market vs. Statement-Anchored</h4>
+        <p>AdvisorBot clearly distinguishes how asset <em>dollar values</em> are priced:</p>
+        <ul>
+          <li><strong>Live Public Market Quotes (Mark-to-Market)</strong>: For public equities, ETFs, and direct-indexing UMA stocks, current value is computed as <code>Quantity &times; Live Split-Adjusted Quote</code> (stepping up share counts automatically when RSU tranches vest after a statement date).</li>
+          <li><strong>Statement-Anchored Contracts</strong>: Non-public carrier contracts (annuities, municipal bond sleeves, bank deposits) have no public ticker; their market values are anchored directly to your latest ingested statement until a newer statement arrives.</li>
+        </ul>
+
+        <h4>4. Scenario Overrides, Fees &amp; Volatility Controls</h4>
+        <p>Click any holding row or <em>◆ Proj. Growth</em> capsule to open the <em>Holding Details &amp; Scenario Forecast</em> modal. Ingested holdings display their immutable 7-tier Risk Profile badge alongside interactive controls for projected annual growth (<code>&minus;20%</code> to <code>+25%</code>), annual volatility, and advisory/contract fees (<code>%/yr</code>). Quick-reset capsules—<code>Hist. Ref</code>, <code>Hist. Ref Vol</code>, <code>10Y Realized Vol</code>, and the table-header <code>Reset</code> button—restore empirical baselines at any time.</p>
+      </section>
+
+      <!-- Chapter Pagination Footer -->
+      <div class="chapter-nav-footer">
+        <a href="ch1-portfolio-setup.html" class="chapter-nav-btn prev">
+          <span class="dir-label">← Previous Chapter</span>
+          <span class="title-label">Chapter 1: Setting Up Your Portfolio</span>
+        </a>
+        <a href="ch3-security-privacy.html" class="chapter-nav-btn next">
+          <span class="dir-label">Next Chapter →</span>
+          <span class="title-label">Chapter 3: Security &amp; Privacy Architecture</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="docs.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      initDocsPage(2);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "_schema_version": "1.0",
+  "_instructions": {
+    "quick_start": "Copy this file to Data/Config/LLM/openai.json (for global use) or Portfolios/<PortfolioName>/LLM/openai.json (portfolio-specific) and paste your OpenAI API key into 'api_key'.",
+    "key_types": {
+      "project_api_key": "RECOMMENDED. Create a Project API key (starts with 'sk-proj-') at https://platform.openai.com/api-keys.",
+      "user_legacy_key": "User-scoped keys (starts with 'sk-') are also supported.",
+      "credits_requirement": "IMPORTANT: OpenAI API keys require a pre-funded credit balance in your organization account (https://platform.openai.com/settings/organization/billing). Unlike ChatGPT Plus subscriptions, API usage is billed separately. A key with $0 credit balance will fail with 'You have no credits remaining' and show as a red '🔴 (no credits)' dot in AdvisorBot.",
+      "azure_openai": "For Azure OpenAI endpoints, update 'api_base_url' to your deployment endpoint (e.g. 'https://<resource>.openai.azure.com/openai/deployments/<deployment-id>/chat/completions?api-version=2024-02-15-preview') and provide your Azure key.",
+      "local_proxies": "If running an OpenAI-compatible proxy (such as Ollama, LocalAI, vLLM, or LM Studio), set 'api_base_url' to 'http://localhost:11434/v1/chat/completions' and use any non-empty 'api_key' like 'ollama'."
+    },
+    "environment_variable_alternative": "Instead of pasting your key here, you can set export OPENAI_API_KEY='sk-proj-...' in your shell (~/.bashrc or ~/.zshrc). If 'api_key' in this file is empty or starts with 'PASTE_YOUR_', AdvisorBot will automatically read OPENAI_API_KEY from your environment.",
+    "privacy_shield": "Direct OpenAI cloud endpoints enforce your active Privacy Shield mode: Mode B ('identity_aliased') pseudonymizes investor/account/institution/ticker identities while keeping dollar values unscaled for exact tax math; Mode C ('identity_and_values') also scales dollar values and shifts birth years; 'local_only' restricts requests to loopback/localhost URLs."
+  },
+  "provider": "openai",
+  "api_key": "PASTE_YOUR_OPENAI_API_KEY_HERE",
+  "model": "gpt-4.1",
+  "display_name": "OpenAI GPT-4.1",
+  "api_base_url": "https://api.openai.com/v1/chat/completions",
+  "max_tool_rounds": 8,
+  "temperature": 0.2,
+  "models": [
+    {
+      "id": "gpt-4.1",
+      "display_name": "OpenAI GPT-4.1",
+      "tier": "flagship",
+      "description": "Default OpenAI GPT-4.1 general-purpose & tool-calling model"
+    },
+    {
+      "id": "gpt-4.1-mini",
+      "display_name": "OpenAI GPT-4.1 Mini",
+      "tier": "fast",
+      "description": "OpenAI GPT-4.1 Mini fast model"
+    },
+    {
+      "id": "gpt-4o",
+      "display_name": "OpenAI GPT-4o",
+      "tier": "balanced",
+      "description": "OpenAI GPT-4o multimodal & tool-calling model"
+    },
+    {
+      "id": "gpt-4o-mini",
+      "display_name": "OpenAI GPT-4o Mini",
+      "tier": "lite",
+      "description": "OpenAI GPT-4o Mini lightweight model"
+    },
+    {
+      "id": "o3",
+      "display_name": "OpenAI o3",
+      "tier": "reasoning",
+      "omit_temperature": true,
+      "use_max_completion_tokens": true,
+      "description": "OpenAI o3 dedicated reasoning model"
+    },
+    {
+      "id": "o3-mini",
+      "display_name": "OpenAI o3-mini",
+      "tier": "reasoning",
+      "omit_temperature": true,
+      "use_max_completion_tokens": true,
+      "description": "OpenAI o3-mini fast reasoning model"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "active_id": "001",
+  "next_seq": 4,
+  "models": [
+    {
+      "id": "001",
+      "name": "Default",
+      "file": "001_default.json",
+      "snapshot": null,
+      "created_at": "2026-11-16T09:00:00+00:00",
+      "updated_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
+      "id": "002",
+      "name": "Surrender Early",
+      "file": "002_surrender_early.json",
+      "snapshot": null,
+      "created_at": "2026-11-16T09:00:00+00:00",
+      "updated_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
+      "id": "003",
+      "name": "IRA To Roth",
+      "file": "003_ira_to_roth.json",
+      "snapshot": null,
+      "created_at": "2026-11-16T09:00:00+00:00",
+      "updated_at": "2026-11-16T09:00:00+00:00"
+    }
+  ]
+}

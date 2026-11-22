@@ -1,0 +1,35 @@
+# Literal-fallback shapes the fallback audit looks for, as `<id>=<python regex>`.
+#
+# Each shape catches a place where a configuration field exists in `project.json` or payload
+# data, but a hardcoded ticker, institution, date, yield, or tax-rate literal wins when the
+# field is empty.
+#
+# The scan reports `<relpath>:<line>:<id>` for every hit. Hits listed in
+# fallback_allowlist.txt are tolerated; anything else fails. The allowlist can only shrink,
+# so a new literal fallback cannot land unnoticed.
+#
+# NOTE: a `#` inside a pattern is not possible here, because everything after `#` on a
+# line is treated as a comment.
+
+primary_symbol_or_py=or ["']GOOG["']
+primary_symbol_or_js=\|\|\s*["']GOOG["']
+primary_symbol_default_arg=get\(["']primary_equity_symbol["'][^)]*["']GOOG["']
+institution_fallback=or ["']Wells Fargo
+institution_branch=if ["']Morgan["']\s+in
+carrier_branch=["'](?:allianz|prudential|nationwide|lincoln)["']\s+(?:not\s+)?in\s+asset_id
+ssn_effective_literal=get\(["']effective_ssn_tax_rate["']\)\s*or\s*0\.\d+
+pia_literal=get\(["']pia_monthly_2026["']\)\s*or\s*[1-9]\d{2,3}(?:\.\d+)?
+transfer_date_literal=get\(["']in_kind_transfer_vest_date["']\)\s*or\s*["']\d{4}-\d{2}-\d{2}["']
+retention_literal=net_retention_rate\s*\|\|\s*0\.\d{3,}
+vol_preset_literal=single_stock_vol\s*\|\|\s*\d+\.\d+
+muni_yield_literal=["']munis["']\s*:\s*\d+\.\d+
+annuity_yield_literal=["']fixed_annuit(?:y|ies)["']\s*:\s*\d+\.\d+
+ltcg_js_literal=rates\.ltcg\s*\?\?\s*["']\d+\.\d+["']
+ordinary_js_literal=rates\.ordinary\s*\?\?\s*["']\d+\.\d+["']
+ltcg_num_fallback=get\(["']ltcg_top["']\s*,\s*0\.[1-9]\d*\)
+ordinary_num_fallback=get\(["']ordinary_top["']\)\s*or\s*0\.[1-9]\d*
+ira_num_fallback=get\(["']sim_ira_ordinary_tax_rate["']\s*,\s*0\.[1-9]\d*\)
+split_threshold_fallback=["']high_basis_split_threshold["']\s*:\s*[1-9]\d*(?:\.\d+)?
+cash_apy_fallback=get\(["']apy["']\)\s*or\s*0\.0\d+
+state_tax_delta=ltcgTop\s*-\s*0\.1\d+
+grant_symbol_db_default=DEFAULT ['"]GOOG['"]

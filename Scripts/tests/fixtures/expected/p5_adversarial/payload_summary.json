@@ -1,0 +1,27 @@
+{
+  "_as_of": "2026-11-16",
+  "_generated_by": "tests.generate",
+  "_spec_sha": "a7359e63b0b0e876",
+  "account.QQ-0001.child_count": 3,
+  "account.QQ-0001.current_value": 126333.25,
+  "account.QQ-0001.institution": "Quill & Quire Securities",
+  "account.QQ-0002.child_count": 1,
+  "account.QQ-0002.current_value": 17742.2,
+  "account.QQ-0002.institution": "Quill & Quire Securities",
+  "account_count": 2,
+  "grant_symbols": [],
+  "has_portfolio": true,
+  "household_name": "O'Neil & S\u00f8ren-Quist Household",
+  "institutions": [
+    "Quill & Quire Securities"
+  ],
+  "investor_count": 2,
+  "sim_asset_count": 4,
+  "sim_asset_ids": [
+    "nobasis_QQ_0001",
+    "quill_qx_QQ_0001",
+    "quill_qx_QQ_0002",
+    "cash_sweeps"
+  ],
+  "today_iso": "2026-11-16"
+}

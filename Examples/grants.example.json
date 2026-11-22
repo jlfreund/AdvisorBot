@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "institution": "Fidelity",
+  "account_id": "FID_STOCK_PLAN_01",
+  "as_of_date": "2026-11-10",
+  "symbol": "AAPL",
+  "company_name": "Apple Inc.",
+  "award_type": "RSU",
+  "unvested_tranches": [
+    {
+      "grant_id": "AAPL-2025-A",
+      "grant_date": "2025-04-15",
+      "vest_date": "2027-04-15",
+      "orig_qty": 120.0,
+      "deus": 0.0,
+      "total_qty": 120.0
+    },
+    {
+      "grant_id": "AAPL-2025-A",
+      "grant_date": "2025-04-15",
+      "vest_date": "2027-10-15",
+      "orig_qty": 120.0,
+      "deus": 0.0,
+      "total_qty": 120.0
+    }
+  ],
+  "releases_history": [
+    {
+      "order_number": "FID-REL-20260415-01",
+      "grant_id": "AAPL-2025-A",
+      "vest_date": "2026-04-15",
+      "release_price": 212.50,
+      "gross_shares": 120.0,
+      "net_shares": 74.4,
+      "tax_method": "Sell to Cover"
+    }
+  ],
+  "withdrawals": []
+}

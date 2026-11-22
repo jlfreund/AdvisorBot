@@ -1,0 +1,41 @@
+{
+  "id": "003",
+  "name": "Emoji Scenario \ud83d\ude80 With A Very Long Name That Goes On And On Past Any Reasonable Column Width To Check Truncation Behaviour In Tables And Dialogs",
+  "is_protected": false,
+  "created_at": "2026-11-16T09:00:00+00:00",
+  "updated_at": "2026-11-16T09:00:00+00:00",
+  "author": {
+    "type": "fixture",
+    "model": null,
+    "prompt_type": null
+  },
+  "notes_md": "",
+  "settings": {
+    "simActiveModel": "simple",
+    "simAnnualBurn": 95000,
+    "simInflationPct": 3.4,
+    "simIncludeSSN": true,
+    "simIncludeUnvested": true,
+    "simIncludeScheduledActions": true,
+    "simScaleMode": "real",
+    "simStressScenario": "gfc2008",
+    "simCustomShockPct": -30,
+    "simOrderPreset": "diversified_first",
+    "simAssetOrder": [],
+    "simHypotheticalAssets": [],
+    "simScheduledActions": [],
+    "mcReturnModel": "normal",
+    "mcSimulations": 500,
+    "mcSingleStockVolPct": 32.0,
+    "mcBroadEquityVolPct": 16.0,
+    "mcSingleStockCorr": 0.5,
+    "taxMode": "net",
+    "pastReleaseValMode": "net",
+    "cohortStartFrom": 1929,
+    "cohortCenterMode": "median",
+    "cohortInflationMode": "cpi",
+    "holdingForecasts": {}
+  },
+  "kpi_summary": {},
+  "snapshot": null
+}

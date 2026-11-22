@@ -1,0 +1,64 @@
+{
+  "_note": [
+    "Legacy-vocabulary hits that the application still emits regardless of the data, as of",
+    "the Nov 16 2026 legacy-logic review. Each entry is a code literal, not fixture content:",
+    "no fixture portfolio uses any of these terms. See .dev/SecurityAudit.html section 3.",
+    "",
+    "This baseline may only SHRINK. scans/test_portability.py fails if a fixture renders a",
+    "term that is not listed here (a new leak), and tells you to delete the entry when a",
+    "listed term stops appearing (a fixed leak). Deleting entries is the LL fix backlog."
+  ],
+  "_findings": {
+    "schemas.asset legend labels": "LL-04",
+    "account label institution fallback": "LL-02",
+    "sim bucket id naming": "LL-15",
+    "payload goog_* keys and kpis": "LL-01",
+    "ssn_model per-investor literal keys": "LL-08",
+    "heuristic account retitling": "LL-05",
+    "grant award-type wording": "LL-06, LL-23"
+  },
+  "portfolios": {
+    "p0_empty_household": [
+      "GOOG",
+      "GSU",
+      "Google",
+      "UMA",
+      "WFB"
+    ],
+    "p1_index_saver": [
+      "GOOG",
+      "GSU",
+      "Google",
+      "UMA",
+      "WFB"
+    ],
+    "p2_equity_comp_rsu": [
+      "GOOG",
+      "GSU",
+      "Google",
+      "UMA",
+      "WFB"
+    ],
+    "p3_retiree_annuities": [
+      "GOOG",
+      "GSU",
+      "Google",
+      "UMA",
+      "WFB"
+    ],
+    "p4_trust_household": [
+      "GOOG",
+      "GSU",
+      "Google",
+      "UMA",
+      "WFB"
+    ],
+    "p5_adversarial": [
+      "GOOG",
+      "GSU",
+      "Google",
+      "UMA",
+      "WFB"
+    ]
+  }
+}

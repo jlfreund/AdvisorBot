@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "ai_shield": {
+    "mode": "identity_aliased",
+    "block_inapp_agy_cli": true,
+    "dob_granularity": "year_month",
+    "notes_policy": "translate"
+  },
+  "demo_mode": {
+    "enabled": false,
+    "scale_factor": 1.0,
+    "seed": "demo-2001",
+    "dob_granularity": "shift_years"
+  },
+  "mcp_server": {
+    "enabled": false
+  },
+  "synonyms": {},
+  "entities": [],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "741fbb455018473f"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "format": "advisorbot.statement/1",
+  "doc_type": "CANONICAL_JSON",
+  "institution": "Harbor Brokerage",
+  "account_id": "HB-7103",
+  "account_name": "Harbor Roth IRA",
+  "account_type": "ROTH_IRA",
+  "tax_status": "ROTH_IRA",
+  "display_order": 40,
+  "period_start": "2026-10-01",
+  "as_of_date": "2026-10-31",
+  "reported_total": 114554.7,
+  "positions": [
+    {
+      "security_id": "TICKER:VTSAX",
+      "symbol_or_code": "VTSAX",
+      "canonical_name": "Vanguard Total Stock Market Index Admiral",
+      "asset_class": "MUTUAL_FUND",
+      "stack_bucket": "stocks",
+      "risk_class": "broad_equity",
+      "is_scrapeable": true,
+      "quote_symbol": "VTSAX",
+      "quantity": 900.0,
+      "stmt_price": 127.283,
+      "market_value": 114554.7,
+      "value_date": "2026-10-31",
+      "cost_basis": 73800.0,
+      "acquisition_date": "2020-09-14"
+    }
+  ],
+  "fixture": {
+    "generated_by": "tests.generate",
+    "spec_sha": "22d3d59ce37a565f"
+  }
+}
