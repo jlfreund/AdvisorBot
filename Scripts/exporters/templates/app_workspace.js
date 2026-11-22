@@ -4701,19 +4701,23 @@
       let stmtTip = "Scanning Statements/ directory for financial statements.";
       if (stLoaded) {
         const c = _lastStatementsState.counts || { processed: 0, available: 0, unknown: 0, total: 0 };
-        if (c.total === 0) {
+        const nProc = Number(c.processed) || 0;
+        const nAvail = Number(c.available) || 0;
+        const nUnk = Number(c.unknown) || 0;
+        const nTotal = Math.max(Number(c.total) || 0, nProc + nAvail + nUnk);
+        if (nTotal === 0) {
           stmtStatus = "needs_review";
           stmtSummary = "0 files in Statements/ \u2014 drop PDF/XLSX/CSV files to ingest";
           stmtTip = "No statement files found yet in Statements/. Drop statements in and run Portfolio Refresh.";
-        } else if (c.available > 0 || c.unknown > 0) {
+        } else if (nAvail > 0 || nUnk > 0) {
           stmtStatus = "needs_review";
-          stmtSummary = `${c.processed} Processed \u2022 ${c.available} Available \u2022 ${c.unknown} Unknown`;
-          stmtTip = c.available > 0
-            ? `${c.available} statement(s) validated and ready \u2014 click Portfolio Refresh to ingest.`
-            : `${c.unknown} file(s) were not recognized by any statement parser.`;
+          stmtSummary = `${nProc} Processed \u2022 ${nAvail} Available \u2022 ${nUnk} Unknown`;
+          stmtTip = nAvail > 0
+            ? `${nAvail} statement(s) validated and ready \u2014 click Portfolio Refresh to ingest.`
+            : `${nUnk} file(s) were not recognized by any statement parser.`;
         } else {
           stmtStatus = "completed";
-          stmtSummary = `${c.processed} Processed \u2022 All statements ingested`;
+          stmtSummary = `${nProc} Processed \u2022 All statements ingested`;
           stmtTip = "All statement files in Statements/ have been ingested into your portfolio.";
         }
       }
@@ -6010,7 +6014,7 @@
       _selectedPromptIdx = 0;
       _projLastSavedPayload = JSON.stringify(_projDraft);
       updateProjectSettingsHeaderUI();
-      renderProjectSettingsForm();
+      renderProjectSettingsForm({ fetchStatements: false });
       switchProjectSettingsTab(targetTab || "info", false);
       _setProjSettingsMsg(
         _editingPortfolioId
@@ -6065,7 +6069,9 @@
               "#94a3b8"
             );
           }
-      } catch (_e) {}
+      } catch (_e) {
+        fetchPortfolioStatements(_editingPortfolioId || (_portfoliosBundle && _portfoliosBundle.active_portfolio_id));
+      }
     }
 
     async function closeProjectSettingsDialog() {
@@ -6608,6 +6614,8 @@
       }
     }
 
+    let _statementsFetchSeq = 0;
+
     async function fetchPortfolioStatements(pid) {
       const tableBody = document.getElementById("proj-statements-table-body");
       const countPill = document.getElementById("proj-statements-count-pill");
@@ -6617,16 +6625,29 @@
       const targetPid = pid || _editingPortfolioId || (_portfoliosBundle && _portfoliosBundle.active_portfolio_id);
 
       if (!targetPid) return;
+      const reqSeq = ++_statementsFetchSeq;
       if (dirLabel) dirLabel.textContent = `Portfolios/${targetPid}/Statements/`;
 
       try {
         const { ok, status, data } = await apiJson(`/api/portfolio/statements?portfolio_id=${encodeURIComponent(targetPid)}`);
+        if (reqSeq !== _statementsFetchSeq) return;
+        const activeEditingPid = _editingPortfolioId || (_portfoliosBundle && _portfoliosBundle.active_portfolio_id);
+        if (activeEditingPid && targetPid !== activeEditingPid) return;
         if (!ok) throw new Error(`HTTP ${status}`);
         if (!data || !data.ok) throw new Error((data && data.error) || "Failed to load statements");
 
         const files = Array.isArray(data.files) ? data.files : [];
-        const counts = data.counts || { processed: 0, available: 0, unknown: 0, total: files.length };
-        _lastStatementsState = { pid: targetPid, loaded: true, counts };
+        const rawCounts = data.counts || {};
+        const nProc = rawCounts.processed != null ? Number(rawCounts.processed) : files.filter(f => f && f.status === "Processed").length;
+        const nAvail = rawCounts.available != null ? Number(rawCounts.available) : files.filter(f => f && f.status === "Available").length;
+        const nUnk = rawCounts.unknown != null ? Number(rawCounts.unknown) : files.filter(f => f && f.status === "Unknown").length;
+        const counts = {
+          processed: nProc,
+          available: nAvail,
+          unknown: nUnk,
+          total: Math.max(Number(rawCounts.total) || 0, nProc + nAvail + nUnk, files.length),
+        };
+        _lastStatementsState = { pid: activeEditingPid || targetPid, loaded: true, counts };
         syncPortfolioCollapsibleHeaders(false);
 
         if (countPill) {
@@ -8714,7 +8735,7 @@
       renderProjectFamilyMembers();
     }
 
-    function renderProjectSettingsForm() {
+    function renderProjectSettingsForm(opts = {}) {
       if (!_projDraft) return;
       const hEl = document.getElementById("proj-household-name");
       if (hEl) hEl.value = _projDraft.household_name || "";
@@ -8724,7 +8745,9 @@
 
       populateBadgeModelDropdown();
       updateDefaultBadgePrompt(false);
-      fetchPortfolioStatements(_editingPortfolioId || (_portfoliosBundle && _portfoliosBundle.active_portfolio_id));
+      if (opts.fetchStatements !== false) {
+        fetchPortfolioStatements(_editingPortfolioId || (_portfoliosBundle && _portfoliosBundle.active_portfolio_id));
+      }
       syncBadgeSliderUI();
 
       renderProjectFamilyMembers();

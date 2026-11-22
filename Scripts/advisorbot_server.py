@@ -3141,9 +3141,6 @@ def handle_list_statements(portfolio_id: str | None = None) -> dict[str, Any]:
         and not p.name.startswith(".")
     )
 
-    pdf_files = [p for p in all_files if p.suffix.lower() == ".pdf"]
-    pages_map = extract_pdf_pages_batch(pdf_files) if pdf_files else {}
-
     investors = cfg.get("investors") or []
     configured_ssn_files = set()
     for inv in investors:
@@ -3156,21 +3153,20 @@ def handle_list_statements(portfolio_id: str | None = None) -> dict[str, Any]:
         if ssn_cfg.get("annual_earnings"):
             configured_ssn_files.add("social-security-statement.xml")
 
-    files_out = []
+    # Pass 1: classify files by content hash / path / configured SSA filename BEFORE extracting PDFs
+    pre_entries: list[dict[str, Any]] = []
+    unprocessed_pdfs: list[Path] = []
     for p in all_files:
         rel_path = str(p.relative_to(sdir))
         sha256 = compute_sha256(p)
         st = p.stat()
         file_size = st.st_size
-        file_mtime = st.st_mtime
-        mtime_date = datetime.fromtimestamp(file_mtime).strftime("%Y-%m-%d")
-
+        mtime_date = datetime.fromtimestamp(st.st_mtime).strftime("%Y-%m-%d")
         rec = known_by_hash.get(sha256) or known_by_path.get(str(p.resolve()))
 
         is_processed = False
         date_str = None
         doc_type = None
-
         if rec is not None:
             is_processed = True
             date_str = rec.get("statement_as_of_date") or rec.get("period_start") or mtime_date
@@ -3179,22 +3175,45 @@ def handle_list_statements(portfolio_id: str | None = None) -> dict[str, Any]:
             is_processed = True
             doc_type = "SSA_XML"
             try:
-                res = parse_ssa_xml_path(p, portfolio_id=pid)
-                if res.get("ok") and res.get("max_year"):
-                    date_str = f"{res['max_year']}-12-31"
+                res_ssa = parse_ssa_xml_path(p, portfolio_id=pid)
+                if res_ssa.get("ok") and res_ssa.get("max_year"):
+                    date_str = f"{res_ssa['max_year']}-12-31"
             except Exception:
                 pass
             date_str = date_str or mtime_date
 
-        if is_processed:
+        if not is_processed and p.suffix.lower() == ".pdf":
+            unprocessed_pdfs.append(p)
+        pre_entries.append({
+            "path": p,
+            "rel_path": rel_path,
+            "sha256": sha256,
+            "size": file_size,
+            "mtime_date": mtime_date,
+            "is_processed": is_processed,
+            "date_str": date_str,
+            "doc_type": doc_type,
+        })
+
+    pages_map = extract_pdf_pages_batch(unprocessed_pdfs) if unprocessed_pdfs else {}
+
+    files_out = []
+    for item in pre_entries:
+        p = item["path"]
+        rel_path = item["rel_path"]
+        sha256 = item["sha256"]
+        file_size = item["size"]
+        mtime_date = item["mtime_date"]
+
+        if item["is_processed"]:
             files_out.append({
                 "filename": rel_path,
                 "name": p.name,
                 "rel_path": rel_path,
-                "date": date_str or mtime_date,
+                "date": item["date_str"] or mtime_date,
                 "status": "Processed",
                 "status_color": "gray",
-                "doc_type": doc_type or "STATEMENT",
+                "doc_type": item["doc_type"] or "STATEMENT",
                 "size": file_size,
                 "error": None,
             })
@@ -3255,6 +3274,8 @@ def handle_list_statements(portfolio_id: str | None = None) -> dict[str, Any]:
     if demo_cfg is not None:
         proj = DemoTranslator(demo_cfg)
         res = proj.project_obj(res)
+        # Keep non-monetary integer statement counts exact ("total" is in DemoTranslator _USD_KEYS).
+        res["counts"] = dict(counts)
         res["portfolio_id"] = orig_pid
         res["statements_dir"] = f"Portfolios/{orig_pid}/Statements"
     return res

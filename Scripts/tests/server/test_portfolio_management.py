@@ -1253,6 +1253,34 @@ console.log(JSON.stringify({
                 self.assertEqual(file_map["Unknown.txt"]["status_color"], "red")
                 self.assertIsNotNone(file_map["Unknown.txt"]["error"])
 
+                # Demo Mode: counts["total"] remains exact integer count (not scaled by k), and processed PDFs skip extraction
+                pdf_file = stmts_dir / "ProcessedStmt.pdf"
+                pdf_file.write_bytes(b"%PDF-1.4\n%fake\n")
+                pdf_hash = hashlib.sha256(pdf_file.read_bytes()).hexdigest()
+                with PortfolioDB(db_path) as db:
+                    db.conn.execute(
+                        """
+                        INSERT INTO ingested_files (sha256_hash, file_path, rel_path, file_size, file_birthtime, file_mtime, file_ctime, doc_type, account_id, period_start, statement_as_of_date, reported_total, ingested_at_iso)
+                        VALUES (?, ?, 'ProcessedStmt.pdf', 100, 1.0, 1.0, 1.0, 'BROKERAGE_PDF', 'ACC1', '2026-10-01', '2026-11-01', 1000.0, '2026-11-13T00:00:00Z')
+                        """,
+                        (pdf_hash, str(pdf_file.resolve())),
+                    )
+                    db.conn.commit()
+                from privacy import default_privacy_config
+
+                demo_cfg = default_privacy_config()
+                demo_cfg["demo_mode"]["enabled"] = True
+                demo_cfg["demo_mode"]["scale_factor"] = 0.25
+                extracted_pdfs: list[Path] = []
+                with patch("advisorbot_server._active_demo_privacy_cfg", return_value=demo_cfg), \
+                     patch("config.get_active_portfolio_id", return_value="test_p"), \
+                     patch("ingest.pdf_reader.extract_pdf_pages_batch", side_effect=lambda paths: (extracted_pdfs.extend(paths) or {})):
+                    demo_res = handle_list_statements("demo_portfolio")
+                self.assertTrue(demo_res["ok"])
+                self.assertEqual(demo_res["portfolio_id"], "demo_portfolio")
+                self.assertEqual(demo_res["counts"], {"processed": 2, "available": 1, "unknown": 1, "total": 4})
+                self.assertEqual(extracted_pdfs, [])
+
     def test_scenarios_card_keyboard_nav_and_active_cyan_ring(self) -> None:
         """Verifies removal of 'Open in Simulator' button, active card gold ring + outer teal focus ring, and arrow+Enter navigation."""
         with _IsolatedPortfolioEnv() as env:
