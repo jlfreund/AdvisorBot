@@ -2,7 +2,7 @@
 
 <!-- GENERATED FILE. Run `make fixtures` (or `python3 -m tests.catalog`) to refresh. -->
 
-**318 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 96 are ported from the pre-fixture suite.
+**320 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 98 are ported from the pre-fixture suite.
 
 Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA3-05`, `DA3-06`, `DA4-03`, `DA4-07`, `DA4-08b`, `DA4-09`, `DA4-10`, `DA4-11`, `DA4-13`, `DP-01`, `DP-02`, `DP-03`, `DP-04`, `I4`, `LL-01`, `LL-03`, `LL-06`, `LL-08`, `LL-09`, `LL-13`, `LL-14`, `LL-22`, `LL-23`, `S1`, `SA-02`, `SA-03`, `SA-04`, `SA-05`, `SA-06`, `SA-09`, `SA-11`, `SA-13`, `SA-15`, `SA-18`, `SA-20`, `SA2-01`, `SA2-02`, `SA2-03`, `SA2-04`, `SA2-06`, `SA2-07`, `SA2-08`, `SA2-10`, `SA2-11`, `SA2-12`, `SA2-13`, `SA2-14`, `SA2-15`, `SA2-16`, `SA2-17`, `SA2-21`, `SA2-22`, `SA3-01`, `SA3-02`, `SA3-05`, `SA3-06`, `SA3-08`, `SA4-01`, `SA4-03`, `SA4-04`, `SA4-05`, `SA5-01`, `SA5-02`, `SA5-03`, `SA5-04`, `SA5-05`, `SA5-06`, `SA5-07`, `SA5-08`, `SA5-09`, `SA5-10`.
 
@@ -12,9 +12,9 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `parsers` | 28 |
 | `pipeline` | 53 |
 | `engine` | 41 |
-| `parity` | 9 |
+| `parity` | 10 |
 | `render` | 16 |
-| `server` | 96 |
+| `server` | 97 |
 | `llm` | 35 |
 | `scans` | 22 |
 
@@ -286,6 +286,7 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `ParityTest::test_historical_cohorts_match_js` | — | _legacy_ | A3 Historical tab: deterministic 4-risk-class cohort replay matches 1:1 between Python and JS. |
 | `ParityTest::test_monte_carlo_zero_vol_matches_js` | — | _legacy_ | With volatility=0 across risk classes, MC paths are degenerate and match single-path to the cent. |
 | `ParityTest::test_monte_carlo_nonzero_vol_matches_js` | — | _legacy_ | Phase D Stage 4: Shared 32-bit mulberry32 + Box-Muller PRNG (`seed=1`) produces 1:1 non-zero-vol MC parity. |
+| `ParityTest::test_scheduled_withdrawal_adds_pre_post_event_checkpoints_in_mc_and_cohorts` | — | _legacy_ | Non-monthly scheduled actions add pre-(m-1) and post-(m) checkpoints in MC and Historical cohorts. |
 
 ## `render`
 
@@ -387,6 +388,7 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `PortfoliosTest::test_portfolio_crud_and_http_routes_with_delete_confirmation` | — | _legacy_ | _(no docstring)_ |
 | `PortfoliosTest::test_statement_refresh_isolation_between_portfolios` | — | _legacy_ | _(no docstring)_ |
 | `PortfoliosTest::test_empty_state_render_and_ui_modal_js_contracts` | — | _legacy_ | _(no docstring)_ |
+| `PortfoliosTest::test_autosave_with_no_portfolio_reports_instead_of_discarding` | — | _legacy_ | Verifies Portfolio Settings edits with no portfolio surface a message instead of silently no-op saving. |
 | `PortfoliosTest::test_badge_generation_and_rotation_server` | — | _legacy_ | Tests that handle_generate_badge saves generated SVG and updates 10-badge rotation window. |
 | `PortfoliosTest::test_saved_prompts_lifecycle_and_migration` | — | _legacy_ | Verifies default pre-population, CRUD persistence (including empty []), and legacy migration. |
 | `PortfoliosTest::test_prompts_ui_and_agent_dropdown_node_vm` | — | _legacy_ | Verifies Prompts settings UI and Agent dropdown behavior in rendered HTML via Node VM. |
