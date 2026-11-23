@@ -159,6 +159,87 @@
         </ol>
 
         <p>All statement parsing, data storage, and portfolio math run strictly on your local machine (<code>localhost</code>). No brokerage login credentials or raw statements are sent anywhere. Market quotes fetch only public ticker symbols from Yahoo Finance; when using cloud AI providers, outbound messages follow your chosen Privacy Shield mode (<strong>A. Clear Text</strong>, <strong>B. Obfuscated Names</strong>, or <strong>C. Obfuscated Names &amp; Values</strong>).</p>
+
+        <h3 id="gallery">Gallery</h3>
+        <p class="muted" style="font-size: 13px; margin-top: -4px;">Click any screenshot to inspect full-size, or play the interactive simulation walkthrough below.</p>
+        <div class="gallery-grid">
+          <div class="gallery-card">
+            <div class="gallery-media">
+              <img src="../Assets/gallery/Performance.png" alt="Portfolio Performance" data-caption="Portfolio Performance — Consolidated positions, allocation &amp; timeline" loading="lazy" />
+            </div>
+            <div class="gallery-caption">
+              <span>Portfolio Performance</span>
+              <span class="gallery-caption-meta">Screenshot</span>
+            </div>
+          </div>
+          <div class="gallery-card">
+            <div class="gallery-media">
+              <img src="../Assets/gallery/Holding.png" alt="Holding Details &amp; Forecast" data-caption="Holding Details &amp; Forecast — 40-year projected annual returns" loading="lazy" />
+            </div>
+            <div class="gallery-caption">
+              <span>Holding Details &amp; Forecast</span>
+              <span class="gallery-caption-meta">Screenshot</span>
+            </div>
+          </div>
+          <div class="gallery-card">
+            <div class="gallery-media">
+              <img src="../Assets/gallery/StockGrants.png" alt="Stock Vesting &amp; Grants" data-caption="Stock Vesting &amp; Grants — RSU/GSU tax withholding &amp; timelines" loading="lazy" />
+            </div>
+            <div class="gallery-caption">
+              <span>Stock Vesting &amp; Grants</span>
+              <span class="gallery-caption-meta">Screenshot</span>
+            </div>
+          </div>
+          <div class="gallery-card">
+            <div class="gallery-media">
+              <img src="../Assets/gallery/SSN.png" alt="SSN Visualizer" data-caption="SSN Visualizer — OASDI PIA bend-points &amp; claiming ages" loading="lazy" />
+            </div>
+            <div class="gallery-caption">
+              <span>SSN Visualizer</span>
+              <span class="gallery-caption-meta">Screenshot</span>
+            </div>
+          </div>
+          <div class="gallery-card">
+            <div class="gallery-media">
+              <img src="../Assets/gallery/Portfolio.png" alt="Portfolio Settings" data-caption="Portfolio Settings — Accounts, statements &amp; household setup" loading="lazy" />
+            </div>
+            <div class="gallery-caption">
+              <span>Portfolio Settings</span>
+              <span class="gallery-caption-meta">Screenshot</span>
+            </div>
+          </div>
+          <div class="gallery-card">
+            <div class="gallery-media">
+              <img src="../Assets/gallery/Privacy.png" alt="Privacy Shield &amp; Settings" data-caption="Privacy Shield &amp; Settings — Modes A/B/C, Demo Mode &amp; MCP" loading="lazy" />
+            </div>
+            <div class="gallery-caption">
+              <span>Privacy Shield &amp; Settings</span>
+              <span class="gallery-caption-meta">Screenshot</span>
+            </div>
+          </div>
+          <div class="gallery-card">
+            <div class="gallery-media">
+              <img src="../Assets/gallery/ChatWindow.png" alt="In-App AI Assistant" data-caption="In-App AI Assistant — Local &amp; cloud AI with Privacy Shield" loading="lazy" />
+            </div>
+            <div class="gallery-caption">
+              <span>In-App AI Assistant</span>
+              <span class="gallery-caption-meta">Screenshot</span>
+            </div>
+          </div>
+          <div class="gallery-card">
+            <div class="gallery-media">
+              <video controls playsinline preload="metadata" poster="../Assets/gallery/Performance.png">
+                <source src="../Assets/gallery/Simulation.mov" type="video/quicktime" />
+                <source src="../Assets/gallery/Simulation.mov" type="video/mp4" />
+                <img src="../Assets/gallery/Simulation.gif" alt="Retirement Simulation Walkthrough" />
+              </video>
+            </div>
+            <div class="gallery-caption">
+              <span>Retirement Simulation Walkthrough</span>
+              <span class="gallery-caption-meta"><a href="../Assets/gallery/Simulation.mov">Simulation.mov</a> &middot; <a href="../Assets/gallery/Simulation.gif">GIF</a></span>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- (B) Setup and Workflow -->
@@ -221,18 +302,18 @@ python -m pip install -e ".[mcp,ingest,ui]"</code></pre>
           </li>
           <li>
             <strong>Create &amp; Configure Your Portfolio (<code>Settings ⚙️</code>):</strong><br />
-            Open <strong>Portfolio Settings (⚙️) &gt; Portfolio</strong>, click <strong>+ New Portfolio</strong> (or initialize <code>Portfolios/&lt;PortfolioName&gt;/</code> manually per <a href="ch1-portfolio-setup.html#portfolio-dir">Chapter 1</a>), and complete the required fields (<strong>Portfolio Name</strong>, <strong>Annual Burn Rate</strong>, <strong>Tax Jurisdiction &amp; Ceilings</strong>, and at least one <strong>Family Member Name &amp; Birthdate</strong>) so the portfolio moves from <strong>Incomplete</strong> to ready and <strong>Select Portfolio</strong> activates. Use the remaining Settings tabs to set <strong>Symbols</strong>, <strong>Prompts</strong>, and <strong>Privacy</strong>.
+            Open <strong>Portfolio Settings (⚙️) &gt; Portfolio</strong>, click <strong>+ New Portfolio</strong> (or initialize <code>Portfolios/&lt;PortfolioName&gt;/</code> manually per <a href="ch1-portfolio-setup.html#portfolio-dir">Chapter 1</a>), and complete the required fields (<strong>Portfolio Name</strong>, <strong>Annual Burn Rate</strong>, <strong>Tax Jurisdiction &amp; Ceilings</strong>, and at least one <strong>Family Member Name &amp; Birthdate</strong>) so the portfolio moves from <strong>Incomplete</strong> to ready and <strong>Select Portfolio</strong> activates. Use the remaining Settings tabs to set <strong>Symbols</strong> (tracked tickers/indices with your primary equity first), <strong>Prompts</strong>, and <strong>Privacy</strong> (AI Chat Privacy Shield A/B/C, Demo Mode, Alias Registry, MCP toggle).
           </li>
           <li>
             <strong>Add Statements &amp; Refresh:</strong><br />
-            Drop brokerage statements into <code>Portfolios/&lt;PortfolioName&gt;/Statements/</code> (supports Wells Fargo <code>.pdf</code>, Morgan Stanley <code>.pdf</code>/<code>.xlsx</code>, <code>*.statement.json</code>, and <code>*.grants.json</code>), then click <strong>↻ Rescan</strong> and <strong>⚙ Portfolio Refresh</strong> in <strong>Settings &gt; Portfolio</strong>. Upload official <code>ssa.gov</code> <code>.xml</code> earnings statements per investor inside <strong>Settings &gt; Family Members</strong>. For unsupported institutions, see <a href="ch1-portfolio-setup.html#agent-plugins">Chapter 1, Section 1.5</a>.
+            Drop brokerage statements into <code>Portfolios/&lt;PortfolioName&gt;/Statements/</code> (supports Wells Fargo <code>.pdf</code>, Morgan Stanley <code>.pdf</code>/<code>.xlsx</code>, <code>*.statement.json</code>, and <code>*.grants.json</code>), then click <strong>↻ Rescan</strong> and <strong>⚙ Portfolio Refresh</strong> in <strong>Settings &gt; Portfolio</strong>. Upload official <code>ssa.gov</code> <code>.xml</code> earnings statements per investor inside <strong>Settings &gt; Family Members &gt; Select ssa.gov XML file</strong>. For unsupported institutions, see <a href="ch1-portfolio-setup.html#agent-plugins">Chapter 1, Section 1.5</a> to convert exports into universal <code>*.statement.json</code>, or inspect and build a custom <code>StatementPlugin</code> in <code>Portfolios/&lt;PortfolioName&gt;/Plugins/</code> (via <code>Scripts/holdings.py inspect-statement</code> and <code>test-plugin --offline</code>, opted in via <code>allowed_plugins</code> in <code>project.json</code>).
           </li>
           <li>
             <strong>Explore &amp; Model:</strong>
             <ul>
               <li>Inspect aggregated holdings, asset allocation, and vesting timelines.</li>
               <li>Experiment in the <strong>Retirement Simulator</strong> using <strong>Simulation Controls</strong> (<strong>Market Correction</strong> + <strong>Simulation</strong>: <code>None</code>, <code>Monte Carlo</code>, <code>Historical</code>), <strong>Inclusions</strong>, and <strong>Overrides</strong>.</li>
-              <li>Save what-if scenarios, toggle <code>🔒 Protected</code> / <code>🔓 Unprotected</code> on benchmark plans, or consult the in-page AI Financial Assistant.</li>
+              <li>Save what-if scenarios, toggle <code>🔒 Protected</code> / <code>🔓 Unprotected</code> on benchmark plans, or consult the in-page AI Financial Assistant. A saved Advisor workflow presents its analysis first. If it proposes a new scenario or a vote/concurrence on an existing scenario, choose the corresponding button to apply it (an Advisor vote appends a timestamped signature under <code>## Upvotes &amp; Concurrences</code> in <strong>Details &amp; Notes &rarr;</strong>).</li>
             </ul>
           </li>
         </ol>

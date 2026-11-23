@@ -264,11 +264,55 @@
     }, 1800);
   };
 
+  function initGalleryLightbox() {
+    const imgs = Array.from(document.querySelectorAll(".gallery-media img"));
+    if (!imgs.length) return;
+
+    const overlay = document.createElement("div");
+    overlay.className = "gallery-lightbox";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.innerHTML =
+      '<button type="button" class="gallery-lightbox-close" aria-label="Close preview">&times;</button>' +
+      '<div class="gallery-lightbox-inner">' +
+      '  <img src="" alt="" />' +
+      '  <div class="gallery-lightbox-caption"></div>' +
+      "</div>";
+    document.body.appendChild(overlay);
+
+    const previewImg = overlay.querySelector("img");
+    const captionEl = overlay.querySelector(".gallery-lightbox-caption");
+    const closeBtn = overlay.querySelector(".gallery-lightbox-close");
+
+    function close() {
+      overlay.classList.remove("open");
+      previewImg.removeAttribute("src");
+    }
+
+    imgs.forEach((img) => {
+      img.addEventListener("click", () => {
+        previewImg.src = img.getAttribute("src") || "";
+        previewImg.alt = img.getAttribute("alt") || "";
+        captionEl.textContent = img.getAttribute("data-caption") || img.getAttribute("alt") || "";
+        overlay.classList.add("open");
+      });
+    });
+
+    closeBtn.addEventListener("click", close);
+    overlay.addEventListener("click", (ev) => {
+      if (ev.target === overlay) close();
+    });
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && overlay.classList.contains("open")) close();
+    });
+  }
+
   window.initDocsPage = function (activeChapterNum) {
     if (activeChapterNum === 0) {
       window.checkIndexHashRedirect();
     }
     initToc(activeChapterNum);
     initPlatformFilter();
+    initGalleryLightbox();
   };
 })();

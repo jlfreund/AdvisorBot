@@ -5,6 +5,9 @@ An interactive, local-first portfolio analytics, statement ingestion, and tax-aw
 > [!IMPORTANT]
 > **Financial, Tax & AI Disclaimer:** AdvisorBot is free, self-hosted software for **educational and personal modeling purposes only**—it is **not** financial, investment, tax, or legal advice, and does **not** create an RIA/fiduciary relationship. Tax logic, Monte Carlo paths, and AI Chat / MCP outputs are simplified or probabilistic and must be verified independently before acting. See [DISCLAIMER.md](DISCLAIMER.md) for the full terms.
 
+> [!TIP]
+> **Interactive HTML View:** For full-resolution image zoom and inline HD video playback of the walkthrough, open [README.html](README.html) (or [Docs/readme.html](Docs/readme.html)) in your web browser.
+
 ---
 
 ## (A) Synopsis
@@ -20,6 +23,15 @@ From this consolidated view of your accounts, AdvisorBot serves a self-contained
 6. **In-App AI Assistant & MCP Integration**: Local (Ollama, LM Studio) and cloud (Gemini, Claude, OpenAI) AI support with configurable Privacy Shield modes (**A. Clear Text**, **B. Obfuscated Names**, and **C. Obfuscated Names & Values**), read-only **Demo Mode** for screen shares, and a Model Context Protocol (MCP) server for connecting external AI assistants.
 
 All statement parsing, data storage, and portfolio math run strictly on your local machine (`localhost`). No brokerage login credentials or raw statements are sent anywhere. Market quotes fetch only public ticker symbols from Yahoo Finance; when using cloud AI providers, outbound messages follow your chosen Privacy Shield mode (**A. Clear Text**, **B. Obfuscated Names**, or **C. Obfuscated Names & Values**).
+
+### Gallery
+
+| | |
+| :---: | :---: |
+| ![Portfolio Performance](Assets/gallery/Performance.png)<br>**Portfolio Performance** | ![Holding Details & Forecast](Assets/gallery/Holding.png)<br>**Holding Details & Forecast** |
+| ![Stock Vesting & Grants](Assets/gallery/StockGrants.png)<br>**Stock Vesting & Grants** | ![SSN Visualizer](Assets/gallery/SSN.png)<br>**SSN Visualizer** |
+| ![Portfolio Settings](Assets/gallery/Portfolio.png)<br>**Portfolio Settings** | ![Privacy Shield & Settings](Assets/gallery/Privacy.png)<br>**Privacy Shield & Settings** |
+| ![In-App AI Assistant](Assets/gallery/ChatWindow.png)<br>**In-App AI Assistant** | [![Retirement Simulation Walkthrough](Assets/gallery/Simulation.gif)](Assets/gallery/Simulation.mov)<br>**Retirement Simulation Walkthrough** ([Simulation.mov](Assets/gallery/Simulation.mov) · [GIF](Assets/gallery/Simulation.gif)) |
 
 ---
 
