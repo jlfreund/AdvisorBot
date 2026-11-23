@@ -735,6 +735,125 @@ console.log(JSON.stringify({ emptyRes, activeRes }));
             self.assertIn(">Close<", html_empty)
             self.assertLess(html_empty.index('id="proj-save-btn"'), html_empty.index('id="proj-close-btn"'))
 
+    def test_reopening_editor_with_no_active_portfolio_keeps_saved_draft(self) -> None:
+        """Verifies the editor loads the edited portfolio's own config, not the empty no-active-portfolio response."""
+        with _IsolatedPortfolioEnv() as env:
+            config.set_active_portfolio(None)
+            with PortfolioDB(":memory:") as db:
+                payload = build_report_payload(db, config.default_config(), date(2026, 10, 15))
+            render_html_report(payload, env.out_html)
+
+            node_script = """
+import fs from "node:fs";
+import vm from "node:vm";
+
+const html = fs.readFileSync(process.argv[1], "utf8");
+const scripts = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)];
+const code = scripts[scripts.length - 1][1];
+
+const elems = new Map();
+function makeEl(id) {
+  if (elems.has(id)) return elems.get(id);
+  const classes = new Set();
+  const el = {
+    id, textContent: "", innerHTML: "", value: "", disabled: false,
+    style: {}, dataset: {}, options: [], min: "", max: "",
+    classList: {
+      add: (...cs) => cs.forEach(c => classes.add(c)),
+      remove: (...cs) => cs.forEach(c => classes.delete(c)),
+      toggle: (c, force) => { if (force === undefined ? !classes.has(c) : force) classes.add(c); else classes.delete(c); },
+      contains: (c) => classes.has(c),
+    },
+    addEventListener: () => {}, removeEventListener: () => {},
+    setAttribute: () => {}, removeAttribute: () => {}, getAttribute: () => null,
+    appendChild: () => {}, closest: () => null, focus: () => {}, scrollIntoView: () => {},
+    querySelector: () => makeEl(id + "__q"), querySelectorAll: () => [],
+  };
+  elems.set(id, el);
+  return el;
+}
+
+const doc = {
+  getElementById: (id) => makeEl(id),
+  querySelector: () => makeEl("__doc_q"),
+  querySelectorAll: () => [],
+  createElement: () => makeEl("__created"),
+  createElementNS: () => makeEl("__created_ns"),
+  addEventListener: () => {},
+  body: makeEl("__body"), documentElement: makeEl("__root"), title: "",
+};
+
+// The portfolio the user is editing: saved on disk, but NOT the active one.
+const SAVED_PROJECT = {
+  version: 1,
+  household_name: "Saved Household",
+  tax_rates: { state_code: "CA", ltcg_top: 0.371, ordinary_top: 0.541 },
+  reference_annual_burn: 120000,
+};
+// What `/api/project` returns with no `portfolio_id` while nothing is active: the empty default.
+const EMPTY_PROJECT = { version: 1, household_name: "", tax_rates: {}, reference_annual_burn: null };
+const BUNDLE = {
+  active_portfolio_id: null,
+  has_active: false,
+  portfolios: [{ id: "p_saved", name: "Saved", is_complete: false, badge_image: "" }],
+};
+
+const ctxObj = {
+  document: doc, navigator: { userAgent: "node" }, console,
+  localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+  setInterval: () => 0, clearInterval: () => {}, setTimeout: (f) => { f(); return 0; }, clearTimeout: () => {},
+  requestAnimationFrame: (f) => { f(); return 0; },
+  fetch: (url) => {
+    const u = String(url);
+    let payload = { ok: false };
+    if (u.indexOf("portfolio_id=p_saved") > -1) {
+      payload = { ok: true, portfolio_id: "p_saved", project: SAVED_PROJECT, portfolios_bundle: BUNDLE };
+    } else if (u.indexOf("/api/project") > -1) {
+      payload = { ok: true, portfolio_id: null, has_portfolio: false, project: EMPTY_PROJECT, portfolios_bundle: BUNDLE };
+    }
+    return Promise.resolve({ ok: true, status: 200, json: async () => payload });
+  },
+  Date, Math, JSON, parseInt, parseFloat, isNaN, isFinite,
+  Array, Object, String, Number, Boolean, Map, Set, RegExp, Error, Symbol,
+};
+ctxObj.globalThis = ctxObj; ctxObj.window = ctxObj; ctxObj.self = ctxObj;
+ctxObj.addEventListener = () => {};
+ctxObj.location = { hash: "", href: "http://127.0.0.1:8765/", search: "", protocol: "http:", reload: () => {} };
+ctxObj.history = { replaceState: () => {} };
+ctxObj.matchMedia = () => ({ matches: false, addEventListener: () => {} });
+ctxObj.getComputedStyle = () => makeEl("__style");
+ctxObj.devicePixelRatio = 1;
+ctxObj.URL = URL; ctxObj.Promise = Promise; ctxObj.structuredClone = structuredClone;
+ctxObj.AbortController = AbortController; ctxObj.TextEncoder = TextEncoder; ctxObj.TextDecoder = TextDecoder;
+
+const ctx = vm.createContext(ctxObj);
+vm.runInContext(code, ctx);
+await vm.runInContext("openProjectSettingsDialog('info')", ctx);
+
+const out = vm.runInContext(`JSON.stringify({
+  editingId: String(_editingPortfolioId),
+  draftName: String(_projDraft && _projDraft.household_name),
+  draftState: String(_projDraft && (_projDraft.tax_rates || {}).state_code),
+})`, ctx);
+console.log(out);
+"""
+            proc = subprocess.run(
+                ["node", "--input-type=module", "-e", node_script, str(env.out_html)],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(proc.returncode, 0, msg=f"Node editor-draft check failed:\n{proc.stderr}")
+            res = json.loads(proc.stdout.strip().splitlines()[-1])
+
+            # The editor targets the selected-but-inactive portfolio...
+            self.assertEqual(res["editingId"], "p_saved")
+            # ...so the draft must be that portfolio's saved config. The bug adopted the empty
+            # no-active-portfolio response instead, and the next auto-save wrote those blanks
+            # over the real project.json.
+            self.assertEqual(res["draftName"], "Saved Household")
+            self.assertEqual(res["draftState"], "CA")
+
     def test_badge_generation_and_rotation_server(self) -> None:
         """Tests that handle_generate_badge saves generated SVG and updates 10-badge rotation window."""
         with _IsolatedPortfolioEnv() as env:

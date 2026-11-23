@@ -6041,7 +6041,18 @@
             if (data.advisor_prompts) {
               _resolvedAdvisorPrompts = Object.assign({}, data.advisor_prompts);
             }
-            if (data.project && _editingPortfolioId) {
+            // DESIGN INTENT (Draft Must Match Its Target): this `/api/project` call carries no
+            // `portfolio_id`, so the server answers for the ACTIVE portfolio — and when nothing
+            // is active it answers with the empty default config while still returning
+            // `ok: true` and a truthy `data.project`. `_editingPortfolioId` was just resolved
+            // above and can point at a merely *selected* (inactive) portfolio, so adopting this
+            // response unconditionally hands the editor a blank draft aimed at a real file; the
+            // next auto-save then serializes those blanks over it and destroys the saved
+            // household name, tax rates and symbols. Only adopt the response when it is
+            // genuinely the record for the portfolio being edited; otherwise fetch that
+            // portfolio's own config by id.
+            const _draftMatchesTarget = Boolean(data.project) && data.portfolio_id === _editingPortfolioId;
+            if (_editingPortfolioId && _draftMatchesTarget) {
               const projSrc = Object.assign({}, data.project);
               if (!Array.isArray(projSrc.saved_prompts) && Array.isArray(data.saved_prompts)) {
                 projSrc.saved_prompts = data.saved_prompts;
@@ -6054,7 +6065,7 @@
               renderAiPromptsDropdown();
               _projLastSavedPayload = JSON.stringify(_projDraft);
               fetchSsnStatementFiles(_editingPortfolioId);
-            } else if (_editingPortfolioId && (!data.project || _portfoliosBundle.active_portfolio_id !== _editingPortfolioId)) {
+            } else if (_editingPortfolioId) {
               await _loadPortfolioDraftIntoEditor(_editingPortfolioId);
             } else {
               renderAiPromptsDropdown();
