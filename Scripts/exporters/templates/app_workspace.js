@@ -1789,24 +1789,37 @@
 
     async function loadModelById(idOrName, openSim = false) {
       const entry = findModelEntry(idOrName);
-      if (!entry || !entry.settings) return;
+      if (!entry || !entry.settings || typeof entry.settings !== "object") return false;
+      const prevModelId = currentModelId;
+      const prevSaveName = currentSaveName;
       currentModelId = entry.id;
       currentSaveName = entry.name;
-      applySettingsSnapshot(entry.settings);
-      persistLocalSavesRegistry();
       try {
-        await apiJson("/api/models/active", {
+        applySettingsSnapshot(entry.settings);
+      } catch (err) {
+        currentModelId = prevModelId;
+        currentSaveName = prevSaveName;
+        console.error("Failed to load scenario settings:", err);
+        return false;
+      }
+      persistLocalSavesRegistry();
+      let apiRes = null;
+      try {
+        apiRes = await apiJson("/api/models/active", {
           body: { id: entry.id, name: entry.name },
         });
       } catch (_e) {
         // Handled transparently by apiJson
       }
+      if (apiRes && apiRes.status === 409) {
+        return false;
+      }
       updateSaveStatusUI(false);
+      selectedModelDetailId = null;
+      isEditingDetailNotes = false;
       if (openSim) {
         switchScreen("retirement");
       } else {
-        selectedModelDetailId = null;
-        isEditingDetailNotes = false;
         renderModelsScreen();
         const activeCard = document.getElementById("model-card-" + entry.id);
         if (activeCard) {
@@ -1816,6 +1829,7 @@
           }
         }
       }
+      return true;
     }
 
     function openModelDetail(idOrName) {
@@ -2078,7 +2092,7 @@
           </div>
 
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button type="button" class="btn btn-primary" data-sa-action="load-model" data-sa-id="${escHtml(entry.id)}">Load</button>
+            <button type="button" class="btn btn-primary" data-sa-action="load-model" data-sa-id="${escHtml(entry.id)}" data-sa-open-sim="1">Load</button>
             <button type="button" class="btn" data-sa-action="rename-model" data-sa-id="${escHtml(entry.id)}">Rename</button>
             <button type="button" class="btn" data-sa-action="dup-model" data-sa-id="${escHtml(entry.id)}">Duplicate</button>
             <button type="button" class="btn btn-danger" data-sa-action="del-model" data-sa-id="${escHtml(entry.id)}">Delete</button>

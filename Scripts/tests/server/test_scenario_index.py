@@ -397,6 +397,153 @@ console.log(JSON.stringify({
         self.assertIn("No per-holding growth overrides configured in this Scenario", empty)
         self.assertIn("0 Overrides", empty)
 
+    def test_scenario_detail_load_jumps_to_retirement_simulator(self):
+        """Clicking Load in scenario details jumps to Retirement Simulator only when load succeeds."""
+        html_path = self.fixture_html_path
+        import subprocess
+
+        node_script = """
+import fs from "node:fs";
+import vm from "node:vm";
+
+const html = fs.readFileSync(process.argv[1], "utf8");
+const m = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)];
+const script = m[m.length - 1][1];
+
+const mkClassList = () => {
+  const set = new Set();
+  return {
+    add: (...xs) => xs.forEach(x => set.add(x)),
+    remove: (...xs) => xs.forEach(x => set.delete(x)),
+    toggle: (x, force) => { if (force === undefined) { set.has(x) ? set.delete(x) : set.add(x); } else if (force) set.add(x); else set.delete(x); },
+    contains: (x) => set.has(x),
+    list: () => [...set],
+  };
+};
+const detailPanel = { innerHTML: "", id: "models-detail-panel", style: {}, classList: mkClassList() };
+const elems = {
+  "models-detail-panel": detailPanel,
+  "models-grid-view": { style: {}, classList: mkClassList() },
+  "models-detail-view": { style: {}, classList: mkClassList() },
+  "models-cards-container": { innerHTML: "", querySelectorAll: () => [] },
+  "models-count-pill": { textContent: "" },
+  "screen-models": { classList: mkClassList() },
+  "screen-portfolio": { classList: mkClassList() },
+  "screen-google": { classList: mkClassList() },
+  "screen-retirement": { classList: mkClassList() },
+  "screen-income": { classList: mkClassList() },
+  "nav-btn-models": { title: "", style: {}, classList: mkClassList() },
+  "nav-btn-portfolio": { title: "", style: {}, classList: mkClassList() },
+  "nav-btn-google": { title: "", style: {}, classList: mkClassList() },
+  "nav-btn-retirement": { title: "", style: {}, classList: mkClassList() },
+  "nav-btn-income": { title: "", style: {}, classList: mkClassList() },
+  "hdr-title": { textContent: "" },
+  "ui-tooltip": { style: {} },
+  "save-current-name": { textContent: "", title: "", style: {} },
+  "save-status-sub": { textContent: "", title: "", style: {}, classList: mkClassList() },
+  "save-status-dot": { title: "", style: {}, classList: mkClassList() },
+  "nav-disk-btn": { title: "", style: {}, classList: mkClassList() },
+};
+let clickHandler = null;
+const stub = new Proxy(function(){}, {
+  get: (t,p) => (p === Symbol.toPrimitive ? (()=>0) : (p==="length"?0:(p==="value"?"":(p==="classList"?mkClassList():(p==="style"?{}:(p==="dataset"?{}:stub)))))),
+  apply: () => stub, set: () => true, has: () => true,
+});
+const doc = {
+  getElementById: (id) => elems[id] || stub,
+  querySelector: () => stub, querySelectorAll: () => [], createElement: () => stub,
+  createElementNS: () => stub,
+  addEventListener: (evt, fn) => { if (evt === "click") clickHandler = fn; },
+  body: stub, documentElement: stub,
+};
+let fetchStatus = 200;
+const ctx = {
+  document: doc, navigator: { userAgent: "node" }, console,
+  localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+  setInterval: () => 0, clearInterval: () => {}, setTimeout: () => 0, clearTimeout: () => {},
+  requestAnimationFrame: () => 0,
+  fetch: () => Promise.resolve({ ok: fetchStatus < 400, status: fetchStatus, json: async () => ({ ok: fetchStatus < 400 }) }),
+  Date, Math, JSON, parseInt, parseFloat, isNaN, isFinite, Array, Object, String, Number, Boolean, Map, Set, RegExp, Error, Symbol,
+  URL, Promise, structuredClone, AbortController, TextEncoder, TextDecoder,
+  addEventListener: () => {}, removeEventListener: () => {},
+  location: { hash: "", href: "", search: "" }, matchMedia: () => ({ matches: false, addEventListener: () => {} }),
+  getComputedStyle: () => stub, devicePixelRatio: 1, innerWidth: 1200, innerHeight: 800,
+  history: { replaceState: () => {} },
+};
+ctx.globalThis = ctx; ctx.window = ctx; ctx.self = ctx;
+vm.createContext(ctx);
+vm.runInContext(script, ctx);
+
+const entry = {
+  id: "002",
+  name: "Target Scenario",
+  file: "002_target.json",
+  settings: { simActiveModel: "single_path", simAnnualBurn: 120000 }
+};
+ctx.modelsList = [entry];
+ctx.savesRegistry = { "Target Scenario": entry };
+ctx.switchScreen("models");
+ctx.openModelDetail("002");
+
+const hasOpenSimAttr = detailPanel.innerHTML.includes('data-sa-action="load-model"') && detailPanel.innerHTML.includes('data-sa-open-sim="1"');
+
+// 1. Simulated click on card Activate button (no data-sa-open-sim) stays on models
+const cardBtn = {
+  getAttribute: (k) => ({ "data-sa-action": "load-model", "data-sa-id": "002", "data-sa-stop": "1" }[k] || null),
+  closest: (sel) => (sel === "[data-sa-action]" ? cardBtn : null),
+};
+clickHandler({ target: cardBtn, stopPropagation: () => {} });
+await new Promise(r => setTimeout(r, 0));
+const screenAfterCardLoad = vm.runInContext("currentScreen", ctx);
+
+// 2. Missing scenario fails to load and does NOT jump to retirement
+ctx.openModelDetail("002");
+const missingBtn = {
+  getAttribute: (k) => ({ "data-sa-action": "load-model", "data-sa-id": "missing_id", "data-sa-open-sim": "1" }[k] || null),
+  closest: (sel) => (sel === "[data-sa-action]" ? missingBtn : null),
+};
+clickHandler({ target: missingBtn, stopPropagation: () => {} });
+await new Promise(r => setTimeout(r, 0));
+const screenAfterMissing = vm.runInContext("currentScreen", ctx);
+const detailAfterMissing = vm.runInContext("selectedModelDetailId", ctx);
+
+// 3. Valid scenario via detail Load button jumps to retirement
+const detailLoadBtn = {
+  getAttribute: (k) => ({ "data-sa-action": "load-model", "data-sa-id": "002", "data-sa-open-sim": "1" }[k] || null),
+  closest: (sel) => (sel === "[data-sa-action]" ? detailLoadBtn : null),
+};
+clickHandler({ target: detailLoadBtn, stopPropagation: () => {} });
+await new Promise(r => setTimeout(r, 0));
+const screenAfterDetailLoad = vm.runInContext("currentScreen", ctx);
+const detailAfterDetailLoad = vm.runInContext("selectedModelDetailId", ctx);
+const activeIdAfterDetailLoad = vm.runInContext("currentModelId", ctx);
+
+console.log(JSON.stringify({
+  hasOpenSimAttr,
+  screenAfterCardLoad,
+  screenAfterMissing,
+  detailAfterMissing,
+  screenAfterDetailLoad,
+  detailAfterDetailLoad,
+  activeIdAfterDetailLoad,
+}));
+"""
+        res = subprocess.run(
+            ["node", "--input-type=module", "-e", node_script, str(html_path)],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        self.assertEqual(res.returncode, 0, f"Node check failed: {res.stderr}")
+        out = json.loads(res.stdout.strip().splitlines()[-1])
+        self.assertTrue(out["hasOpenSimAttr"])
+        self.assertEqual(out["screenAfterCardLoad"], "models")
+        self.assertEqual(out["screenAfterMissing"], "models")
+        self.assertEqual(out["detailAfterMissing"], "002")
+        self.assertEqual(out["screenAfterDetailLoad"], "retirement")
+        self.assertIsNone(out["detailAfterDetailLoad"])
+        self.assertEqual(out["activeIdAfterDetailLoad"], "002")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
