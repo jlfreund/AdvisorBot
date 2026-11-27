@@ -351,6 +351,210 @@ run().catch(err => { console.error(err); process.exit(1); });
         self.assertIn("reloadCurrentScenario", html)
         self.assertIn('key === "r" || evt.key === "R"', html)
 
+    def test_historical_mode_dollar_toggle_updates_top_kpis(self):
+        """Toggling Nominal $ / Today's $ in Historical mode updates all 3 top KPI cards."""
+        node_script = """
+import fs from "node:fs";
+import vm from "node:vm";
+
+const html = fs.readFileSync(process.argv[1], "utf8");
+const m = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)];
+const script = m[m.length - 1][1];
+
+const mk = () => new Proxy(function(){}, {
+  get: (t,p) => (p === Symbol.toPrimitive ? (()=>0) : (p==="length"?0:(p==="value"?"":(p==="classList"?mk():(p==="style"?mk():(p==="dataset"?mk():stub)))))),
+  apply: () => stub, set: () => true, has: () => true,
+});
+const stub = mk();
+const _els = new Map();
+const _getEl = (id) => {
+  if (!_els.has(id)) {
+    const state = { value: "", textContent: "", innerHTML: "", checked: false };
+    _els.set(id, new Proxy(function(){}, {
+      get: (t,p) => (p === Symbol.toPrimitive ? (()=>0) : (p in state ? state[p] : (p==="length"?0:(p==="classList"?mk():(p==="style"?mk():(p==="dataset"?mk():stub)))))),
+      set: (t,p,v) => { state[p] = v; return true; },
+      apply: () => stub, has: () => true,
+    }));
+  }
+  return _els.get(id);
+};
+const doc = { getElementById:(id)=>_getEl(id), querySelector:()=>stub, querySelectorAll:()=>[], createElement:()=>stub, createElementNS:()=>stub, addEventListener:()=>{}, body:stub, documentElement:stub };
+const win = { addEventListener:()=>{}, location:{hash:"",href:""}, matchMedia:()=>({matches:false,addEventListener:()=>{}}), devicePixelRatio:1, getComputedStyle:()=>stub };
+const ctxObj = {
+  document:doc, window:win, navigator:{userAgent:"node"}, console,
+  localStorage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},
+  setInterval:()=>0, clearInterval:()=>{}, setTimeout:()=>0, clearTimeout:()=>{}, requestAnimationFrame:(f)=>{ f(); return 0; },
+  fetch:()=>Promise.resolve({ok:false,json:async()=>({})}),
+  Date, Math, JSON, parseInt, parseFloat, isNaN, isFinite, Array, Object, String, Number, Boolean, Map, Set, RegExp, Error, Symbol,
+  URL, Promise, structuredClone, AbortController, TextEncoder, TextDecoder,
+  addEventListener:()=>{}, removeEventListener:()=>{},
+  location:{hash:"",href:"",search:""}, matchMedia:()=>({matches:false,addEventListener:()=>{}}),
+  getComputedStyle:()=>stub, devicePixelRatio:1, innerWidth:1200, innerHeight:800,
+  history:{replaceState:()=>{}},
+};
+ctxObj.globalThis = ctxObj; ctxObj.window = ctxObj; ctxObj.self = ctxObj;
+const ctx = vm.createContext(ctxObj);
+vm.runInContext(script, ctx);
+
+async function run() {
+  await vm.runInContext("initSavesSystem()", ctx);
+  vm.runInContext(`
+    switchScreen("retirement");
+    onSimBurnInput(10000);
+    setSimModel("historical");
+    getCohortResult();
+  `, ctx);
+
+  const readCards = () => ({
+    inhVal: _getEl("sim-kpi-inheritance").innerHTML,
+    inhReal: _getEl("sim-kpi-inheritance-real").textContent,
+    inhSub: _getEl("sim-kpi-inheritance-sub").textContent,
+    solvSub: _getEl("sim-kpi-solvency-sub").textContent,
+    taxVal: _getEl("sim-kpi-taxdrag").textContent,
+    taxShelter: _getEl("sim-kpi-taxdrag-shelter").textContent,
+    taxSub: _getEl("sim-kpi-taxdrag-sub").textContent,
+  });
+
+  vm.runInContext('setSimDollarMode("nominal")', ctx);
+  const nominal = readCards();
+
+  vm.runInContext('setSimDollarMode("real")', ctx);
+  const real = readCards();
+
+  console.log(JSON.stringify({ nominal, real }));
+}
+
+run().catch(err => { console.error(err); process.exit(1); });
+"""
+        res = subprocess.run(
+            ["node", "--input-type=module", "-e", node_script, str(self.index_path)],
+            capture_output=True,
+            text=True,
+            timeout=45,
+        )
+        self.assertEqual(res.returncode, 0, f"Node script failed: {res.stderr}")
+        out = json.loads(res.stdout.strip().splitlines()[-1])
+        nom, real = out["nominal"], out["real"]
+
+        self.assertNotEqual(nom["inhVal"], real["inhVal"])
+        self.assertIn("(nominal $)", nom["inhReal"])
+        self.assertIn("(today's $)", real["inhReal"])
+        self.assertIn("p25 · p50 · p75 (nominal $):", nom["inhSub"])
+        self.assertIn("p25 · p50 · p75 (today's $):", real["inhSub"])
+        self.assertNotEqual(nom["inhSub"], real["inhSub"])
+
+        self.assertIn("(Nominal $):", nom["solvSub"])
+        self.assertIn("(Today's $):", real["solvSub"])
+        self.assertNotEqual(nom["solvSub"], real["solvSub"])
+
+        self.assertIn("(nominal $)", nom["taxShelter"])
+        self.assertIn("(today's $)", real["taxShelter"])
+        self.assertNotEqual(nom["taxShelter"], real["taxShelter"])
+        self.assertIn("(Nominal $)", nom["taxSub"])
+        self.assertIn("(Today's $)", real["taxSub"])
+
+    def test_mc_simulations_forced_500_on_old_saves_and_narrative(self):
+        """Old saves with non-500 mcSimulations load at 500 paths cleanly, slider is gone, narrative shows 500."""
+        html = self.index_path.read_text(encoding="utf-8")
+        self.assertNotIn('id="sim-mc-sims-slider"', html)
+        self.assertNotIn('id="sim-mc-sims-row"', html)
+
+        node_script = """
+import fs from "node:fs";
+import vm from "node:vm";
+
+const html = fs.readFileSync(process.argv[1], "utf8");
+const m = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)];
+const script = m[m.length - 1][1];
+
+const mk = () => new Proxy(function(){}, {
+  get: (t,p) => (p === Symbol.toPrimitive ? (()=>0) : (p==="length"?0:(p==="value"?"":(p==="classList"?mk():(p==="style"?mk():(p==="dataset"?mk():stub)))))),
+  apply: () => stub, set: () => true, has: () => true,
+});
+const stub = mk();
+const _els = new Map();
+const _getEl = (id) => {
+  if (!_els.has(id)) {
+    const state = { value: "", textContent: "", innerHTML: "", checked: false };
+    _els.set(id, new Proxy(function(){}, {
+      get: (t,p) => (p === Symbol.toPrimitive ? (()=>0) : (p in state ? state[p] : (p==="length"?0:(p==="classList"?mk():(p==="style"?mk():(p==="dataset"?mk():stub)))))),
+      set: (t,p,v) => { state[p] = v; return true; },
+      apply: () => stub, has: () => true,
+    }));
+  }
+  return _els.get(id);
+};
+const doc = { getElementById:(id)=>_getEl(id), querySelector:()=>stub, querySelectorAll:()=>[], createElement:()=>stub, createElementNS:()=>stub, addEventListener:()=>{}, body:stub, documentElement:stub };
+const win = { addEventListener:()=>{}, location:{hash:"",href:""}, matchMedia:()=>({matches:false,addEventListener:()=>{}}), devicePixelRatio:1, getComputedStyle:()=>stub };
+const ctxObj = {
+  document:doc, window:win, navigator:{userAgent:"node"}, console,
+  localStorage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},
+  setInterval:()=>0, clearInterval:()=>{}, setTimeout:()=>0, clearTimeout:()=>{}, requestAnimationFrame:(f)=>{ f(); return 0; },
+  fetch:()=>Promise.resolve({ok:false,json:async()=>({})}),
+  Date, Math, JSON, parseInt, parseFloat, isNaN, isFinite, Array, Object, String, Number, Boolean, Map, Set, RegExp, Error, Symbol,
+  URL, Promise, structuredClone, AbortController, TextEncoder, TextDecoder,
+  addEventListener:()=>{}, removeEventListener:()=>{},
+  location:{hash:"",href:"",search:""}, matchMedia:()=>({matches:false,addEventListener:()=>{}}),
+  getComputedStyle:()=>stub, devicePixelRatio:1, innerWidth:1200, innerHeight:800,
+  history:{replaceState:()=>{}},
+};
+ctxObj.globalThis = ctxObj; ctxObj.window = ctxObj; ctxObj.self = ctxObj;
+const ctx = vm.createContext(ctxObj);
+vm.runInContext(script, ctx);
+
+async function run() {
+  await vm.runInContext("initSavesSystem()", ctx);
+  await vm.runInContext(`
+    (async () => {
+      const legacyEntry = {
+        id: "099",
+        name: "Legacy 1000 Paths",
+        file: "099_legacy.json",
+        settings: {
+          simActiveModel: "range",
+          simAnnualBurn: 80000,
+          mcSimulations: 1000,
+          mcReturnModel: "normal",
+        },
+      };
+      modelsList.push(legacyEntry);
+      savesRegistry[legacyEntry.name] = legacyEntry;
+      await loadModelById("099", true);
+    })()
+  `, ctx);
+
+  const mcSimsAfterLoad = vm.runInContext("mcSimulations", ctx);
+  const snapSims = vm.runInContext("getCurrentSettingsSnapshot().mcSimulations", ctx);
+  const dirtyAfterLoad = vm.runInContext("isSaveDirty", ctx);
+  const narrHtml = _getEl("sim-mc-narrative").innerHTML;
+  const subtextHtml = _getEl("sim-model-summary-subtext").innerHTML;
+
+  console.log(JSON.stringify({
+    mcSimsAfterLoad,
+    snapSims,
+    dirtyAfterLoad,
+    narrHtml,
+    subtextHtml,
+  }));
+}
+
+run().catch(err => { console.error(err); process.exit(1); });
+"""
+        res = subprocess.run(
+            ["node", "--input-type=module", "-e", node_script, str(self.index_path)],
+            capture_output=True,
+            text=True,
+            timeout=45,
+        )
+        self.assertEqual(res.returncode, 0, f"Node script failed: {res.stderr}")
+        out = json.loads(res.stdout.strip().splitlines()[-1])
+        self.assertEqual(out["mcSimsAfterLoad"], 500)
+        self.assertEqual(out["snapSims"], 500)
+        self.assertFalse(out["dirtyAfterLoad"])
+        self.assertIn("500", out["narrHtml"])
+        self.assertIn("randomized market simulations", out["narrHtml"])
+        self.assertIn("500 paths", out["subtextHtml"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

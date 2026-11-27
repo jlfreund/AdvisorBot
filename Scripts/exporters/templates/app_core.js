@@ -1272,7 +1272,7 @@
     let mcNonGoogVolPct = 13.9;         // Range: broad-equity annualized volatility % (Ref from weekly history)
     let mcReturnModel = "normal";       // 'normal' (correlated Gaussian) | 'historical' (52-week block bootstrap)
     let mcGoogRestCorr = 0.51;          // single-stock<->rest correlation (Ref 0.51 from weekly history)
-    let mcSimulations = 1000;           // number of Monte Carlo paths (100..1500)
+    let mcSimulations = 500;            // fixed number of Monte Carlo paths
     let mcSuccessThresholdUsd = 0;      // Probability tab: a path "succeeds" if ending real >= this ($, Today's dollars)
     // Historical (cohort / retire-in-year) tab controls:
     let cohortCenterMode = "anchor";    // 'anchor' (re-center returns to Expected sliders) | 'raw'

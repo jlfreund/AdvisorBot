@@ -90,7 +90,7 @@
         mcBroadEquityVolPct: roundSnapNum(mcBroadEquityVolPct, 2),
         mcReturnModel: mcReturnModel || "normal",
         mcSingleStockCorr: roundSnapNum(mcSingleStockCorr, 3),
-        mcSimulations: Math.round(Number(mcSimulations) || 1000),
+        mcSimulations: 500,
         mcSuccessThresholdUsd: Math.round(Number(mcSuccessThresholdUsd) || 0),
         cohortCenterMode: cohortCenterMode || "anchor",
         cohortInflationMode: "real_cpi",
@@ -495,7 +495,7 @@
           mcReturnModel = snap.mcReturnModel === "historical" ? "historical" : "normal";
           mcSingleStockCorr = Math.max(-0.99, Math.min(0.99, Number(snap.mcSingleStockCorr ?? snap.mcGoogRestCorr ?? MC_REF_CORR)));
           mcGoogRestCorr = mcSingleStockCorr;
-          mcSimulations = Math.max(100, Math.min(1500, Math.round(Number(snap.mcSimulations ?? 1000))));
+          mcSimulations = 500;
           mcSuccessThresholdUsd = Math.max(0, Math.round(Number(snap.mcSuccessThresholdUsd ?? 0)));
           cohortCenterMode = snap.cohortCenterMode === "raw" ? "raw" : "anchor";
           cohortInflationMode = "real_cpi";
@@ -2149,7 +2149,7 @@
                     ${ssnClaimRowHtml}
                     <tr><td class="muted">Liquidation Strategy / Tax View</td><td class="num mono">${escHtml(_fmtPresetLbl(s.simOrderPreset))}${s.simBearShield !== false ? " + Bear Shield" : ""} &bull; ${escHtml(s.taxMode === "gross" ? "Pre-Tax" : "After-Tax Net")}</td></tr>
                     <tr><td class="muted">Include Unvested / SSN / Actions</td><td class="num mono">${s.simIncludeUnvested !== false ? "Yes" : "No"} / ${s.simIncludeSSN !== false ? "Yes" : "No"} / ${s.simIncludeScheduledActions !== false ? "Yes" : "No"}</td></tr>
-                    <tr><td class="muted">MC Model / Paths</td><td class="num mono">${escHtml(s.mcReturnModel === "historical" ? "Historical Bootstrap" : "Normal (Multi-Asset)")} &bull; ${Number(s.mcSimulations || 1000).toLocaleString("en-US")} paths</td></tr>
+                    <tr><td class="muted">MC Model / Paths</td><td class="num mono">${escHtml(s.mcReturnModel === "historical" ? "Historical Bootstrap" : "Normal (Multi-Asset)")} &bull; 500 paths</td></tr>
                     <tr><td class="muted">Market Correction</td><td class="num mono">${escHtml(_fmtStressLbl(s.simStressScenario))}${s.simStressScenario === "custom" ? ` (${s.simCustomShockPct}% / ${formatStressMonths(s.simCustomDownMonths ?? 12)} down)` : ""}</td></tr>
                   </tbody>
                 </table>

@@ -2,7 +2,7 @@
 
 <!-- GENERATED FILE. Run `make fixtures` (or `python3 -m tests.catalog`) to refresh. -->
 
-**320 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 98 are ported from the pre-fixture suite.
+**322 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 100 are ported from the pre-fixture suite.
 
 Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA3-05`, `DA3-06`, `DA4-03`, `DA4-07`, `DA4-08b`, `DA4-09`, `DA4-10`, `DA4-11`, `DA4-13`, `DP-01`, `DP-02`, `DP-03`, `DP-04`, `I4`, `LL-01`, `LL-03`, `LL-06`, `LL-08`, `LL-09`, `LL-13`, `LL-14`, `LL-22`, `LL-23`, `S1`, `SA-02`, `SA-03`, `SA-04`, `SA-05`, `SA-06`, `SA-09`, `SA-11`, `SA-13`, `SA-15`, `SA-18`, `SA-20`, `SA2-01`, `SA2-02`, `SA2-03`, `SA2-04`, `SA2-06`, `SA2-07`, `SA2-08`, `SA2-10`, `SA2-11`, `SA2-12`, `SA2-13`, `SA2-14`, `SA2-15`, `SA2-16`, `SA2-17`, `SA2-21`, `SA2-22`, `SA3-01`, `SA3-02`, `SA3-05`, `SA3-06`, `SA3-08`, `SA4-01`, `SA4-03`, `SA4-04`, `SA4-05`, `SA5-01`, `SA5-02`, `SA5-03`, `SA5-04`, `SA5-05`, `SA5-06`, `SA5-07`, `SA5-08`, `SA5-09`, `SA5-10`.
 
@@ -13,7 +13,7 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `pipeline` | 53 |
 | `engine` | 41 |
 | `parity` | 10 |
-| `render` | 16 |
+| `render` | 18 |
 | `server` | 97 |
 | `llm` | 35 |
 | `scans` | 22 |
@@ -296,6 +296,8 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | --- | --- | --- | --- |
 | `DirtyStateAuditTest::test_view_vs_calculation_dirty_state` | — | _legacy_ | _(no docstring)_ |
 | `DirtyStateAuditTest::test_reload_scenario_revert_and_ui` | — | _legacy_ | Verifies that Ctrl-R / Cmd-R reverts modifications, reloads scenario, and updates left-nav status. |
+| `DirtyStateAuditTest::test_historical_mode_dollar_toggle_updates_top_kpis` | — | _legacy_ | Toggling Nominal $ / Today's $ in Historical mode updates all 3 top KPI cards. |
+| `DirtyStateAuditTest::test_mc_simulations_forced_500_on_old_saves_and_narrative` | — | _legacy_ | Old saves with non-500 mcSimulations load at 500 paths cleanly, slider is gone, narrative shows 500. |
 
 ### `render/test_pass3_ui_regressions.py`
 

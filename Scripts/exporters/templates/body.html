@@ -2107,19 +2107,7 @@
                       <p class="sim-tab-narrative" id="sim-mc-narrative"></p>
                       <div class="sim-tab-controls">
                         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
-                          <!-- (1) Simulation Paths first -->
-                          <div class="growth-slider-box mdl-in-box" style="flex:1 1 420px;max-width:560px;justify-content:space-between;margin-bottom:0;" id="sim-mc-sims-row">
-                            <span class="mdl-in-lbl" style="margin:0;"><span class="mdl-in-glyph">&#9670;</span> Simulation Paths:</span>
-                            <div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1;justify-content:flex-end;">
-                              <button class="cap-btn mono active" id="sim-mc-sims-ref-btn" onclick="onMcSimsInput(1000)">Ref: 1,000</button>
-                              <span class="mono muted" style="font-size:11px;flex-shrink:0;">100</span>
-                              <input type="range" id="sim-mc-sims-slider" min="100" max="1500" step="100" value="1000" oninput="onMcSimsInput(this.value)" />
-                              <span class="mono muted" style="font-size:11px;flex-shrink:0;">1,500</span>
-                              <button class="mdl-in-pill mono" id="sim-mc-sims-pill" style="min-width:70px;text-align:center;flex-shrink:0;cursor:pointer;" title="Click to reset Simulation Paths to 1,000" onclick="onMcSimsInput(1000)">1,000</button>
-                            </div>
-                          </div>
-
-                          <!-- (2) Return Model second -->
+                          <!-- Return Model -->
                           <div class="ctrl-group" style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;">
                             <span class="mdl-in-lbl" style="margin:0;white-space:nowrap;"><span class="mdl-in-glyph">&#9670;</span> Return Model:</span>
                             <button class="btn active" id="sim-mc-model-normal-btn" onclick="setMcReturnModel('normal')">Normal (Multi-Asset)</button>

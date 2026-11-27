@@ -7245,7 +7245,7 @@ def evaluate_active_model(
         mc_result = run_monte_carlo(
             payload,
             eff,
-            n_paths=int(eff.get("mcSimulations") or 1000),
+            n_paths=int(eff.get("mcSimulations") or 500),
             seed=seed,
             rollovers=rollovers,
         )
