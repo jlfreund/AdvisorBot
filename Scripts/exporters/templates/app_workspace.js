@@ -90,7 +90,7 @@
         mcBroadEquityVolPct: roundSnapNum(mcBroadEquityVolPct, 2),
         mcReturnModel: mcReturnModel || "normal",
         mcSingleStockCorr: roundSnapNum(mcSingleStockCorr, 3),
-        mcSimulations: Math.round(Number(mcSimulations) || 1000),
+        mcSimulations: 500,
         mcSuccessThresholdUsd: Math.round(Number(mcSuccessThresholdUsd) || 0),
         cohortCenterMode: cohortCenterMode || "anchor",
         cohortInflationMode: "real_cpi",
@@ -495,7 +495,7 @@
           mcReturnModel = snap.mcReturnModel === "historical" ? "historical" : "normal";
           mcSingleStockCorr = Math.max(-0.99, Math.min(0.99, Number(snap.mcSingleStockCorr ?? snap.mcGoogRestCorr ?? MC_REF_CORR)));
           mcGoogRestCorr = mcSingleStockCorr;
-          mcSimulations = Math.max(100, Math.min(1500, Math.round(Number(snap.mcSimulations ?? 1000))));
+          mcSimulations = 500;
           mcSuccessThresholdUsd = Math.max(0, Math.round(Number(snap.mcSuccessThresholdUsd ?? 0)));
           cohortCenterMode = snap.cohortCenterMode === "raw" ? "raw" : "anchor";
           cohortInflationMode = "real_cpi";
@@ -1789,24 +1789,37 @@
 
     async function loadModelById(idOrName, openSim = false) {
       const entry = findModelEntry(idOrName);
-      if (!entry || !entry.settings) return;
+      if (!entry || !entry.settings || typeof entry.settings !== "object") return false;
+      const prevModelId = currentModelId;
+      const prevSaveName = currentSaveName;
       currentModelId = entry.id;
       currentSaveName = entry.name;
-      applySettingsSnapshot(entry.settings);
-      persistLocalSavesRegistry();
       try {
-        await apiJson("/api/models/active", {
+        applySettingsSnapshot(entry.settings);
+      } catch (err) {
+        currentModelId = prevModelId;
+        currentSaveName = prevSaveName;
+        console.error("Failed to load scenario settings:", err);
+        return false;
+      }
+      persistLocalSavesRegistry();
+      let apiRes = null;
+      try {
+        apiRes = await apiJson("/api/models/active", {
           body: { id: entry.id, name: entry.name },
         });
       } catch (_e) {
         // Handled transparently by apiJson
       }
+      if (apiRes && apiRes.status === 409) {
+        return false;
+      }
       updateSaveStatusUI(false);
+      selectedModelDetailId = null;
+      isEditingDetailNotes = false;
       if (openSim) {
         switchScreen("retirement");
       } else {
-        selectedModelDetailId = null;
-        isEditingDetailNotes = false;
         renderModelsScreen();
         const activeCard = document.getElementById("model-card-" + entry.id);
         if (activeCard) {
@@ -1816,6 +1829,7 @@
           }
         }
       }
+      return true;
     }
 
     function openModelDetail(idOrName) {
@@ -2078,7 +2092,7 @@
           </div>
 
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button type="button" class="btn btn-primary" data-sa-action="load-model" data-sa-id="${escHtml(entry.id)}">Load</button>
+            <button type="button" class="btn btn-primary" data-sa-action="load-model" data-sa-id="${escHtml(entry.id)}" data-sa-open-sim="1">Load</button>
             <button type="button" class="btn" data-sa-action="rename-model" data-sa-id="${escHtml(entry.id)}">Rename</button>
             <button type="button" class="btn" data-sa-action="dup-model" data-sa-id="${escHtml(entry.id)}">Duplicate</button>
             <button type="button" class="btn btn-danger" data-sa-action="del-model" data-sa-id="${escHtml(entry.id)}">Delete</button>
@@ -2135,7 +2149,7 @@
                     ${ssnClaimRowHtml}
                     <tr><td class="muted">Liquidation Strategy / Tax View</td><td class="num mono">${escHtml(_fmtPresetLbl(s.simOrderPreset))}${s.simBearShield !== false ? " + Bear Shield" : ""} &bull; ${escHtml(s.taxMode === "gross" ? "Pre-Tax" : "After-Tax Net")}</td></tr>
                     <tr><td class="muted">Include Unvested / SSN / Actions</td><td class="num mono">${s.simIncludeUnvested !== false ? "Yes" : "No"} / ${s.simIncludeSSN !== false ? "Yes" : "No"} / ${s.simIncludeScheduledActions !== false ? "Yes" : "No"}</td></tr>
-                    <tr><td class="muted">MC Model / Paths</td><td class="num mono">${escHtml(s.mcReturnModel === "historical" ? "Historical Bootstrap" : "Normal (Multi-Asset)")} &bull; ${Number(s.mcSimulations || 1000).toLocaleString("en-US")} paths</td></tr>
+                    <tr><td class="muted">MC Model / Paths</td><td class="num mono">${escHtml(s.mcReturnModel === "historical" ? "Historical Bootstrap" : "Normal (Multi-Asset)")} &bull; 500 paths</td></tr>
                     <tr><td class="muted">Market Correction</td><td class="num mono">${escHtml(_fmtStressLbl(s.simStressScenario))}${s.simStressScenario === "custom" ? ` (${s.simCustomShockPct}% / ${formatStressMonths(s.simCustomDownMonths ?? 12)} down)` : ""}</td></tr>
                   </tbody>
                 </table>

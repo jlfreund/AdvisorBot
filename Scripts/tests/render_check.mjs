@@ -562,21 +562,13 @@ const progAnimCheck = await page.evaluate(() => {
   const optPill = document.getElementById('sim-optimism-pill');
   const histActiveImmediate = histBtn ? histBtn.classList.contains('active') : false;
   const histAnimImmediate = histBtn ? histBtn.classList.contains('sim-computing') : false;
-  const simsSlider = document.getElementById('sim-mc-sims-slider');
-  const simsMin = simsSlider ? simsSlider.getAttribute('min') : '';
-  const simsMax = simsSlider ? simsSlider.getAttribute('max') : '';
+  const simsSliderGone = !document.getElementById('sim-mc-sims-slider') && !document.getElementById('sim-mc-sims-row');
 
   // 2. Interrupt immediately by clicking "Monte-Carlo" -> Historical animation stops, Monte-Carlo animates
   setSimModel('range');
   const histStoppedOnSwitch = histBtn ? !histBtn.classList.contains('sim-computing') : false;
   const rangeAnimOnSwitch = rangeBtn ? rangeBtn.classList.contains('sim-computing') : false;
-
-  // Verify Simulation Paths slider clamps to 100..1500
-  onMcSimsInput(50);
-  const clampedMin = document.getElementById('sim-mc-sims-pill')?.textContent?.trim() || '';
-  onMcSimsInput(5000);
-  const clampedMax = document.getElementById('sim-mc-sims-pill')?.textContent?.trim() || '';
-  onMcSimsInput(1000);
+  const mcNarrText = document.getElementById('sim-mc-narrative')?.textContent || '';
 
   // 3. Interrupt immediately by dragging Projected Growth Multiplier slider -> Monte-Carlo button stops, right capsule animates
   const tDrag0 = performance.now();
@@ -590,10 +582,8 @@ const progAnimCheck = await page.evaluate(() => {
   return {
     histActiveImmediate,
     histAnimImmediate,
-    simsMin,
-    simsMax,
-    clampedMin,
-    clampedMax,
+    simsSliderGone,
+    mcNarrHas500: mcNarrText.includes('500'),
     histStoppedOnSwitch,
     rangeAnimOnSwitch,
     syncInputMs,
@@ -602,7 +592,7 @@ const progAnimCheck = await page.evaluate(() => {
     surfacesAnimOnSlider,
   };
 });
-// Wait up to 8s for progressive 1,000-path Monte Carlo refinement to complete and stop animating the capsule + KPI/chart surfaces
+// Wait up to 8s for progressive 500-path Monte Carlo refinement to complete and stop animating the capsule + KPI/chart surfaces
 let pillStoppedAfterDone = false;
 let lastPoll = {};
 for (let w = 0; w < 80; w++) {
@@ -626,10 +616,8 @@ for (let w = 0; w < 80; w++) {
 if (
   !progAnimCheck.histActiveImmediate ||
   !progAnimCheck.histAnimImmediate ||
-  progAnimCheck.simsMin !== '100' ||
-  progAnimCheck.simsMax !== '1500' ||
-  progAnimCheck.clampedMin !== '100' ||
-  progAnimCheck.clampedMax !== '1,500' ||
+  !progAnimCheck.simsSliderGone ||
+  !progAnimCheck.mcNarrHas500 ||
   !progAnimCheck.histStoppedOnSwitch ||
   !progAnimCheck.rangeAnimOnSwitch ||
   progAnimCheck.syncInputMs > 100 ||
