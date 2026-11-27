@@ -854,6 +854,108 @@ console.log(out);
             self.assertEqual(res["draftName"], "Saved Household")
             self.assertEqual(res["draftState"], "CA")
 
+    def test_autosave_with_no_portfolio_reports_instead_of_discarding(self) -> None:
+        """Verifies Portfolio Settings edits with no portfolio surface a message instead of silently no-op saving."""
+        with _IsolatedPortfolioEnv() as env:
+            config.set_active_portfolio(None)
+            with PortfolioDB(":memory:") as db:
+                payload = build_report_payload(db, config.default_config(), date(2026, 10, 15))
+            self.assertFalse(payload["has_portfolio"])
+            render_html_report(payload, env.out_html)
+
+            node_script = """
+import fs from "node:fs";
+import vm from "node:vm";
+
+const html = fs.readFileSync(process.argv[1], "utf8");
+const scripts = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)];
+const code = scripts[scripts.length - 1][1];
+
+const elems = new Map();
+function makeEl(id) {
+  if (elems.has(id)) return elems.get(id);
+  const classes = new Set();
+  const el = {
+    id, textContent: "", innerHTML: "", value: "", disabled: false,
+    style: {}, dataset: {},
+    classList: {
+      add: (...cs) => cs.forEach(c => classes.add(c)),
+      remove: (...cs) => cs.forEach(c => classes.delete(c)),
+      toggle: (c, force) => { if (force === undefined ? !classes.has(c) : force) classes.add(c); else classes.delete(c); },
+      contains: (c) => classes.has(c),
+    },
+    addEventListener: () => {}, removeEventListener: () => {},
+    setAttribute: () => {}, removeAttribute: () => {}, getAttribute: () => null,
+    appendChild: () => {}, closest: () => null, focus: () => {}, scrollIntoView: () => {},
+    querySelector: () => makeEl(id + "__q"), querySelectorAll: () => [],
+  };
+  elems.set(id, el);
+  return el;
+}
+
+const doc = {
+  getElementById: (id) => makeEl(id),
+  querySelector: () => makeEl("__doc_q"),
+  querySelectorAll: () => [],
+  createElement: () => makeEl("__created"),
+  createElementNS: () => makeEl("__created_ns"),
+  addEventListener: () => {},
+  body: makeEl("__body"), documentElement: makeEl("__root"), title: "",
+};
+const ctxObj = {
+  document: doc, navigator: { userAgent: "node" }, console,
+  localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+  setInterval: () => 0, clearInterval: () => {}, setTimeout: () => 0, clearTimeout: () => {},
+  requestAnimationFrame: (f) => { f(); return 0; },
+  fetch: () => Promise.resolve({ ok: false, json: async () => ({}) }),
+  Date, Math, JSON, parseInt, parseFloat, isNaN, isFinite,
+  Array, Object, String, Number, Boolean, Map, Set, RegExp, Error, Symbol,
+};
+ctxObj.globalThis = ctxObj; ctxObj.window = ctxObj; ctxObj.self = ctxObj;
+ctxObj.addEventListener = () => {};
+ctxObj.location = { hash: "", href: "http://127.0.0.1:8765/", search: "", reload: () => {} };
+ctxObj.history = { replaceState: () => {} };
+ctxObj.matchMedia = () => ({ matches: false, addEventListener: () => {} });
+ctxObj.getComputedStyle = () => makeEl("__style");
+ctxObj.devicePixelRatio = 1;
+ctxObj.URL = URL; ctxObj.Promise = Promise; ctxObj.structuredClone = structuredClone;
+ctxObj.AbortController = AbortController; ctxObj.TextEncoder = TextEncoder; ctxObj.TextDecoder = TextDecoder;
+
+const ctx = vm.createContext(ctxObj);
+vm.runInContext(code, ctx);
+
+// A draft exists (the editor seeds one) but there is no portfolio to write it into.
+vm.runInContext("_projDraft = _buildDefaultDraftForPortfolio('My Portfolio'); _editingPortfolioId = null;", ctx);
+makeEl("proj-settings-msg").textContent = "";
+vm.runInContext("_scheduleProjectAutoSave(0);", ctx);
+const msgNoPortfolio = makeEl("proj-settings-msg").textContent;
+
+// Editing a family member field must not be silently dropped either.
+makeEl("proj-settings-msg").textContent = "";
+vm.runInContext("_initFamilyMembersFromDraft(); _syncCurrentFamilyMemberFromDOM(true);", ctx);
+const msgOnFamilyEdit = makeEl("proj-settings-msg").textContent;
+
+// Positive control: with a portfolio to save into, the no-portfolio warning must NOT fire.
+makeEl("proj-settings-msg").textContent = "";
+vm.runInContext("_editingPortfolioId = 'some_portfolio'; _scheduleProjectAutoSave(0);", ctx);
+const msgWithPortfolio = makeEl("proj-settings-msg").textContent;
+
+console.log(JSON.stringify({ msgNoPortfolio, msgOnFamilyEdit, msgWithPortfolio }));
+"""
+            proc = subprocess.run(
+                ["node", "--input-type=module", "-e", node_script, str(env.out_html)],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(proc.returncode, 0, msg=f"Node autosave check failed:\n{proc.stderr}")
+            res = json.loads(proc.stdout.strip().splitlines()[-1])
+
+            # The bug: both of these were "" — the save returned at its first line with no signal.
+            self.assertIn("No portfolio selected", res["msgNoPortfolio"])
+            self.assertIn("No portfolio selected", res["msgOnFamilyEdit"])
+            self.assertNotIn("No portfolio selected", res["msgWithPortfolio"])
+
     def test_badge_generation_and_rotation_server(self) -> None:
         """Tests that handle_generate_badge saves generated SVG and updates 10-badge rotation window."""
         with _IsolatedPortfolioEnv() as env:

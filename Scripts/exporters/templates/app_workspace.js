@@ -4222,6 +4222,24 @@
       msgEl.style.color = color;
     }
 
+    // DESIGN INTENT (No Silent Drafts): Portfolio Settings has no explicit Save button — every
+    // edit debounces into `_saveProjectDraftNow()`, which needs a portfolio to write into. With
+    // `_editingPortfolioId === null` (no portfolio created yet) both auto-save entry points used
+    // to `return` on their first line, so the editor accepted keystrokes and discarded them on
+    // close with no request, no error and no status change. Both now report the condition instead.
+    // The panes stay navigable on purpose: reaching Prompts in the empty state is a tested
+    // behavior, so the fix is to make the dead end visible rather than to block the tabs.
+    function _hasEditablePortfolioTarget() {
+      return Boolean(_editingPortfolioId);
+    }
+
+    function _warnNoPortfolioTarget() {
+      _setProjSettingsMsg(
+        "No portfolio selected — click + New Portfolio to create one. Edits cannot be saved yet.",
+        "#fda4af"
+      );
+    }
+
     function switchProjectSettingsTab(tabName, syncDomFirst = true) {
       if (syncDomFirst) _syncProjDraftFromDOM();
       const validTabs = ["info", "family", "investors", "beneficiaries", "symbols", "prompts", "privacy"];
@@ -5445,7 +5463,11 @@
     }
 
     async function _saveProjectDraftNow() {
-      if (!_editingPortfolioId || !_projDraft) return;
+      if (!_projDraft) return;
+      if (!_hasEditablePortfolioTarget()) {
+        _warnNoPortfolioTarget();
+        return;
+      }
       _syncProjDraftFromDOM();
       const serialized = JSON.stringify(_projDraft);
       if (serialized === _projLastSavedPayload) return;
@@ -5531,7 +5553,11 @@
     }
 
     function _scheduleProjectAutoSave(delayMs = 350) {
-      if (!_editingPortfolioId || !_projDraft) return;
+      if (!_projDraft) return;
+      if (!_hasEditablePortfolioTarget()) {
+        _warnNoPortfolioTarget();
+        return;
+      }
       if (_projAutoSaveTimer) clearTimeout(_projAutoSaveTimer);
       if (delayMs <= 0) {
         _projAutoSaveTimer = null;
