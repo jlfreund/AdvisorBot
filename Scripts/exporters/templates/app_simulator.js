@@ -4104,14 +4104,20 @@
           };
           const colPct = (p) => (p >= 90 ? "pos" : (p >= 75 ? "" : "neg"));
           const cohortCountLbl = co.is_partial && co.total_cohorts ? `${co.n_cohorts}/${co.total_cohorts}` : String(co.n_cohorts);
+          const dlrModeLbl = isReal ? "Today's $" : "Nominal $";
+          const dlrModeLower = isReal ? "today's $" : "nominal $";
           if (solvLblEl) solvLblEl.textContent = `★ Solvency — historical cohorts (to ${INV0.name}'s ${inv0TargetAge}th)`;
           if (solvValEl && solvSubEl) {
             const s85 = co.success_to_ms_pct, n85 = co.success_to_ms_n;
+            const lastBand = Array.isArray(co.band) && co.band.length ? co.band[co.band.length - 1] : null;
+            const endMed = lastBand ? Math.max(0, isReal ? (lastBand.real?.p50 || 0) : (lastBand.nominal?.p50 || 0)) : null;
+            const endYrLbl = lastBand && lastBand.yearsOut ? `Yr ${Math.round(lastBand.yearsOut)} P50` : "End P50";
+            const endTxt = endMed != null ? ` • ${endYrLbl} (${dlrModeLbl}): ${fmtUSD0(endMed)}` : "";
             if (s85 != null) {
               solvValEl.textContent = `${s85.toFixed(0)}% funded to ${inv0TargetAge}`;
               solvValEl.className = "kpi-val mono " + colPct(s85);
               const fullTxt = co.success_full_pct != null ? ` • ${co.success_full_n[0]}/${co.success_full_n[1]} funded full 40 yrs` : "";
-              solvSubEl.textContent = `${n85[0]} of ${n85[1]} start years (${co.data_range[0]}–${co.data_range[1]}) still funded at ${INV0.name}'s ${inv0TargetAge}th${fullTxt}`;
+              solvSubEl.textContent = `${n85[0]} of ${n85[1]} start years (${co.data_range[0]}–${co.data_range[1]}) still funded at ${INV0.name}'s ${inv0TargetAge}th${fullTxt}${endTxt}`;
             } else {
               solvValEl.textContent = "—"; solvSubEl.textContent = "Not enough history for this horizon.";
             }
@@ -4119,21 +4125,34 @@
           if (inhValEl && inhSubEl) {
             const at85 = bandAt(co.ms_month);
             const msR = co.ms_real || at85.real;
-            const medNom = Math.max(0, at85.nominal.p50), medReal = Math.max(0, msR.p50 ?? at85.real.p50);
-            if (inhLblEl) inhLblEl.textContent = `★ Inheritance — median cohort (At ${INV0.name}'s ${inv0TargetAge}th • ${inv0MsLbl})`;
-            inhValEl.className = "kpi-val mono " + (medNom > 0 ? "pos" : "neg");
+            const msN = co.ms_nominal || at85.nominal;
+            const medNom = Math.max(0, msN.p50 ?? at85.nominal.p50);
+            const medReal = Math.max(0, msR.p50 ?? at85.real.p50);
+            const primaryMed = isReal ? medReal : medNom;
+            const secondaryMed = isReal ? medNom : medReal;
+            const activeQ = isReal ? msR : msN;
+            if (inhLblEl) inhLblEl.textContent = `★ Inheritance — median cohort (At ${INV0.name}'s ${inv0TargetAge}th • ${inv0MsLbl} • ${dlrModeLbl})`;
+            inhValEl.className = "kpi-val mono " + (primaryMed > 0 ? "pos" : "neg");
             inhValEl.style.display = "flex"; inhValEl.style.justifyContent = "space-between"; inhValEl.style.alignItems = "baseline"; inhValEl.style.gap = "10px";
-            inhValEl.innerHTML = `<span>${fmtUSD0(medNom)}</span><span class="mono" style="font-size:15.5px;font-weight:600;color:var(--muted);">${fmtUSD0(medReal)}</span>`;
-            if (inhRealEl) { inhRealEl.style.textAlign = "right"; inhRealEl.textContent = "Median start year • today's $ at right"; }
-            inhSubEl.textContent = `p25 · p50 · p75 (today's $): ${fmtUSD0(Math.max(0, msR.p25 || 0))} · ${fmtUSD0(medReal)} · ${fmtUSD0(Math.max(0, msR.p75 || 0))}`;
+            inhValEl.innerHTML = `<span>${fmtUSD0(primaryMed)}</span><span class="mono" style="font-size:15.5px;font-weight:600;color:var(--muted);">${fmtUSD0(secondaryMed)}</span>`;
+            if (inhRealEl) {
+              inhRealEl.style.textAlign = "right";
+              inhRealEl.textContent = isReal
+                ? "Median start year (today's $) • nominal $ at right"
+                : "Median start year (nominal $) • today's $ at right";
+            }
+            inhSubEl.textContent = `p25 · p50 · p75 (${dlrModeLower}): ${fmtUSD0(Math.max(0, activeQ.p25 || 0))} · ${fmtUSD0(primaryMed)} · ${fmtUSD0(Math.max(0, activeQ.p75 || 0))}`;
           }
           if (taxValEl && taxSubEl && co.tax_to_ms) {
             const tx = co.tax_to_ms;
+            const effPct = isReal ? tx.eff_tax_pct : (tx.eff_tax_nominal_pct ?? tx.eff_tax_pct);
+            const keptPct = isReal ? tx.net_kept_pct : (tx.net_kept_nominal_pct ?? tx.net_kept_pct);
+            const cumTaxDisp = isReal ? tx.cum_tax_real : (tx.cum_tax_nominal ?? tx.cum_tax_real);
             if (taxLblEl) taxLblEl.textContent = `★ Tax Efficiency — median cohort (To ${INV0.name}'s ${inv0TargetAge}th)`;
-            taxValEl.textContent = `${tx.net_kept_pct.toFixed(1)}% kept (${tx.eff_tax_pct.toFixed(1)}% eff.)`;
-            taxValEl.className = "kpi-val mono " + (tx.eff_tax_pct <= 12.0 ? "pos" : "neg");
-            if (taxSheltEl) taxSheltEl.textContent = `Median cohort cumulative tax to Age ${inv0TargetAge}: -${fmtUSD0(tx.cum_tax_real)} (today's $)`;
-            taxSubEl.textContent = `Evaluated across ${cohortCountLbl} historical rolling cohorts`;
+            taxValEl.textContent = `${keptPct.toFixed(1)}% kept (${effPct.toFixed(1)}% eff.)`;
+            taxValEl.className = "kpi-val mono " + (effPct <= 12.0 ? "pos" : "neg");
+            if (taxSheltEl) taxSheltEl.textContent = `Median cohort cumulative tax to Age ${inv0TargetAge}: -${fmtUSD0(cumTaxDisp)} (${dlrModeLower})`;
+            taxSubEl.textContent = `Evaluated across ${cohortCountLbl} historical rolling cohorts (${dlrModeLbl})`;
           }
         }
       }
@@ -5357,7 +5376,7 @@
       const rawCorr = mc.singleStockCorr ?? mc.googRestCorr ?? mcSingleStockCorr ?? mcGoogRestCorr ?? 0.52;
       const corr = Math.max(-0.999, Math.min(0.999, Number(rawCorr)));
       let model = String(mc.returnModel || mcReturnModel || "normal").toLowerCase();
-      const nPaths = Math.max(1, parseInt(mc.simulations != null ? mc.simulations : (mcSimulations || 1000), 10) || 1000);
+      const nPaths = Math.max(1, parseInt(mc.simulations != null ? mc.simulations : (mcSimulations || 500), 10) || 500);
 
       const overrideSsPct = mc.googExpectedPct ?? mc.singleStockExpectedPct;
       const overrideMktPct = mc.nonGoogExpectedPct ?? mc.broadEquityExpectedPct;
@@ -5950,9 +5969,9 @@
           let deflator = 1.0, depletedMonth = null;
           const line = [];
           const cpNomByM = {}, cpRealByM = {};
-          let hasMs = false, msRealY = 0.0, msTaxRealY = 0.0, msEffTaxY = 0.0;
+          let hasMs = false, msRealY = 0.0, msNomY = 0.0, msTaxRealY = 0.0, msTaxNomY = 0.0, msEffTaxY = 0.0, msEffTaxNomY = 0.0;
           let cyRates = {}, cyInf = 0, cyBear = false, cyTbill = 3.5;
-          let cohortMsGrossReal = 0.0, cohortMsTaxReal = 0.0;
+          let cohortMsGrossReal = 0.0, cohortMsTaxReal = 0.0, cohortMsGrossNom = 0.0, cohortMsTaxNom = 0.0;
 
           for (let m = 0; m <= runMonths; m++) {
             const sc = skel[m];
@@ -5975,6 +5994,8 @@
               if (m <= msTargetMonth) {
                 cohortMsGrossReal += stepRes.monthlyGrossSold / deflator;
                 cohortMsTaxReal += stepRes.monthlyTax / deflator;
+                cohortMsGrossNom += stepRes.monthlyGrossSold;
+                cohortMsTaxNom += stepRes.monthlyTax;
               }
             }
             const isCp = cpSet.has(m);
@@ -5995,9 +6016,12 @@
               }
               if (m === msTargetMonth) {
                 hasMs = true;
+                msNomY = total;
                 msRealY = total / deflator;
                 msTaxRealY = cohortMsTaxReal;
+                msTaxNomY = cohortMsTaxNom;
                 msEffTaxY = cohortMsGrossReal > 0 ? (cohortMsTaxReal / cohortMsGrossReal * 100.0) : 0.0;
+                msEffTaxNomY = cohortMsGrossNom > 0 ? (cohortMsTaxNom / cohortMsGrossNom * 100.0) : 0.0;
               }
             }
           }
@@ -6009,7 +6033,7 @@
             spotlight: spotlight.has(Y), line,
           };
           recordsByYear[Y] = {
-            rec, cpNomByM, cpRealByM, hasMs, msRealY, msTaxRealY, msEffTaxY,
+            rec, cpNomByM, cpRealByM, hasMs, msRealY, msNomY, msTaxRealY, msTaxNomY, msEffTaxY, msEffTaxNomY,
             reachedH: runMonths >= horizon,
             reachedJ85: runMonths >= msTargetMonth,
             survivedH: depletedMonth === null,
@@ -6027,7 +6051,7 @@
         const qkey = { 0.10: "p10", 0.25: "p25", 0.50: "p50", 0.75: "p75", 0.90: "p90" };
         const cpNom = {}, cpReal = {};
         checkpoints.forEach(cp => { cpNom[cp] = []; cpReal[cp] = []; });
-        const msRealVals = [], msRealYears = [], msTaxRealVals = [], msEffTaxVals = [];
+        const msRealVals = [], msNomVals = [], msRealYears = [], msTaxRealVals = [], msTaxNomVals = [], msEffTaxVals = [], msEffTaxNomVals = [];
         const cohortOut = [], namedOut = [];
         let fullCohorts = 0, fullSuccess = 0, j85Cohorts = 0, j85Success = 0;
 
@@ -6048,9 +6072,12 @@
           }
           if (item.hasMs) {
             msRealVals.push(item.msRealY);
+            msNomVals.push(item.msNomY);
             msRealYears.push(Y);
             msTaxRealVals.push(item.msTaxRealY);
+            msTaxNomVals.push(item.msTaxNomY);
             msEffTaxVals.push(item.msEffTaxY);
+            msEffTaxNomVals.push(item.msEffTaxNomY);
           }
         }
 
@@ -6073,13 +6100,22 @@
         const cohMedYearsSolvent = cohMedDep > horizon ? Math.round((horizon / 12.0) * 10) / 10 : Math.round((cohMedDep / 12.0) * 10) / 10;
 
         const msSorted = msRealVals.slice().sort((a, b) => a - b);
+        const msNomSorted = msNomVals.slice().sort((a, b) => a - b);
         const msTaxSorted = msTaxRealVals.slice().sort((a, b) => a - b);
+        const msTaxNomSorted = msTaxNomVals.slice().sort((a, b) => a - b);
         const msEffSorted = msEffTaxVals.slice().sort((a, b) => a - b);
+        const msEffNomSorted = msEffTaxNomVals.slice().sort((a, b) => a - b);
         const p50EffTax = msEffSorted.length ? Math.round(mcPercentile(msEffSorted, 0.50) * 10) / 10 : 0.0;
+        const p50EffTaxNom = msEffNomSorted.length ? Math.round(mcPercentile(msEffNomSorted, 0.50) * 10) / 10 : 0.0;
         const p50TaxReal = msTaxSorted.length ? Math.round(mcPercentile(msTaxSorted, 0.50) * 100) / 100 : 0.0;
+        const p50TaxNom = msTaxNomSorted.length ? Math.round(mcPercentile(msTaxNomSorted, 0.50) * 100) / 100 : 0.0;
         const msRealObj = { p10: 0, p25: 0, p50: 0, p75: 0, p90: 0 };
+        const msNomObj = { p10: 0, p25: 0, p50: 0, p75: 0, p90: 0 };
         if (msSorted.length) {
           qs.forEach(q => { msRealObj[qkey[q]] = Math.round(mcPercentile(msSorted, q) * 100) / 100; });
+        }
+        if (msNomSorted.length) {
+          qs.forEach(q => { msNomObj[qkey[q]] = Math.round(mcPercentile(msNomSorted, q) * 100) / 100; });
         }
 
         // DA-A05: Replay the single representative median cohort so hover popup sales & holdings reconcile with P50
@@ -6145,10 +6181,14 @@
           success_full_pct: fullCohorts ? Math.round((1000 * fullSuccess) / fullCohorts) / 10 : null,
           success_full_n: [fullSuccess, fullCohorts],
           ms_real: msRealObj,
+          ms_nominal: msNomObj,
           tax_to_ms: {
             net_kept_pct: Math.round((100.0 - p50EffTax) * 10) / 10,
             eff_tax_pct: p50EffTax,
             cum_tax_real: Math.round(p50TaxReal),
+            net_kept_nominal_pct: Math.round((100.0 - p50EffTaxNom) * 10) / 10,
+            eff_tax_nominal_pct: p50EffTaxNom,
+            cum_tax_nominal: Math.round(p50TaxNom),
           },
           best_cohort: best ? { startYear: best.startYear, endReal: best.endReal } : null,
           worst_cohort: worst ? { startYear: worst.startYear, endReal: worst.endReal, depletedMonth: worst.depletedMonth } : null,
@@ -6176,7 +6216,7 @@
     const SIM_MODEL_NARRATIVES = {
       range:
         "<b>Monte-Carlo</b> replaces the single projection line with a <b>range of possible futures</b>: it runs " +
-        "<span id='sim-mc-sims-inline'>1,000</span> randomized market paths and shades the middle 80% of outcomes " +
+        "<span id='sim-mc-sims-inline'>500</span> randomized market simulations and shades the middle 80% of outcomes " +
         "(10th to 90th percentile) around the median path based on each holding's historical ups and downs. " +
         "The <b>Return Model</b> below chooses how each year's market return is generated:" +
         "<br><br>" +
@@ -6504,23 +6544,10 @@
         clickHint: "Click to use the Historical 1-year slice model.",
       });
 
-      const simsSl = document.getElementById("sim-mc-sims-slider"); if (simsSl) simsSl.value = String(mcSimulations);
-      _setPill("sim-mc-sims-pill", mcSimulations.toLocaleString("en-US"), "mdl-in-pill");
-      _setRefActive("sim-mc-sims-ref-btn", mcSimulations === 1000);
-      const msSolvLbl = (INV0 && Number(INV0.milestone_age)) ? `Age-${Number(INV0.milestone_age)}` : "Milestone";
-      _setSimRefTip("sim-mc-sims-ref-btn", {
-        title: "Reference Simulation Count (1,000 paths)",
-        meaning: `Number of independent randomized futures run to generate the probability band, median path, and ${msSolvLbl} solvency rate.`,
-        calculation: "Fixed default of 1,000 simulated paths—enough samples to keep median and success-rate estimates steady within roughly ±1.5% while updating quickly as you drag sliders.",
-        clickHint: "Click to reset Simulation count to 1,000 paths.",
-      });
-      const simsInline = document.getElementById("sim-mc-sims-inline");
-      if (simsInline) simsInline.textContent = mcSimulations.toLocaleString("en-US");
-
       const narr = document.getElementById("sim-mc-narrative");
       if (narr) narr.innerHTML = SIM_MODEL_NARRATIVES[simActiveModel] || "";
       const narrInline = document.getElementById("sim-mc-sims-inline");
-      if (narrInline) narrInline.textContent = mcSimulations.toLocaleString("en-US");
+      if (narrInline) narrInline.textContent = (mcSimulations || 500).toLocaleString("en-US");
 
       updateSimSummarySubtext();
     }
@@ -6687,7 +6714,7 @@
         simHtml = `<b style="color:#f8fafc;">None</b> &bull; Deterministic single path`;
         simTopShort = `<b style="color:#f8fafc;">None</b>`;
       } else if (simActiveModel === "range") {
-        const sims = (mcSimulations || 1000).toLocaleString("en-US");
+        const sims = (mcSimulations || 500).toLocaleString("en-US");
         const modLbl = mcReturnModel === "historical" ? "Bootstrap" : "Normal";
         simHtml = `<b style="color:#34d399;">Monte-Carlo</b> &bull; ${sims} paths &bull; ${modLbl}`;
         simTopShort = `<b style="color:#34d399;">Monte-Carlo</b> (${sims} paths &bull; ${modLbl})`;
@@ -6732,11 +6759,6 @@
     function onMcCorrInput(v) {
       mcGoogRestCorr = Math.max(-0.99, Math.min(0.99, Number(v) || 0));
       mcSingleStockCorr = mcGoogRestCorr;
-      _onSimModelControlChanged();
-    }
-    function onMcSimsInput(v) {
-      mcSimulations = Math.max(100, Math.min(1500, Math.round(Number(v) || 1000)));
-      setActiveSimComputingControl("sim-mc-sims-pill", false);
       _onSimModelControlChanged();
     }
     function _fmtSignedPct(p, digits = 0) {

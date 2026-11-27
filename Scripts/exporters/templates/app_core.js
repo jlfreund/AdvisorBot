@@ -1272,7 +1272,7 @@
     let mcNonGoogVolPct = 13.9;         // Range: broad-equity annualized volatility % (Ref from weekly history)
     let mcReturnModel = "normal";       // 'normal' (correlated Gaussian) | 'historical' (52-week block bootstrap)
     let mcGoogRestCorr = 0.51;          // single-stock<->rest correlation (Ref 0.51 from weekly history)
-    let mcSimulations = 1000;           // number of Monte Carlo paths (100..1500)
+    let mcSimulations = 500;            // fixed number of Monte Carlo paths
     let mcSuccessThresholdUsd = 0;      // Probability tab: a path "succeeds" if ending real >= this ($, Today's dollars)
     // Historical (cohort / retire-in-year) tab controls:
     let cohortCenterMode = "anchor";    // 'anchor' (re-center returns to Expected sliders) | 'raw'
@@ -1428,7 +1428,9 @@
             if (typeof openModelDetail === "function") openModelDetail(id);
             break;
           case "load-model":
-            if (typeof loadModelById === "function") loadModelById(id, false);
+            if (typeof loadModelById === "function") {
+              loadModelById(id, el.getAttribute("data-sa-open-sim") === "1");
+            }
             break;
           case "toggle-model-protect":
             if (typeof toggleModelProtection === "function") toggleModelProtection(id, evt);
@@ -2726,6 +2728,8 @@
 
       visible.forEach((w, localIdx) => {
         const globalIdx = iStart + localIdx;
+        const isAfterToday = (TODAY_IDX >= 0 ? globalIdx > TODAY_IDX : w.kind === "FORECAST") && !w.isToday;
+        const barOpacity = isAfterToday ? "0.60" : "0.95";
         const slotX = padL + (globalIdx - viewStart) * slotW;
         const cx = slotX + 0.5 * slotW;
         const bx = cx - barW / 2;
@@ -2736,14 +2740,14 @@
           if (val <= 0) return;
           const h = (val / yMax) * plotH;
           curY -= h;
-          clipped.push(`<rect x="${bx.toFixed(2)}" y="${curY.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(0.6, h).toFixed(2)}" fill="${s.color}" opacity="${w.kind === 'FORECAST' ? '0.86' : '0.95'}"/>`);
+          clipped.push(`<rect x="${bx.toFixed(2)}" y="${curY.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(0.6, h).toFixed(2)}" fill="${s.color}" opacity="${barOpacity}"/>`);
         });
 
         const relVal = projectedReleaseValue(w);
         if (relVal > 0) {
           const rh = (relVal / yMax) * plotH;
           curY -= rh;
-          clipped.push(`<rect x="${bx.toFixed(2)}" y="${curY.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(0.8, rh).toFixed(2)}" fill="url(#gsu-hatch)" stroke="#34d399" stroke-width="${barW > 5 ? 0.7 : 0.3}"/>`);
+          clipped.push(`<rect x="${bx.toFixed(2)}" y="${curY.toFixed(2)}" width="${barW.toFixed(2)}" height="${Math.max(0.8, rh).toFixed(2)}" fill="url(#gsu-hatch)" stroke="#34d399" stroke-width="${barW > 5 ? 0.7 : 0.3}"${isAfterToday ? ' opacity="0.60"' : ''}/>`);
         }
 
         const barH = Math.max(1, axisY - curY);

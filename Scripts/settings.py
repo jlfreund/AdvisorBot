@@ -415,7 +415,7 @@ def default_settings_snapshot(cfg: dict[str, Any] | None = None) -> dict[str, An
         "mcBroadEquityVolPct": 13.9,
         "mcReturnModel": "normal",
         "mcSingleStockCorr": 0.50,
-        "mcSimulations": 1000,
+        "mcSimulations": 500,
         "mcSuccessThresholdUsd": 0,
         "cohortCenterMode": "anchor",
         "cohortInflationMode": "real_cpi",

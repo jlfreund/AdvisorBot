@@ -2,7 +2,7 @@
 
 <!-- GENERATED FILE. Run `make fixtures` (or `python3 -m tests.catalog`) to refresh. -->
 
-**320 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 98 are ported from the pre-fixture suite.
+**324 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 102 are ported from the pre-fixture suite.
 
 Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA3-05`, `DA3-06`, `DA4-03`, `DA4-07`, `DA4-08b`, `DA4-09`, `DA4-10`, `DA4-11`, `DA4-13`, `DP-01`, `DP-02`, `DP-03`, `DP-04`, `I4`, `LL-01`, `LL-03`, `LL-06`, `LL-08`, `LL-09`, `LL-13`, `LL-14`, `LL-22`, `LL-23`, `S1`, `SA-02`, `SA-03`, `SA-04`, `SA-05`, `SA-06`, `SA-09`, `SA-11`, `SA-13`, `SA-15`, `SA-18`, `SA-20`, `SA2-01`, `SA2-02`, `SA2-03`, `SA2-04`, `SA2-06`, `SA2-07`, `SA2-08`, `SA2-10`, `SA2-11`, `SA2-12`, `SA2-13`, `SA2-14`, `SA2-15`, `SA2-16`, `SA2-17`, `SA2-21`, `SA2-22`, `SA3-01`, `SA3-02`, `SA3-05`, `SA3-06`, `SA3-08`, `SA4-01`, `SA4-03`, `SA4-04`, `SA4-05`, `SA5-01`, `SA5-02`, `SA5-03`, `SA5-04`, `SA5-05`, `SA5-06`, `SA5-07`, `SA5-08`, `SA5-09`, `SA5-10`.
 
@@ -13,8 +13,8 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `pipeline` | 53 |
 | `engine` | 41 |
 | `parity` | 10 |
-| `render` | 16 |
-| `server` | 97 |
+| `render` | 18 |
+| `server` | 99 |
 | `llm` | 35 |
 | `scans` | 22 |
 
@@ -296,6 +296,8 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | --- | --- | --- | --- |
 | `DirtyStateAuditTest::test_view_vs_calculation_dirty_state` | — | _legacy_ | _(no docstring)_ |
 | `DirtyStateAuditTest::test_reload_scenario_revert_and_ui` | — | _legacy_ | Verifies that Ctrl-R / Cmd-R reverts modifications, reloads scenario, and updates left-nav status. |
+| `DirtyStateAuditTest::test_historical_mode_dollar_toggle_updates_top_kpis` | — | _legacy_ | Toggling Nominal $ / Today's $ in Historical mode updates all 3 top KPI cards. |
+| `DirtyStateAuditTest::test_mc_simulations_forced_500_on_old_saves_and_narrative` | — | _legacy_ | Old saves with non-500 mcSimulations load at 500 paths cleanly, slider is gone, narrative shows 500. |
 
 ### `render/test_pass3_ui_regressions.py`
 
@@ -388,6 +390,7 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `PortfoliosTest::test_portfolio_crud_and_http_routes_with_delete_confirmation` | — | _legacy_ | _(no docstring)_ |
 | `PortfoliosTest::test_statement_refresh_isolation_between_portfolios` | — | _legacy_ | _(no docstring)_ |
 | `PortfoliosTest::test_empty_state_render_and_ui_modal_js_contracts` | — | _legacy_ | _(no docstring)_ |
+| `PortfoliosTest::test_reopening_editor_with_no_active_portfolio_keeps_saved_draft` | — | _legacy_ | Verifies the editor loads the edited portfolio's own config, not the empty no-active-portfolio response. |
 | `PortfoliosTest::test_autosave_with_no_portfolio_reports_instead_of_discarding` | — | _legacy_ | Verifies Portfolio Settings edits with no portfolio surface a message instead of silently no-op saving. |
 | `PortfoliosTest::test_badge_generation_and_rotation_server` | — | _legacy_ | Tests that handle_generate_badge saves generated SVG and updates 10-badge rotation window. |
 | `PortfoliosTest::test_saved_prompts_lifecycle_and_migration` | — | _legacy_ | Verifies default pre-population, CRUD persistence (including empty []), and legacy migration. |
@@ -425,6 +428,7 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `ModelsIndexTest::test_scenario_terminology_in_rendered_html` | — | _legacy_ | _(no docstring)_ |
 | `ModelsIndexTest::test_scenario_nav_button_status_updates_in_js` | — | _legacy_ | _(no docstring)_ |
 | `ModelsIndexTest::test_scenario_detail_holding_overrides_bar_chart` | — | _legacy_ | _(no docstring)_ |
+| `ModelsIndexTest::test_scenario_detail_load_jumps_to_retirement_simulator` | — | _legacy_ | Clicking Load in scenario details jumps to Retirement Simulator only when load succeeds. |
 
 ### `server/test_security_regressions.py`
 
