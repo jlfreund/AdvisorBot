@@ -851,3 +851,158 @@ def test_system_prompt_boilerplate_and_demo_pool_collision_scrubbed(root):
     assert by_tok["BANK_1"]["demo_value"] == expected_cust["name"]
     assert by_tok["STOCK_1"]["demo_value"] == expected_eq["symbol"]
     assert by_tok["FUND_1"]["demo_value"] == expected_fund["symbol"]
+
+
+@pytest.mark.portfolio("p4_trust_household")
+@pytest.mark.feature("privacy_shield")
+@pytest.mark.regression("SA-03")
+def test_gemini_round2_thought_signature_and_model_turn_scrubbed(root, monkeypatch):
+    """Base64 thoughtSignature substrings do not false-trigger pre-egress gate; non-base64 leaks block; Round 1 model prose is scrubbed."""
+    from privacy import PrivacyTranslator, load_privacy_config
+    import llm_tools
+
+    pcfg = load_privacy_config(auto_sync=True)
+    pcfg["ai_shield"]["mode"] = "identity_aliased"
+    pcfg["entities"].append({
+        "token": "STOCK_9",
+        "category": "equity",
+        "canonical": "V",
+        "synonyms": ["V"],
+        "enabled": True,
+    })
+    tr = PrivacyTranslator(pcfg)
+
+    # 1. Valid base64 thoughtSignature containing '+V/' must not trigger pre-egress block
+    valid_sig = "AbCdEfGhIjKl+V/MnOpQrStUvWxYz0123456789=="
+    assert llm_tools._assert_wire_leak_free(
+        tr,
+        {"contents": [{"role": "model", "parts": [{"thoughtSignature": valid_sig, "text": "Checking"}]}]},
+        "Gemini chat",
+    ) is None
+
+    # 2. Non-base64 text inside thoughtSignature must still be blocked fail-closed
+    bad_sig = llm_tools._assert_wire_leak_free(
+        tr,
+        {"contents": [{"role": "model", "parts": [{"thoughtSignature": "Checking ticker V directly"}]}]},
+        "Gemini chat",
+    )
+    assert bad_sig is not None and bad_sig.get("ok") is False
+
+    # 3. End-to-end 2-round Gemini chat where Round 1 returns thoughtSignature ('+V/') + raw term in text/args
+    seen_bodies = []
+    responses = [
+        {
+            "candidates": [{
+                "content": {
+                    "parts": [
+                        {"thought": True, "text": "Checking V position"},
+                        {"functionCall": {"name": "holdings__get_overview", "args": {"note": "V"}}, "thoughtSignature": valid_sig},
+                    ]
+                }
+            }]
+        },
+        {
+            "candidates": [{
+                "content": {"parts": [{"text": "STOCK_9 reviewed."}]}
+            }]
+        },
+    ]
+
+    def _fake_post(_url, _headers, payload, **_kw):
+        seen_bodies.append(json.loads(json.dumps(payload)))
+        return responses[len(seen_bodies) - 1]
+
+    monkeypatch.setattr(llm_tools, "_http_post_json", _fake_post)
+    res = llm_tools._run_chat_gemini_api(
+        "Review my portfolio",
+        {"provider": "gemini", "model": "gemini-4-hydrogen", "api_key": "fake-key"},
+        "",
+        0,
+        translator=tr,
+    )
+    assert res.get("ok") is True, res
+    assert len(seen_bodies) == 2
+    model_parts = seen_bodies[1]["contents"][1]["parts"]
+    assert model_parts[0]["text"] == "Checking STOCK_9 position"
+    assert model_parts[1]["functionCall"]["args"]["note"] == "STOCK_9"
+    assert model_parts[1]["thoughtSignature"] == valid_sig
+
+    # 4. Diagnostics metadata is attached without raw terms for both pre-egress and CLI blocks
+    bad_diag = bad_sig.get("diagnostics") or {}
+    assert bad_diag.get("gate") == "pre_egress_leak_gate"
+    assert "contents[0].parts[0].thoughtSignature" in (bad_diag.get("leak_fields") or [])
+    assert any(c.startswith("equity(len=1)") for c in (bad_diag.get("leak_categories") or []))
+
+    cli_block = llm_tools.run_chat_via_agy_cli("hello", model="default", allow_fast_path=False)
+    assert cli_block.get("ok") is False
+    cli_diag = cli_block.get("diagnostics") or {}
+    assert cli_diag.get("gate") == "cli_shield"
+    assert cli_diag.get("requested_model") == "default"
+    assert cli_diag.get("is_explicit_cli") is True
+
+
+@pytest.mark.feature("privacy_shield")
+def test_max_tool_rounds_triggers_synthesis_and_forwards_history(monkeypatch):
+    """Exhausting max_tool_rounds runs a no-tool synthesis turn, and prior chat history is aliased & forwarded."""
+    import llm_tools
+    from privacy import build_translator
+
+    tr = build_translator({
+        "ai_shield": {"mode": "identity_aliased"},
+        "entities": [
+            {"token": "INVESTOR_1", "category": "investor", "canonical": "Jordan Mercer", "synonyms": ["Jordan Mercer", "Jordan"], "enabled": True},
+            {"token": "STOCK_1", "category": "equity", "canonical": "ACME Corp", "synonyms": ["ACME Corp", "ACME"], "enabled": True},
+        ],
+    })
+
+    seen_bodies: list[dict] = []
+
+    def _fake_post(_url, _headers, payload, **_kw):
+        seen_bodies.append(json.loads(json.dumps(payload)))
+        if len(seen_bodies) == 1:
+            return {
+                "candidates": [{
+                    "content": {
+                        "parts": [{"functionCall": {"name": "holdings__get_overview", "args": {}}}]
+                    }
+                }]
+            }
+        return {
+            "candidates": [{
+                "content": {
+                    "parts": [{"text": "INVESTOR_1 holds STOCK_1 and should target $1.2M."}]
+                }
+            }]
+        }
+
+    monkeypatch.setattr(llm_tools, "_http_post_json", _fake_post)
+    monkeypatch.setattr(
+        llm_tools,
+        "_exec_shielded_tool",
+        lambda name, args, _tr: (args, {"ok": True, "summary": "ok"}),
+    )
+
+    res = llm_tools._run_chat_gemini_api(
+        "Follow-up for Jordan on ACME",
+        {"provider": "gemini", "model": "gemini-4-hydrogen", "api_key": "fake-key", "max_tool_rounds": 1},
+        "",
+        0,
+        translator=tr,
+        history=[
+            {"role": "assistant", "content": "Ignored leading assistant msg"},
+            {"role": "user", "content": "Initial question from Jordan"},
+            {"role": "assistant", "content": "Completed."},
+        ],
+    )
+    assert res["ok"] is True, res
+    assert len(seen_bodies) == 2
+    # Prior history aliased and strictly alternating before final user prompt
+    round0_roles = [c["role"] for c in seen_bodies[0]["contents"]]
+    assert round0_roles == ["user", "model", "user"]
+    round0_wire = json.dumps(seen_bodies[0])
+    assert "Jordan" not in round0_wire and "ACME" not in round0_wire
+    assert "INVESTOR_1" in round0_wire and "STOCK_1" in round0_wire
+    # Second request is the forced synthesis turn with function calling disabled
+    assert (seen_bodies[1].get("toolConfig") or {}).get("functionCallingConfig", {}).get("mode") == "NONE"
+    assert "Jordan Mercer holds ACME Corp" in res["reply"]
+    assert res["reply"] != "Completed."

@@ -7349,6 +7349,42 @@ def evaluate_active_model(
     }
 
 
+def _scale_payload_for_portfolio_value(
+    payload: dict[str, Any],
+    target_portfolio_usd: float,
+    base_port_val: float,
+) -> dict[str, Any]:
+    """Returns a shallow payload copy whose vested `retirement_sim_assets` are scaled proportionally to `target_portfolio_usd`."""
+    alpha = max(0.0, float(target_portfolio_usd) / max(1.0, float(base_port_val)))
+    scaled_assets: list[dict[str, Any]] = []
+    for a in (payload.get("retirement_sim_assets") or []):
+        a_c = dict(a)
+        if not a.get("is_unvested_goog"):
+            a_c["current_value"] = round(float(a.get("current_value") or 0.0) * alpha, 2)
+            if a.get("cost_basis") is not None:
+                a_c["cost_basis"] = round(float(a["cost_basis"]) * alpha, 2)
+            if a.get("shares") is not None:
+                a_c["shares"] = round(float(a["shares"]) * alpha, 6)
+            if isinstance(a.get("tranches"), list):
+                scaled_tranches: list[dict[str, Any]] = []
+                for tr in a["tranches"]:
+                    if not isinstance(tr, dict):
+                        continue
+                    tr_c = dict(tr)
+                    if tr_c.get("current_value") is not None:
+                        tr_c["current_value"] = round(float(tr_c["current_value"]) * alpha, 2)
+                    if tr_c.get("cost_basis") is not None:
+                        tr_c["cost_basis"] = round(float(tr_c["cost_basis"]) * alpha, 2)
+                    if tr_c.get("shares") is not None:
+                        tr_c["shares"] = round(float(tr_c["shares"]) * alpha, 6)
+                    scaled_tranches.append(tr_c)
+                a_c["tranches"] = scaled_tranches
+        scaled_assets.append(a_c)
+    out_payload = dict(payload)
+    out_payload["retirement_sim_assets"] = scaled_assets
+    return out_payload
+
+
 def solve_simulation(
     payload: dict[str, Any],
     solve_for: str = "primary_growth",
@@ -7358,8 +7394,8 @@ def solve_simulation(
 ) -> dict[str, Any]:
     """
     Bisection solver finding the exact model parameter (`primary_growth`, `broad_equity`, `all_holdings`,
-    any `<forecast_key>`, `simAnnualBurn`, `simInflationPct`, plus legacy `GOOG` / `futureGoogGrowthPct` /
-    `futureNonGoogGrowthPct` aliases) that achieves `target_value` on `target_metric`, honoring `simActiveModel`.
+    any `<forecast_key>`, `simAnnualBurn`, `simInflationPct`, `initial_portfolio_value`, plus legacy aliases)
+    that achieves `target_value` on `target_metric` (dollar balance or `solvency_pct`), honoring `simActiveModel`.
     """
     proj_cfg = payload.get("project") if isinstance(payload.get("project"), dict) else {}
     primary_sym = str(proj_cfg.get("primary_equity_symbol") or "").strip().upper()
@@ -7370,8 +7406,22 @@ def solve_simulation(
         str(a.get("forecast_key") or a["id"]) for a in (payload.get("retirement_sim_assets") or [])
     }
 
-    port_start_val = sum(float(a.get("current_value") or 0.0) for a in (payload.get("retirement_sim_assets") or []))
+    port_start_val = sum(
+        float(a.get("current_value") or 0.0)
+        for a in (payload.get("retirement_sim_assets") or [])
+        if not a.get("is_unvested_goog")
+    )
+    if port_start_val <= 0.0:
+        port_start_val = sum(float(a.get("current_value") or 0.0) for a in (payload.get("retirement_sim_assets") or []))
     burn_hi = max(5_000_000.0, round(port_start_val * 0.25, -3))
+    port_lo = max(10_000.0, round(port_start_val * 0.01, -3))
+    port_hi = max(100_000.0, round(port_start_val * 3.0, -3))
+    portfolio_value_aliases = {
+        "initial_portfolio_value",
+        "starting_portfolio_value",
+        "portfolio_value",
+        "portfolio_dollar_value",
+    }
     bounds_map: dict[str, tuple[float, float, bool, float]] = {
         "primary_growth": (-20.0, 20.0, True, 0.1),
         "primaryGrowthPct": (-20.0, 20.0, True, 0.1),
@@ -7385,6 +7435,7 @@ def solve_simulation(
         "futureNonGoogGrowthPct": (-20.0, 20.0, True, 0.1),
         "simAnnualBurn": (10_000.0, burn_hi, False, 1000.0),
         "simInflationPct": (0.0, 6.0, False, 0.1),
+        **{k: (port_lo, port_hi, True, 1000.0) for k in portfolio_value_aliases},
     }
     if primary_sym:
         bounds_map[primary_sym] = (-20.0, 20.0, True, 0.1)
@@ -7392,7 +7443,7 @@ def solve_simulation(
         bounds_map[solve_for] = (-20.0, 20.0, True, 0.1)
     if solve_for not in bounds_map:
         raise ValueError(
-            f"Unsupported solve_for={solve_for!r}. Choose from ['primary_growth', 'broad_equity', 'all_holdings', 'simAnnualBurn', 'simInflationPct'] or a holding forecast_key."
+            f"Unsupported solve_for={solve_for!r}. Choose from ['primary_growth', 'broad_equity', 'all_holdings', 'simAnnualBurn', 'simInflationPct', 'initial_portfolio_value'] or a holding forecast_key."
         )
 
     inv_meta = _get_investors_meta(payload)
@@ -7401,12 +7452,15 @@ def solve_simulation(
         target_metric = f"{p_inv['id']}_{p_inv['milestone_age']}_real"
 
     lo, hi, increasing, step = bounds_map[solve_for]
+    is_portfolio_solve = solve_for in portfolio_value_aliases
 
-    def _apply_candidate(val: float) -> dict[str, Any]:
+    def _apply_candidate(val: float) -> tuple[dict[str, Any], dict[str, Any]]:
+        if is_portfolio_solve:
+            return _scale_payload_for_portfolio_value(payload, val, port_start_val), copy.deepcopy(base_eff)
         cand = copy.deepcopy(base_eff)
         if solve_for in ("simAnnualBurn", "simInflationPct"):
             cand[solve_for] = val
-            return cand
+            return payload, cand
         hf = copy.deepcopy(cand.get("holdingForecasts") or {})
         # DA-A09: Seed sparse `holdingForecasts` from resolved asset defaults so solving for
         # `broad_equity` or `all_holdings` mutates every matching bucket even when `hf` started as `{}`.
@@ -7437,11 +7491,13 @@ def solve_simulation(
             prev_rc = str((hf.get(solve_for) or {}).get("risk_class") or "broad_equity")
             hf[solve_for] = {"growth_pct": val, "risk_class": prev_rc}
         cand["holdingForecasts"] = hf
-        return cand
+        return payload, cand
 
     active_lens_base = str(base_eff.get("simActiveModel") or "single_path").strip().lower()
     full_mc_paths = int(base_eff.get("mcSimulations") or 300)
     coarse_mc_paths = min(full_mc_paths, 150)
+    tm_norm = target_metric.strip().lower()
+    is_solvency_metric = tm_norm in ("solvency_pct", "funded_to_ms_pct", "funded_pct", "solvency", "success_to_ms_pct")
 
     def eval_metric(
         val: float,
@@ -7449,8 +7505,8 @@ def solve_simulation(
         fast: bool = False,
         mc_paths_override: int | None = None,
     ) -> tuple[float, dict[str, Any] | None]:
-        cand = _apply_candidate(val)
-        tm = target_metric.strip().lower()
+        cand_payload, cand = _apply_candidate(val)
+        tm = tm_norm
         is_nom = tm.endswith("_nominal")
         val_field = "nominal_usd" if is_nom else "real_today_usd"
         prefix = tm[: -len("_nominal")] if is_nom else (tm[: -len("_real")] if tm.endswith("_real") else tm)
@@ -7466,12 +7522,14 @@ def solve_simulation(
             n_p = mc_paths_override or full_mc_paths
             cand["mcSimulations"] = n_p
             mc_fast = run_monte_carlo(
-                payload,
+                cand_payload,
                 cand,
                 n_paths=n_p,
                 seed=1,
                 stop_at_milestone=(not is_yr40),
             )
+            if is_solvency_metric:
+                return float(mc_fast.get("success_to_ms_pct") or 0.0), None
             q_src = mc_fast.get(ms_q_key) or {}
             end_src = mc_fast.get(end_q_key) or {}
             if tm in ("age_85_p25", "p25"):
@@ -7482,10 +7540,12 @@ def solve_simulation(
                 return float(end_src.get("p50", 0.0)), None
             return float(q_src.get("p50", 0.0)), None
 
-        res = evaluate_active_model(payload, cand, seed=1)
+        res = evaluate_active_model(cand_payload, cand, seed=1)
         active_lens = res["active_lens"]
         if active_lens in ("range", "historical"):
             lens_obj = (res.get("monte_carlo") or {}) if active_lens == "range" else (res.get("historical_cohorts") or {})
+            if is_solvency_metric:
+                return float(lens_obj.get("success_to_ms_pct") or 0.0), res
             q_src = lens_obj.get(ms_q_key)
             end_src = lens_obj.get(end_q_key)
             if not end_src and lens_obj.get("band"):
@@ -7500,6 +7560,9 @@ def solve_simulation(
                 return float(end_src.get("p50", 0.0)), res
             if q_src and prefix not in ("yr_40", "year_40"):
                 return float(q_src.get("p50", 0.0)), res
+
+        if is_solvency_metric:
+            return float((res.get("kpi_summary") or {}).get("solvency", {}).get("funded_to_85_pct") or 0.0), res
 
         ms = res["milestones"]
         if prefix in ("yr_40", "year_40"):
@@ -7520,32 +7583,49 @@ def solve_simulation(
     f_min, f_max = (min(val_lo, val_hi), max(val_lo, val_hi))
     converged = True
     note = ""
-    if abs(val_hi - val_lo) < max(1.0, 0.0005 * max(abs(f_min), abs(f_max))):
+    move_tol = 0.05 if is_solvency_metric else max(1.0, 0.0005 * max(abs(f_min), abs(f_max)))
+    bound_tol = 0.05 if is_solvency_metric else 1.0
+    if abs(val_hi - val_lo) < move_tol:
         converged = False
-        note = (
-            f"The {target_metric} metric barely moves across the full {solve_for} range "
-            f"(${f_min:,.0f}–${f_max:,.0f}); no single value hits ${target_value:,.0f}."
-        )
-    elif target_value < f_min - 1.0 or target_value > f_max + 1.0:
+        if is_solvency_metric:
+            note = (
+                f"The {target_metric} metric stays at {f_min:.1f}%–{f_max:.1f}% across the full {solve_for} range; "
+                f"no single value hits {target_value:.1f}%."
+            )
+        else:
+            note = (
+                f"The {target_metric} metric barely moves across the full {solve_for} range "
+                f"(${f_min:,.0f}–${f_max:,.0f}); no single value hits ${target_value:,.0f}."
+            )
+    elif target_value < f_min - bound_tol or target_value > f_max + bound_tol:
         converged = False
         closest = lo if abs(val_lo - target_value) <= abs(val_hi - target_value) else hi
-        note = (
-            f"Target ${target_value:,.0f} is outside the achievable range for {solve_for} "
-            f"[{lo:g}, {hi:g}] -> metric spans ${f_min:,.0f}–${f_max:,.0f}. "
-            f"Closest at {solve_for}={closest:g}."
-        )
+        if is_solvency_metric:
+            note = (
+                f"Target {target_value:.1f}% is outside the achievable range for {solve_for} "
+                f"[{lo:g}, {hi:g}] -> solvency spans {f_min:.1f}%–{f_max:.1f}%. "
+                f"Closest at {solve_for}={closest:g}."
+            )
+        else:
+            note = (
+                f"Target ${target_value:,.0f} is outside the achievable range for {solve_for} "
+                f"[{lo:g}, {hi:g}] -> metric spans ${f_min:,.0f}–${f_max:,.0f}. "
+                f"Closest at {solve_for}={closest:g}."
+            )
 
     iters = 0
-    val_tol = max(250.0, 0.0015 * abs(target_value))
+    val_tol = 0.25 if is_solvency_metric else max(250.0, 0.0015 * abs(target_value))
+    step_stop = max(step * 5.0, 0.005 * port_start_val) if is_portfolio_solve else (step / 10.0)
+    max_solve_iters = 16 if (is_portfolio_solve or is_solvency_metric) else 20
     solved_exact: float
     if converged:
         f_lo = val_lo - target_value
         f_hi = val_hi - target_value
         side = 0
         solved_exact = 0.5 * (lo + hi)
-        while (hi - lo) > step / 10.0 and iters < 20:
+        while (hi - lo) > step_stop and iters < max_solve_iters:
             iters += 1
-            if iters % 4 != 0 and abs(f_hi - f_lo) > 1e-9:
+            if (not is_solvency_metric) and iters % 4 != 0 and abs(f_hi - f_lo) > 1e-9:
                 sec = lo - f_lo * (hi - lo) / (f_hi - f_lo)
                 pad = 0.06 * (hi - lo)
                 mid = max(lo + pad, min(hi - pad, sec))
@@ -7572,7 +7652,7 @@ def solve_simulation(
             solved_exact = 0.5 * (lo + hi)
 
         # Local 2-point secant polish on full_mc_paths when range lens used coarse_mc_paths
-        if active_lens_base == "range" and full_mc_paths > coarse_mc_paths:
+        if active_lens_base == "range" and full_mc_paths > coarse_mc_paths and (not is_solvency_metric):
             span = max(step * 2.0, 0.025 * (orig_hi - orig_lo))
             x1 = max(orig_lo, solved_exact - span)
             x2 = min(orig_hi, solved_exact + span)
@@ -7600,27 +7680,24 @@ def solve_simulation(
 
     achieved_val, final_sim = eval_metric(solved_exact, fast=False)
     assert final_sim is not None
-    is_burn = solve_for == "simAnnualBurn"
-    slider_step_val = round(solved_exact / 1000.0) * 1000 if is_burn else round(solved_exact, 1)
+    is_dollar_solve = solve_for == "simAnnualBurn" or is_portfolio_solve
+    slider_step_val = round(solved_exact / 1000.0) * 1000 if is_dollar_solve else round(solved_exact, 1)
     if abs(slider_step_val - solved_exact) < 1e-6:
         slider_achieved = achieved_val
-    elif active_lens_base == "range" and abs(slider_step_val - solved_exact) <= step * 0.55:
+    elif (active_lens_base == "range" or is_portfolio_solve) and abs(slider_step_val - solved_exact) <= step * 0.55:
         # Linear local estimate avoids an extra 1000-path full MC pass just for rounded slider display
         slider_achieved = achieved_val
     else:
         slider_achieved, _ = eval_metric(slider_step_val, fast=True)
     residual = achieved_val - target_value
 
-    return {
+    out_dict: dict[str, Any] = {
         "solve_for": solve_for,
         "active_lens": final_sim.get("active_lens", "single_path"),
         "target_metric": target_metric,
         "target_value": target_value,
         "converged": converged,
         "note": note,
-        "residual_usd": round(residual, 2),
-        "residual_pct": round((residual / target_value * 100.0) if target_value else 0.0, 3),
-        "achievable_range_usd": [round(f_min, 2), round(f_max, 2)],
         "iterations": iters,
         "solved_value_exact": round(solved_exact, 4),
         "solved_value_2dec": round(solved_exact, 2),
@@ -7629,6 +7706,19 @@ def solve_simulation(
         "achieved_at_slider_step": round(slider_achieved, 2),
         "simulation_at_solved": final_sim,
     }
+    if is_solvency_metric:
+        out_dict["residual_pct_points"] = round(residual, 2)
+        out_dict["achievable_range_pct"] = [round(f_min, 2), round(f_max, 2)]
+        out_dict["residual_pct"] = round(residual, 2)
+        out_dict["achievable_range_usd"] = [round(orig_lo, 2), round(orig_hi, 2)]
+    else:
+        out_dict["residual_usd"] = round(residual, 2)
+        out_dict["residual_pct"] = round((residual / target_value * 100.0) if target_value else 0.0, 3)
+        out_dict["achievable_range_usd"] = [round(f_min, 2), round(f_max, 2)]
+    if is_portfolio_solve:
+        out_dict["baseline_portfolio_value_usd"] = round(port_start_val, 2)
+        out_dict["portfolio_scale_factor"] = round(solved_exact / max(1.0, port_start_val), 4)
+    return out_dict
 
 
 def query_positions(

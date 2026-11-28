@@ -210,3 +210,27 @@ def test_every_scenario__runs_without_error(slug, tmp_path_factory):
             result = run_simulation(payload, settings=settings)
             assert result.get("bars"), f"{slug}: scenario {save.get('name')!r} produced no path"
         pipeline_support.clear_payload_cache()
+
+
+@pytest.mark.feature("solver")
+@pytest.mark.portfolio("p1_index_saver")
+def test_solver__initial_portfolio_value_for_solvency_pct(root, payload):
+    """Solving for initial_portfolio_value targeting solvency_pct scales vested balances monotonically."""
+    from valuation.simulator import build_effective_settings, solve_simulation
+
+    settings = build_effective_settings(payload)
+    settings["simActiveModel"] = "range"
+    settings["mcSimulations"] = 30
+    res = solve_simulation(
+        payload,
+        solve_for="initial_portfolio_value",
+        target_metric="solvency_pct",
+        target_value=50.0,
+        settings=settings,
+    )
+    assert res["solve_for"] == "initial_portfolio_value"
+    assert res["target_metric"] == "solvency_pct"
+    assert "baseline_portfolio_value_usd" in res
+    assert "portfolio_scale_factor" in res
+    assert res["achievable_range_pct"][0] <= res["achievable_range_pct"][1]
+    assert res["solved_value_exact"] > 0

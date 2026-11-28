@@ -2,7 +2,7 @@
 
 <!-- GENERATED FILE. Run `make fixtures` (or `python3 -m tests.catalog`) to refresh. -->
 
-**326 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 102 are ported from the pre-fixture suite.
+**329 tests** across 9 tiers. 82 are tagged as security regressions, 0 are expected failures recording an open finding, and 102 are ported from the pre-fixture suite.
 
 Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA3-05`, `DA3-06`, `DA4-03`, `DA4-07`, `DA4-08b`, `DA4-09`, `DA4-10`, `DA4-11`, `DA4-13`, `DP-01`, `DP-02`, `DP-03`, `DP-04`, `I4`, `LL-01`, `LL-03`, `LL-06`, `LL-08`, `LL-09`, `LL-13`, `LL-14`, `LL-22`, `LL-23`, `S1`, `SA-02`, `SA-03`, `SA-04`, `SA-05`, `SA-06`, `SA-09`, `SA-11`, `SA-13`, `SA-15`, `SA-18`, `SA-20`, `SA2-01`, `SA2-02`, `SA2-03`, `SA2-04`, `SA2-06`, `SA2-07`, `SA2-08`, `SA2-10`, `SA2-11`, `SA2-12`, `SA2-13`, `SA2-14`, `SA2-15`, `SA2-16`, `SA2-17`, `SA2-21`, `SA2-22`, `SA3-01`, `SA3-02`, `SA3-05`, `SA3-06`, `SA3-08`, `SA4-01`, `SA4-03`, `SA4-04`, `SA4-05`, `SA5-01`, `SA5-02`, `SA5-03`, `SA5-04`, `SA5-05`, `SA5-06`, `SA5-07`, `SA5-08`, `SA5-09`, `SA5-10`.
 
@@ -11,11 +11,11 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `unit` | 18 |
 | `parsers` | 28 |
 | `pipeline` | 54 |
-| `engine` | 42 |
+| `engine` | 43 |
 | `parity` | 10 |
 | `render` | 18 |
 | `server` | 99 |
-| `llm` | 35 |
+| `llm` | 37 |
 | `scans` | 22 |
 
 ## `unit`
@@ -258,6 +258,7 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `test_annuity_buckets__are_taxed_under_the_contract_rule_not_the_carrier_name` | `p2_equity_comp_rsu`, `p3_retiree_annuities` | _wrappers_ | All three annuity classes get the ordinary-income-on-gain treatment from their class. |
 | `test_historical_cohorts__are_available_and_span_the_published_range` | `p2_equity_comp_rsu`, `p1_index_saver` | _cohorts_ | The cohort table loads and covers the documented start year onward. |
 | `test_every_scenario__runs_without_error` | `p2_equity_comp_rsu` | _simulator_ | Each fixture's saved scenarios all execute. |
+| `test_solver__initial_portfolio_value_for_solvency_pct` | `p2_equity_comp_rsu`, `p1_index_saver` | _solver_ | Solving for initial_portfolio_value targeting solvency_pct scales vested balances monotonically. |
 
 ### `engine/test_release_accuracy.py`
 
@@ -522,6 +523,8 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `test_demo_mode_gemini_chat_no_pre_egress_block_unicode_and_dob_ym` | `p4_trust_household`, `p4_trust_household` | `SA-03` _privacy_shield_ | Demo Mode (upgrading Mode B -> Mode C) + Unicode stems & YYYY-MM DOBs pass Gemini pre-egress gate. |
 | `test_unicode_person_stems_gemini_demo_mode_wire_clean` | `p4_trust_household`, `p5_adversarial` | `SA-03` _privacy_shield_ | Adversarial Unicode person stems (e.g., Håkon) in camelCase keys do not trip Gemini pre-egress. |
 | `test_system_prompt_boilerplate_and_demo_pool_collision_scrubbed` | `p4_trust_household`, `p4_trust_household` | `SA-03` _privacy_shield_ | System prompt boilerplate is scrubbed and assign_demo_personas avoids codes/company/name collisions. |
+| `test_gemini_round2_thought_signature_and_model_turn_scrubbed` | `p4_trust_household`, `p4_trust_household` | `SA-03` _privacy_shield_ | Base64 thoughtSignature substrings do not false-trigger pre-egress gate; non-base64 leaks block; Round 1 model prose is scrubbed. |
+| `test_max_tool_rounds_triggers_synthesis_and_forwards_history` | `p4_trust_household` | _privacy_shield_ | Exhausting max_tool_rounds runs a no-tool synthesis turn, and prior chat history is aliased & forwarded. |
 
 ## `scans`
 

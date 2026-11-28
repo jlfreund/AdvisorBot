@@ -3710,10 +3710,13 @@
       const modeCMetaHtml = (!demoActiveNow && role === "assistant" && shieldMode === "identity_and_values")
         ? `<div class="ai-reply-shield-meta mono" title="Mode C Privacy Shield active: dollar figures in chat prose are obfuscated while statutory tax constants remain exact.">&#128737; Mode C &bull; Dollar figures obfuscated by Privacy Shield (statutory tax constants exact)</div>`
         : "";
+      const diagMetaHtml = (role === "assistant" && meta && meta.diagnostics)
+        ? `<div class="ai-reply-shield-meta mono" style="color:#94a3b8;margin-top:4px;" title="Non-PII request diagnostics">${escHtml(String(meta.diagnostics))}</div>`
+        : "";
 
       const bodyHtml = role === "user"
         ? `<div class="ai-msg-bubble"><p>${escHtml(content)}</p></div>`
-        : `${pillsHtml}<div class="ai-msg-bubble">${formatAiMarkdown(content)}</div>${modeCMetaHtml}`;
+        : `${pillsHtml}<div class="ai-msg-bubble">${formatAiMarkdown(content)}</div>${modeCMetaHtml}${diagMetaHtml}`;
       wrap.innerHTML = bodyHtml;
       box.appendChild(wrap);
       box.scrollTop = box.scrollHeight;
@@ -3802,6 +3805,22 @@
         statusEl.textContent = "Analyzing portfolio scenario...";
       }
 
+      const selEl = document.getElementById("ai-model-select");
+      if ((!aiModel || aiModel === "default") && selEl && selEl.value && selEl.value !== "default") {
+        aiModel = selEl.value;
+      }
+      if (!aiModel || aiModel === "default") {
+        try {
+          const cachedM = localStorage.getItem(AI_MODEL_STORAGE);
+          if (cachedM && cachedM !== "default") aiModel = cachedM;
+        } catch (_e) {}
+      }
+      const clientDiag = {
+        sent_model: aiModel || "default",
+        select_val: selEl ? (selEl.value || "") : "",
+        loaded_models: Array.isArray(availableAiModels) ? availableAiModels.length : 0,
+      };
+
       createPendingAiBubble(aiModel);
       pollLiveUiEvents();
       const fastPollTimer = setInterval(pollLiveUiEvents, 300);
@@ -3833,7 +3852,36 @@
           if (status === 403 || errMsg.includes("missing session token")) {
             errMsg = "AdvisorBot Service is currently re-authenticating. Please try your prompt again.";
           }
-          appendAiMessage("assistant", `**Notice:** ${errMsg}`);
+          const srvDiag = (data && data.diagnostics && typeof data.diagnostics === "object") ? data.diagnostics : {};
+          const diagParts = [];
+          if (srvDiag.gate) diagParts.push(`gate=${srvDiag.gate}`);
+          if (srvDiag.round != null) diagParts.push(`round=${srvDiag.round}`);
+          diagParts.push(`sent_model=${JSON.stringify(srvDiag.requested_model ?? clientDiag.sent_model)}`);
+          if (srvDiag.resolved_provider || srvDiag.resolved_model) {
+            diagParts.push(`resolved=${[srvDiag.resolved_provider, srvDiag.resolved_model].filter(Boolean).join(":")}`);
+          }
+          if (srvDiag.shield_mode || (data && data.privacy_shield)) {
+            diagParts.push(`shield=${srvDiag.shield_mode || data.privacy_shield}`);
+          }
+          if (Array.isArray(srvDiag.leak_fields) && srvDiag.leak_fields.length > 0) {
+            diagParts.push(`fields=${srvDiag.leak_fields.join(",")}`);
+          }
+          if (Array.isArray(srvDiag.leak_categories) && srvDiag.leak_categories.length > 0) {
+            diagParts.push(`categories=${srvDiag.leak_categories.join(",")}`);
+          }
+          diagParts.push(`select=${JSON.stringify(clientDiag.select_val)}`);
+          diagParts.push(`models=${clientDiag.loaded_models}`);
+          appendAiMessage(
+            "assistant",
+            `**Notice:** ${errMsg}`,
+            [],
+            [],
+            {
+              privacy_shield: (data && data.privacy_shield) || _activeAiShieldMode(),
+              demo_mode: Boolean((data && data.demo_mode) || isDemoModeActive()),
+              diagnostics: `Diagnostics: ${diagParts.join(" • ")}`,
+            }
+          );
           if (statusEl) statusEl.textContent = "Service temporarily unavailable";
         } else {
           if (data.privacy_shield) {
@@ -4130,7 +4178,7 @@
 
     function initAiChatAssistant() {
       try {
-        loadAiModels(true);
+        loadAiModels(false).then(() => loadAiModels(true));
         const savedOpen = localStorage.getItem(AI_PANE_OPEN_STORAGE);
         if (savedOpen === "1") {
           toggleAiChatPane(true);

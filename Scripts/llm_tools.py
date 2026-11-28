@@ -393,19 +393,134 @@ def _sanitize_error_for_llm(msg: Any) -> str:
     return s
 
 
+_OPAQUE_SIGNATURE_KEYS = frozenset({"thoughtSignature", "thought_signature", "signature"})
+_OPAQUE_SIGNATURE_RE = re.compile(r"^[A-Za-z0-9+/=_-]{16,}$")
+
+
+def _strip_opaque_signatures_for_scan(node: Any) -> Any:
+    """Removes strictly base64 cryptographic thinking-signature tokens from a scratch copy before leak scanning."""
+    if isinstance(node, dict):
+        return {
+            k: (
+                "[OPAQUE_SIG]"
+                if (k in _OPAQUE_SIGNATURE_KEYS and isinstance(v, str) and _OPAQUE_SIGNATURE_RE.fullmatch(v))
+                else _strip_opaque_signatures_for_scan(v)
+            )
+            for k, v in node.items()
+        }
+    if isinstance(node, list):
+        return [_strip_opaque_signatures_for_scan(x) for x in node]
+    return node
+
+
+def _find_leak_field_paths(translator: PrivacyTranslator, node: Any, prefix: str = "", limit: int = 5) -> list[str]:
+    """Returns structural JSON field paths containing leaks without exposing any raw leaked terms."""
+    paths: list[str] = []
+
+    def _walk(cur: Any, path: str) -> None:
+        if len(paths) >= limit:
+            return
+        if isinstance(cur, dict):
+            for k, v in cur.items():
+                child_path = f"{path}.{k}" if path else str(k)
+                if k in _OPAQUE_SIGNATURE_KEYS and isinstance(v, str) and _OPAQUE_SIGNATURE_RE.fullmatch(v):
+                    continue
+                if isinstance(v, (dict, list)):
+                    if translator.find_leaked_terms(v):
+                        _walk(v, child_path)
+                elif isinstance(v, str) and translator.find_leaked_terms(v):
+                    paths.append(child_path)
+        elif isinstance(cur, list):
+            for idx, item in enumerate(cur):
+                child_path = f"{path}[{idx}]"
+                if isinstance(item, (dict, list)):
+                    if translator.find_leaked_terms(item):
+                        _walk(item, child_path)
+                elif isinstance(item, str) and translator.find_leaked_terms(item):
+                    paths.append(child_path)
+        elif isinstance(cur, str) and translator.find_leaked_terms(cur):
+            paths.append(path or "<root>")
+
+    _walk(node, prefix)
+    return paths
+
+
+def _scrub_model_turn_for_history(node: Any, translator: PrivacyTranslator | None, *, key_hint: str = "") -> Any:
+    """Aliases assistant/model turn prose and tool-call args before echoing into Round 2+ history."""
+    if translator is None:
+        return node
+    if isinstance(node, dict):
+        out: dict[str, Any] = {}
+        for k, v in node.items():
+            if k in _OPAQUE_SIGNATURE_KEYS and isinstance(v, str):
+                out[k] = v
+            elif k == "arguments" and isinstance(v, str):
+                try:
+                    parsed = json.loads(v)
+                    out[k] = json.dumps(translator.to_alias(parsed), ensure_ascii=False)
+                except Exception:
+                    out[k] = translator.to_alias_text(v, scale_prose=False)
+            elif k in ("args", "input") and isinstance(v, dict):
+                out[k] = translator.to_alias(v, key_hint=k)
+            else:
+                out[k] = _scrub_model_turn_for_history(v, translator, key_hint=k)
+        return out
+    if isinstance(node, list):
+        return [_scrub_model_turn_for_history(x, translator, key_hint=key_hint) for x in node]
+    if isinstance(node, str):
+        return translator.to_alias_text(node, scale_prose=False)
+    return node
+
+
+def _summarize_leak_categories(translator: PrivacyTranslator, leaks: list[str]) -> list[str]:
+    """Summarizes leaked terms solely by entity category and character length (never exposing raw terms)."""
+    ents = (translator.cfg.get("entities") or []) if isinstance(translator.cfg, dict) else []
+    out: list[str] = []
+    seen: set[str] = set()
+    for lk in leaks[:8]:
+        lk_low = str(lk).lower()
+        cat = "dob_or_stem"
+        for ent in ents:
+            if not isinstance(ent, dict) or not ent.get("enabled", True):
+                continue
+            syns = ent.get("synonyms") or []
+            canon = str(ent.get("canonical") or "").strip()
+            if any(str(s).strip().lower() == lk_low for s in syns) or (canon and canon.lower() == lk_low):
+                cat = str(ent.get("category") or "entity").lower()
+                break
+        tag = f"{cat}(len={len(str(lk))})"
+        if tag not in seen:
+            seen.add(tag)
+            out.append(tag)
+    return out
+
+
+def _with_round_diag(err_res: dict[str, Any], round_idx: int, provider: str, model_name: str) -> dict[str, Any]:
+    """Attaches round, provider, and model metadata to an outbound error response."""
+    diag = dict(err_res.get("diagnostics") or {})
+    diag.update({"round": round_idx + 1, "resolved_provider": provider, "resolved_model": model_name})
+    err_res["diagnostics"] = diag
+    return err_res
+
+
 def _assert_wire_leak_free(translator: PrivacyTranslator | None, wire_body: Any, context_label: str) -> dict[str, Any] | None:
     """Hard pre-egress leak gate (`SA-03`): checks serialized wire payload with `find_leaked_terms`."""
     # SECURITY DO: Call this right before every external HTTP/CLI inference call whenever Shield is active.
     # SECURITY DON'T: Never log raw leaked terms or bypass this check when Shield mode is `identity_aliased` or `identity_and_values`.
     if translator is None:
         return None
-    blob = wire_body if isinstance(wire_body, str) else json.dumps(wire_body, ensure_ascii=False)
+    scan_target = wire_body if isinstance(wire_body, str) else _strip_opaque_signatures_for_scan(wire_body)
+    blob = scan_target if isinstance(scan_target, str) else json.dumps(scan_target, ensure_ascii=False)
     leaks = translator.find_leaked_terms(blob)
     if leaks:
+        leak_paths = _find_leak_field_paths(translator, scan_target) if not isinstance(scan_target, str) else ["<text>"]
+        leak_cats = _summarize_leak_categories(translator, leaks)
         logging.getLogger("llm_tools").error(
-            "Privacy Shield blocked %s egress: %d leaked entity term(s) detected in serialized wire request.",
+            "Privacy Shield blocked %s egress: %d leaked entity term(s) detected in serialized wire request (fields=%s, categories=%s).",
             context_label,
             len(leaks),
+            ", ".join(leak_paths) or "<unknown>",
+            ", ".join(leak_cats) or "<unknown>",
         )
         return {
             "ok": False,
@@ -415,6 +530,14 @@ def _assert_wire_leak_free(translator: PrivacyTranslator | None, wire_body: Any,
                 f"Blocked by Privacy Shield pre-egress gate ({context_label}): "
                 f"{len(leaks)} protected term(s) detected in outbound payload."
             ),
+            "diagnostics": {
+                "gate": "pre_egress_leak_gate",
+                "context": context_label,
+                "shield_mode": translator.mode,
+                "leak_count": len(leaks),
+                "leak_fields": leak_paths,
+                "leak_categories": leak_cats,
+            },
         }
     return None
 
@@ -1286,22 +1409,22 @@ GEMINI_TOOL_DECLARATIONS = [
         "name": "holdings__solve_simulation",
         "description": (
             "Goal-seeks the exact parameter (`primary_equity`, `broad_equity`, `all_holdings`, any `<forecast_key>`, `simAnnualBurn`, "
-            "`simInflationPct`) needed to achieve `target_value` on `target_metric`, honoring `simActiveModel`."
+            "`simInflationPct`, or `initial_portfolio_value`) needed to achieve `target_value` on `target_metric`, honoring `simActiveModel`."
         ),
         "parameters": {
             "type": "OBJECT",
             "properties": {
                 "solve_for": {
                     "type": "STRING",
-                    "description": "'primary_equity', 'broad_equity', 'all_holdings', any holding forecast_key, 'simAnnualBurn', or 'simInflationPct'.",
+                    "description": "'primary_equity', 'broad_equity', 'all_holdings', any holding forecast_key, 'simAnnualBurn', 'simInflationPct', or 'initial_portfolio_value' (scales Day-0 vested portfolio value).",
                 },
                 "target_metric": {
                     "type": "STRING",
-                    "description": "Optional milestone metric (e.g. 'investor_1_milestone_real', '<investor_id>_<milestone_age>_real', 'yr_40_real'; omit to target the primary investor's configured milestone).",
+                    "description": "Milestone metric (e.g. 'investor_1_milestone_real', '<investor_id>_<milestone_age>_real', 'yr_40_real') or 'solvency_pct' (target % funded to primary milestone under range/historical, e.g. target_value=90).",
                 },
                 "target_value": {
                     "type": "NUMBER",
-                    "description": "Target dollar balance at the milestone (e.g. 2000000).",
+                    "description": "Target dollar balance at the milestone (e.g. 2000000), or target solvency % (0-100, e.g. 90) when target_metric='solvency_pct'.",
                 },
                 "base_save": {"type": "STRING", "description": "Optional base Scenario ID or name."},
                 "use_ref_rates": {"type": "BOOLEAN", "description": "If True, uses Reference rates for non-solved parameters."},
@@ -2011,6 +2134,7 @@ def _resolve_inapp_privacy_shield(
             "engine": "privacy_shield",
             "privacy_shield": "error_blocked",
             "error": f"Blocked by Privacy Shield: failed to load privacy configuration ({type(exc).__name__}).",
+            "diagnostics": {"gate": "config_load", "is_cli_target": is_cli_target, "shield_mode": "error_blocked"},
         }, None, "error_blocked"
     shield = privacy_cfg.get("ai_shield") or {}
     mode = str(shield.get("mode") or "identity_aliased")
@@ -2028,6 +2152,7 @@ def _resolve_inapp_privacy_shield(
                     "Blocked by Demo Mode Privacy Shield: the in-app CLI backend can read raw workspace files "
                     "directly from disk. Select a Direct API model or exit Demo Mode."
                 ),
+                "diagnostics": {"gate": "cli_shield", "is_cli_target": True, "shield_mode": "identity_and_values", "demo_mode": True},
             }, None, "identity_and_values"
         if mode in ("identity_aliased", "identity_and_values") and block_cli:
             return {
@@ -2039,6 +2164,7 @@ def _resolve_inapp_privacy_shield(
                     "can read raw workspace files directly from disk. Select a Direct API model (Gemini/Claude/OpenAI) "
                     "or adjust Portfolio Settings -> Privacy."
                 ),
+                "diagnostics": {"gate": "cli_shield", "is_cli_target": True, "shield_mode": mode, "demo_mode": False},
             }, None, mode
         if mode == "local_only":
             return {
@@ -2046,6 +2172,7 @@ def _resolve_inapp_privacy_shield(
                 "engine": "agy",
                 "privacy_shield": mode,
                 "error": "Blocked by Local-Only Privacy Mode: select a localhost LLM in Data/Config/LLM/ or change Portfolio Settings -> Privacy.",
+                "diagnostics": {"gate": "local_only", "is_cli_target": True, "shield_mode": mode, "demo_mode": False},
             }, None, mode
         return None, None, mode
 
@@ -2063,6 +2190,7 @@ def _resolve_inapp_privacy_shield(
                 f"Blocked by Local-Only Privacy Mode: '{base_url}' is an external cloud endpoint. "
                 "Choose a localhost OpenAI-compatible model or switch Settings -> Privacy to Obfuscated Names."
             ),
+            "diagnostics": {"gate": "local_only", "is_cli_target": False, "resolved_provider": provider or "api", "shield_mode": mode, "demo_mode": demo_on},
         }, None, mode
 
     if demo_on or mode in ("identity_aliased", "identity_and_values"):
@@ -2376,6 +2504,59 @@ def _lowercase_json_schema(schema: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def _build_wire_conversation(
+    history: list[dict[str, Any]] | None,
+    wire_msg: str,
+    translator: PrivacyTranslator | None,
+    *,
+    is_demo_active: bool = False,
+    assistant_role: str = "assistant",
+    gemini_parts: bool = False,
+    max_turns: int = 16,
+) -> list[dict[str, Any]]:
+    """
+    Normalizes, aliases, and strictly alternates prior chat turns plus the current `wire_msg`
+    for Gemini (`model` + `parts`), Claude, and OpenAI (`assistant` + `content`).
+    """
+    cleaned: list[dict[str, str]] = []
+    if isinstance(history, list):
+        for item in history[-max_turns:]:
+            if not isinstance(item, dict):
+                continue
+            raw_role = str(item.get("role") or "").strip().lower()
+            if raw_role in ("user", "human"):
+                role = "user"
+            elif raw_role in ("assistant", "model"):
+                role = "assistant"
+            else:
+                continue
+            raw_text = str(item.get("content") or "").strip()
+            if not raw_text:
+                continue
+            wire_text = translator.to_alias_text(raw_text, scale_prose=not is_demo_active) if translator is not None else raw_text
+            if not wire_text.strip():
+                continue
+            if cleaned and cleaned[-1]["role"] == role:
+                cleaned[-1]["content"] = f"{cleaned[-1]['content']}\n\n{wire_text}"
+            else:
+                cleaned.append({"role": role, "content": wire_text})
+    while cleaned and cleaned[0]["role"] != "user":
+        cleaned.pop(0)
+    if cleaned and cleaned[-1]["role"] == "user":
+        cleaned[-1]["content"] = f"{cleaned[-1]['content']}\n\n{wire_msg}"
+    else:
+        cleaned.append({"role": "user", "content": wire_msg})
+    if gemini_parts:
+        return [
+            {"role": (assistant_role if t["role"] == "assistant" else "user"), "parts": [{"text": t["content"]}]}
+            for t in cleaned
+        ]
+    return [
+        {"role": (assistant_role if t["role"] == "assistant" else "user"), "content": t["content"]}
+        for t in cleaned
+    ]
+
+
 def _build_api_system_prompt(ui_summary: str, *, shield_active: bool = False, translator: PrivacyTranslator | None = None) -> str:
     if translator is not None and getattr(translator, "scale_values", False):
         shield_note = (
@@ -2509,6 +2690,7 @@ def _run_chat_gemini_api(
     *,
     on_step: Callable[[dict[str, Any]], None] | None = None,
     translator: PrivacyTranslator | None = None,
+    history: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     api_key = str(llm_cfg.get("api_key") or os.environ.get("GEMINI_API_KEY") or "").strip()
     model_name = str(llm_cfg.get("model") or "gemini-3-flash-preview").strip()
@@ -2524,13 +2706,17 @@ def _run_chat_gemini_api(
     wire_msg = translator.to_alias_text(message, scale_prose=not is_demo_active) if translator is not None else message
     wire_ui_summary = translator.to_alias_text(ui_summary, scale_prose=not is_demo_active) if translator is not None else ui_summary
     sys_prompt = _build_api_system_prompt(wire_ui_summary, shield_active=translator is not None, translator=translator)
-    contents: list[dict[str, Any]] = [{"role": "user", "parts": [{"text": wire_msg}]}]
+    contents = _build_wire_conversation(
+        history, wire_msg, translator, is_demo_active=is_demo_active, assistant_role="model", gemini_parts=True
+    )
     tool_calls_log: list[dict[str, Any]] = []
     final_text = ""
 
     model_disp = str(llm_cfg.get("display_name") or model_name)
     active_model = model_name
     fallback_note = ""
+    gemini_tools = [{"functionDeclarations": _shielded_tool_declarations(translator)}]
+    exhausted_rounds = True
     for round_idx in range(max_rounds):
         url = f"{base_url}/models/{active_model}:generateContent"
         if on_step:
@@ -2543,12 +2729,12 @@ def _run_chat_gemini_api(
         body = {
             "systemInstruction": {"parts": [{"text": sys_prompt}]},
             "contents": contents,
-            "tools": [{"functionDeclarations": _shielded_tool_declarations(translator)}],
+            "tools": gemini_tools,
             "generationConfig": {"temperature": temperature},
         }
         leak_err = _assert_wire_leak_free(translator, body, "Gemini chat")
         if leak_err:
-            return leak_err
+            return _with_round_diag(leak_err, round_idx, "gemini", active_model)
         resp = None
         candidates_to_try = (
             [active_model, *[m for m in _GEMINI_FALLBACK_MODELS if m != active_model]]
@@ -2604,13 +2790,14 @@ def _run_chat_gemini_api(
             return {"ok": False, "engine": "gemini", "error": f"No candidates returned by Gemini: {resp}"}
         content = candidates[0].get("content") or {}
         parts = content.get("parts") or []
-        contents.append({"role": "model", "parts": parts})
+        contents.append({"role": "model", "parts": _scrub_model_turn_for_history(parts, translator)})
 
         fn_calls = [p["functionCall"] for p in parts if "functionCall" in p]
         text_parts = [p.get("text", "") for p in parts if "text" in p]
         if text_parts:
             final_text = "\n".join(t for t in text_parts if t).strip()
         if not fn_calls:
+            exhausted_rounds = False
             break
 
         fn_responses = []
@@ -2641,6 +2828,38 @@ def _run_chat_gemini_api(
             fn_responses.append({"functionResponse": {"name": t_name, "response": wire_res}})
         contents.append({"role": "user", "parts": fn_responses})
 
+    if exhausted_rounds and tool_calls_log and not final_text:
+        if on_step:
+            on_step({
+                "tool": "synthesis",
+                "summary": f"Synthesizing results from {len(tool_calls_log)} tool calls...",
+                "progress_pct": 96,
+                "status_label": "Finalizing Response",
+            })
+        synth_body = {
+            "systemInstruction": {"parts": [{"text": sys_prompt}]},
+            "contents": contents,
+            "tools": gemini_tools,
+            "toolConfig": {"functionCallingConfig": {"mode": "NONE"}},
+            "generationConfig": {"temperature": temperature},
+        }
+        leak_err = _assert_wire_leak_free(translator, synth_body, "Gemini chat synthesis")
+        if leak_err:
+            return _with_round_diag(leak_err, max_rounds, "gemini", active_model)
+        try:
+            synth_url = f"{base_url}/models/{active_model}:generateContent"
+            if llm_cfg.get("timeout_sec"):
+                synth_resp = _http_post_json(synth_url, headers, synth_body, timeout=int(llm_cfg["timeout_sec"]))
+            else:
+                synth_resp = _http_post_json(synth_url, headers, synth_body)
+            s_cands = synth_resp.get("candidates") or []
+            s_parts = ((s_cands[0].get("content") or {}).get("parts") or []) if s_cands else []
+            s_text = [p.get("text", "") for p in s_parts if "text" in p]
+            if s_text:
+                final_text = "\n".join(t for t in s_text if t).strip()
+        except Exception as exc:
+            logging.getLogger("llm_tools").warning("Gemini post-round synthesis turn failed: %s", exc)
+
     if on_step:
         on_step({
             "tool": "synthesis",
@@ -2652,6 +2871,8 @@ def _run_chat_gemini_api(
     restored_reply = translator.from_alias_text(final_text) if translator is not None else final_text
     if fallback_note and restored_reply:
         restored_reply = f"{restored_reply}{fallback_note}"
+    if not restored_reply and tool_calls_log:
+        restored_reply = f"Completed {len(tool_calls_log)} tool calls (tool round limit {max_rounds} reached before a written summary was produced)."
     ui_delta = poll_ui_actions(since_seq=start_seq)
     return {
         "ok": True,
@@ -2672,6 +2893,7 @@ def _run_chat_claude_api(
     *,
     on_step: Callable[[dict[str, Any]], None] | None = None,
     translator: PrivacyTranslator | None = None,
+    history: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     api_key = str(llm_cfg.get("api_key") or os.environ.get("ANTHROPIC_API_KEY") or "").strip()
     model_name = str(llm_cfg.get("model") or "claude-sonnet-4-20250514").strip()
@@ -2693,11 +2915,12 @@ def _run_chat_claude_api(
     wire_msg = translator.to_alias_text(message, scale_prose=not is_demo_active) if translator is not None else message
     wire_ui_summary = translator.to_alias_text(ui_summary, scale_prose=not is_demo_active) if translator is not None else ui_summary
     sys_prompt = _build_api_system_prompt(wire_ui_summary, shield_active=translator is not None, translator=translator)
-    messages: list[dict[str, Any]] = [{"role": "user", "content": wire_msg}]
+    messages = _build_wire_conversation(history, wire_msg, translator, is_demo_active=is_demo_active)
     tool_calls_log: list[dict[str, Any]] = []
     final_text = ""
 
     model_disp = str(llm_cfg.get("display_name") or model_name)
+    exhausted_rounds = True
     for round_idx in range(max_rounds):
         if on_step:
             on_step({
@@ -2715,7 +2938,7 @@ def _run_chat_claude_api(
         }
         leak_err = _assert_wire_leak_free(translator, body, "Claude chat")
         if leak_err:
-            return leak_err
+            return _with_round_diag(leak_err, round_idx, "claude", model_name)
         try:
             resp = _http_post_json(url, headers, body)
         except urllib.error.HTTPError as exc:
@@ -2725,13 +2948,14 @@ def _run_chat_claude_api(
             return {"ok": False, "engine": "claude", "error": _sanitize_error_for_llm(f"Claude API error: {exc}")}
 
         blocks = resp.get("content") or []
-        messages.append({"role": "assistant", "content": blocks})
+        messages.append({"role": "assistant", "content": _scrub_model_turn_for_history(blocks, translator)})
         text_parts = [b.get("text", "") for b in blocks if b.get("type") == "text"]
         if text_parts:
             final_text = "\n".join(t for t in text_parts if t).strip()
 
         tool_uses = [b for b in blocks if b.get("type") == "tool_use"]
         if not tool_uses:
+            exhausted_rounds = False
             break
 
         tool_results = []
@@ -2762,6 +2986,34 @@ def _run_chat_claude_api(
             tool_results.append({"type": "tool_result", "tool_use_id": tu.get("id"), "content": json.dumps(wire_res)})
         messages.append({"role": "user", "content": tool_results})
 
+    if exhausted_rounds and tool_calls_log and not final_text:
+        if on_step:
+            on_step({
+                "tool": "synthesis",
+                "summary": f"Synthesizing results from {len(tool_calls_log)} tool calls...",
+                "progress_pct": 96,
+                "status_label": "Finalizing Response",
+            })
+        synth_body: dict[str, Any] = {
+            "model": model_name,
+            "max_tokens": max_tokens,
+            "system": sys_prompt,
+            "tools": claude_tools,
+            "tool_choice": {"type": "none"},
+            "messages": messages,
+        }
+        leak_err = _assert_wire_leak_free(translator, synth_body, "Claude chat synthesis")
+        if leak_err:
+            return _with_round_diag(leak_err, max_rounds, "claude", model_name)
+        try:
+            synth_resp = _http_post_json(url, headers, synth_body)
+            s_blocks = synth_resp.get("content") or []
+            s_text = [b.get("text", "") for b in s_blocks if b.get("type") == "text"]
+            if s_text:
+                final_text = "\n".join(t for t in s_text if t).strip()
+        except Exception as exc:
+            logging.getLogger("llm_tools").warning("Claude post-round synthesis turn failed: %s", exc)
+
     if on_step:
         on_step({
             "tool": "synthesis",
@@ -2771,6 +3023,8 @@ def _run_chat_claude_api(
         })
 
     restored_reply = translator.from_alias_text(final_text) if translator is not None else final_text
+    if not restored_reply and tool_calls_log:
+        restored_reply = f"Completed {len(tool_calls_log)} tool calls (tool round limit {max_rounds} reached before a written summary was produced)."
     ui_delta = poll_ui_actions(since_seq=start_seq)
     return {
         "ok": True,
@@ -2791,6 +3045,7 @@ def _run_chat_openai_api(
     *,
     on_step: Callable[[dict[str, Any]], None] | None = None,
     translator: PrivacyTranslator | None = None,
+    history: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     api_key = str(llm_cfg.get("api_key") or os.environ.get("OPENAI_API_KEY") or "").strip()
     model_name = str(llm_cfg.get("model") or "gpt-4.1").strip()
@@ -2815,12 +3070,14 @@ def _run_chat_openai_api(
     wire_ui_summary = translator.to_alias_text(ui_summary, scale_prose=not is_demo_active) if translator is not None else ui_summary
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": _build_api_system_prompt(wire_ui_summary, shield_active=translator is not None, translator=translator)},
-        {"role": "user", "content": wire_msg},
+        *_build_wire_conversation(history, wire_msg, translator, is_demo_active=is_demo_active),
     ]
     tool_calls_log: list[dict[str, Any]] = []
     final_text = ""
 
     model_disp = str(llm_cfg.get("display_name") or model_name)
+    omit_temp = bool(llm_cfg.get("omit_temperature")) or model_name.lower().startswith(("gpt-5", "o1", "o3", "o4"))
+    exhausted_rounds = True
     for round_idx in range(max_rounds):
         if on_step:
             on_step({
@@ -2830,12 +3087,11 @@ def _run_chat_openai_api(
                 "status_label": f"Consulting {model_disp}",
             })
         body: dict[str, Any] = {"model": model_name, "tools": openai_tools, "messages": messages}
-        omit_temp = bool(llm_cfg.get("omit_temperature")) or model_name.lower().startswith(("gpt-5", "o1", "o3", "o4"))
         if not omit_temp:
             body["temperature"] = temperature
         leak_err = _assert_wire_leak_free(translator, body, "OpenAI chat")
         if leak_err:
-            return leak_err
+            return _with_round_diag(leak_err, round_idx, "openai", model_name)
         try:
             resp = _http_post_json(url, headers, body)
         except urllib.error.HTTPError as exc:
@@ -2848,12 +3104,13 @@ def _run_chat_openai_api(
         if not choices:
             return {"ok": False, "engine": "openai", "error": f"No choices returned by OpenAI: {resp}"}
         msg = choices[0].get("message") or {}
-        messages.append(msg)
+        messages.append(_scrub_model_turn_for_history(msg, translator))
         if msg.get("content"):
             final_text = str(msg["content"]).strip()
 
         t_calls = msg.get("tool_calls") or []
         if not t_calls:
+            exhausted_rounds = False
             break
 
         demo_cfg = _active_demo_privacy_cfg()
@@ -2886,6 +3143,34 @@ def _run_chat_openai_api(
             tool_calls_log.append({"name": t_name, "args": raw_args})
             messages.append({"role": "tool", "tool_call_id": tc.get("id"), "content": json.dumps(wire_res)})
 
+    if exhausted_rounds and tool_calls_log and not final_text:
+        if on_step:
+            on_step({
+                "tool": "synthesis",
+                "summary": f"Synthesizing results from {len(tool_calls_log)} tool calls...",
+                "progress_pct": 96,
+                "status_label": "Finalizing Response",
+            })
+        synth_body: dict[str, Any] = {
+            "model": model_name,
+            "tools": openai_tools,
+            "tool_choice": "none",
+            "messages": messages,
+        }
+        if not omit_temp:
+            synth_body["temperature"] = temperature
+        leak_err = _assert_wire_leak_free(translator, synth_body, "OpenAI chat synthesis")
+        if leak_err:
+            return _with_round_diag(leak_err, max_rounds, "openai", model_name)
+        try:
+            synth_resp = _http_post_json(url, headers, synth_body)
+            s_choices = synth_resp.get("choices") or []
+            s_msg = (s_choices[0].get("message") or {}) if s_choices else {}
+            if s_msg.get("content"):
+                final_text = str(s_msg["content"]).strip()
+        except Exception as exc:
+            logging.getLogger("llm_tools").warning("OpenAI post-round synthesis turn failed: %s", exc)
+
     if on_step:
         on_step({
             "tool": "synthesis",
@@ -2895,6 +3180,8 @@ def _run_chat_openai_api(
         })
 
     restored_reply = translator.from_alias_text(final_text) if translator is not None else final_text
+    if not restored_reply and tool_calls_log:
+        restored_reply = f"Completed {len(tool_calls_log)} tool calls (tool round limit {max_rounds} reached before a written summary was produced)."
     ui_delta = poll_ui_actions(since_seq=start_seq)
     return {
         "ok": True,
@@ -2953,6 +3240,7 @@ def run_chat_via_agy_cli(
     *,
     allow_fast_path: bool = True,
     on_step: Callable[[dict[str, Any]], None] | None = None,
+    history: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     try:
         demo_cfg = _active_demo_privacy_cfg()
@@ -3001,12 +3289,22 @@ def run_chat_via_agy_cli(
     is_cli_target = is_explicit_cli or not llm_cfg
     shield_err, translator, _shield_mode = _resolve_inapp_privacy_shield(is_cli_target, llm_cfg)
     if shield_err:
+        diag = dict(shield_err.get("diagnostics") or {})
+        diag.update({
+            "requested_model": str(model or ""),
+            "is_explicit_cli": is_explicit_cli,
+            "has_llm_cfg": bool(llm_cfg),
+            "resolved_provider": "agy_cli" if is_cli_target else str(llm_cfg.get("provider") or ""),
+            "resolved_model": "" if is_cli_target else str(llm_cfg.get("model") or ""),
+        })
+        shield_err["diagnostics"] = diag
         return shield_err
 
     if not llm_cfg:
         return {
             "ok": False,
             "error": f"No Direct API LLM configuration found for model {model!r}. Configure a provider JSON in Data/Config/LLM/.",
+            "diagnostics": {"gate": "missing_config", "requested_model": str(model or ""), "is_cli_target": is_cli_target},
         }
 
     already_scaled = bool(translator is not None and getattr(translator, "scale_values", False))
@@ -3019,13 +3317,13 @@ def run_chat_via_agy_cli(
                 err_msg = re.sub(r"Portfolios/[^/\s]+/", "Portfolios/demo_portfolio/", err_msg)
             return {"ok": False, "error": err_msg}
         if provider == "gemini":
-            res = _run_chat_gemini_api(message, llm_cfg, ui_summary, start_seq, on_step=eff_on_step, translator=translator)
+            res = _run_chat_gemini_api(message, llm_cfg, ui_summary, start_seq, on_step=eff_on_step, translator=translator, history=history)
             return _project_demo_chat_response(res, demo_cfg, already_value_scaled=already_scaled)
         if provider in ("claude", "anthropic"):
-            res = _run_chat_claude_api(message, llm_cfg, ui_summary, start_seq, on_step=eff_on_step, translator=translator)
+            res = _run_chat_claude_api(message, llm_cfg, ui_summary, start_seq, on_step=eff_on_step, translator=translator, history=history)
             return _project_demo_chat_response(res, demo_cfg, already_value_scaled=already_scaled)
         if provider == "openai":
-            res = _run_chat_openai_api(message, llm_cfg, ui_summary, start_seq, on_step=eff_on_step, translator=translator)
+            res = _run_chat_openai_api(message, llm_cfg, ui_summary, start_seq, on_step=eff_on_step, translator=translator, history=history)
             return _project_demo_chat_response(res, demo_cfg, already_value_scaled=already_scaled)
 
     if _advisor_draft.get() is not None:

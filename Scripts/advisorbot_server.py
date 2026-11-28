@@ -5275,12 +5275,22 @@ class SavesRequestHandler(BaseHTTPRequestHandler):
                 "status_label": f"Model: {chosen_model}",
             })
 
+            prior_messages = messages
+            if prior_messages:
+                last_msg = prior_messages[-1] if isinstance(prior_messages[-1], dict) else {}
+                if (
+                    str(last_msg.get("role") or "").strip().lower() == "user"
+                    and str(last_msg.get("content") or "").strip() == prompt_text.strip()
+                ):
+                    prior_messages = prior_messages[:-1]
+
             res = llm_tools.run_chat_via_agy_cli(
                 message=prompt_text,
                 conversation_id=body.get("conversation_id"),
                 model=chosen_model,
                 ui_state=browser_state,
                 on_step=_chat_step,
+                history=prior_messages,
             )
             self._send_json(200 if res.get("ok") else 400, res)
             return
