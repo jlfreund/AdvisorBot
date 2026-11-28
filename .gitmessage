@@ -4,11 +4,13 @@
 # Lines starting with '#' are stripped automatically by Git when you commit.
 
 (A) Classification: 
-# Select one: Bug | Feature | Performance | Cosmetic
+# Select one: Bug | Feature | Performance | Cosmetic | Doc/Test | Parsing
 # - Bug:         Fixes unexpected behavior, wrong math, or a crash
-# - Feature:     Adds new capability, UI workflow, parser, or configuration
+# - Feature:     Adds new capability, UI workflow, or configuration
 # - Performance: Improves runtime, memory usage, caching, or bundle size
-# - Cosmetic:    Formatting, wording, layout polish, comments, or docs-only edits
+# - Cosmetic:    Formatting, wording, or UI/layout polish
+# - Doc/Test:    Documentation, comments, templates, test suites, or fixtures
+# - Parsing:     Statement ingestion, institution plugins, or schema mapping
 
 (B) Severity: 
 # Select one: Low | Medium | High

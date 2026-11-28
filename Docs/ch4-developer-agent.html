@@ -335,7 +335,7 @@ git config commit.template .gitmessage
 make commit-template</code></pre>
         <p>Lines starting with <code>#</code> in <code>.gitmessage</code> act as instructional preambles and are stripped automatically by Git when saving a commit. Every commit message should include a concise imperative subject line followed by these five sections:</p>
         <ul>
-          <li><strong><code>(A) Classification</code></strong>: One of <code>Bug</code>, <code>Feature</code>, <code>Performance</code>, or <code>Cosmetic</code>.</li>
+          <li><strong><code>(A) Classification</code></strong>: One of <code>Bug</code>, <code>Feature</code>, <code>Performance</code>, <code>Cosmetic</code>, <code>Doc/Test</code>, or <code>Parsing</code>.</li>
           <li><strong><code>(B) Severity</code></strong>: One of <code>Low</code>, <code>Medium</code>, or <code>High</code>.</li>
           <li><strong><code>(C) Description</code></strong>: What changed, why, and affected modules or related issue/PR numbers.</li>
           <li><strong><code>(D) Privacy and Security Implications</code></strong>: Impact on Privacy Shield (Modes A/B/C), Demo Mode, auth/cookies, <code>0600</code> permissions, PII/wire-leak gates, or LLM/MCP boundaries (write <code>None</code> with a short rationale if none apply).</li>

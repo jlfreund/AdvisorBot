@@ -26,7 +26,7 @@ git config commit.template .gitmessage
 
 Every commit message starts with a concise imperative subject line (≤ 72 characters), followed by a blank line and these five sections:
 
-1. **`(A) Classification:`** — Choose one: `Bug` | `Feature` | `Performance` | `Cosmetic`
+1. **`(A) Classification:`** — Choose one: `Bug` | `Feature` | `Performance` | `Cosmetic` | `Doc/Test` | `Parsing`
 2. **`(B) Severity:`** — Choose one: `Low` | `Medium` | `High`
    - `High`: Security or privacy regression, data loss, crash, or incorrect core financial/tax calculation.
    - `Medium`: Partial feature breakage, degraded UX, or notable performance impact.
