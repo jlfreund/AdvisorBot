@@ -128,6 +128,7 @@
           <a class="sub" href="ch4-developer-agent.html#adv-mcp-security">4.2 MCP Security Boundaries</a>
           <a class="sub" href="ch4-developer-agent.html#adv-guardrails">4.3 Engineering Guardrails</a>
           <a class="sub" href="ch4-developer-agent.html#adv-testing">4.4 Fixture Test Suite</a>
+          <a class="sub" href="ch4-developer-agent.html#adv-contributing">4.5 Commit Template &amp; Contributing</a>
         </div>
       </div>
     </aside>
@@ -330,7 +331,7 @@ python -m pip install -e ".[mcp,ingest,ui]"</code></pre>
               <li><a href="ch1-portfolio-setup.html"><strong>Chapter 1: Setting Up Your Portfolio</strong></a> &mdash; Creating a portfolio folder, configuring portfolio settings, adding statements, reviewing status indicators, and writing custom statement plugins.</li>
               <li><a href="ch2-core-walkthrough.html"><strong>Chapter 2: Core Application Walkthrough</strong></a> &mdash; Portfolio Performance, Stock Vesting, Retirement Simulator, SSN Visualizer, Scenario Management, and Holding Forecast Methodology.</li>
               <li><a href="ch3-security-privacy.html"><strong>Chapter 3: Security &amp; Privacy Architecture</strong></a> &mdash; Local-only architecture, session authentication, Privacy Shield profiles, Demo Mode, and local AI setup.</li>
-              <li><a href="ch4-developer-agent.html"><strong>Chapter 4: Developer &amp; Agent Integration</strong></a> &mdash; Model Context Protocol (MCP) server setup, privacy boundaries, engineering guardrails, and isolated fixture test suite reference.</li>
+              <li><a href="ch4-developer-agent.html"><strong>Chapter 4: Developer &amp; Agent Integration</strong></a> &mdash; Model Context Protocol (MCP) server setup, privacy boundaries, engineering guardrails, isolated fixture test suite reference, and contributor commit template.</li>
             </ul>
           </li>
           <li>
@@ -339,6 +340,13 @@ python -m pip install -e ".[mcp,ingest,ui]"</code></pre>
               <li><code>Examples/project.example.json</code> &amp; <code>Examples/grants.example.json</code>: Starter templates for portfolio configuration and equity-grant schedules.</li>
               <li><code>Examples/llm_config.gemini.json</code>, <code>llm_config.claude.json</code>, <code>llm_config.openai.json</code>, <code>Examples/llm_config.local_ollama.json</code> (and <a href="ch1-portfolio-setup.html#llm-setup">Chapter 1.2 LLM Configuration Guide</a>): Starter templates for cloud and local AI providers.</li>
               <li><code>Examples/mcp_config.example.json</code>: Starter configuration for connecting external MCP clients.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Contributor Guides &amp; Templates:</strong>
+            <ul>
+              <li><a href="../CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a>: Contributor workflow, engineering/privacy guardrails, and isolated fixture test commands.</li>
+              <li><a href="../.gitmessage"><code>.gitmessage</code></a>: Standardized Git commit template (<code>git config commit.template .gitmessage</code> or <code>make commit-template</code>).</li>
             </ul>
           </li>
         </ul>

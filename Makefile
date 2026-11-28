@@ -14,7 +14,8 @@ BASELINES ?= PYTHONPATH=Scripts $(PYTHON) -m tests.refresh_baselines
 
 .DEFAULT_GOAL := help
 .PHONY: help test test-full test-tier test-one test-security fixtures \
-        fixtures-check fixtures-root catalog baselines snapshots clean-pyc
+        fixtures-check fixtures-root catalog baselines snapshots clean-pyc \
+        commit-template
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
@@ -69,3 +70,7 @@ snapshots: ## Rewrite expected snapshots from the current code (review the diff!
 clean-pyc: ## Remove __pycache__ and .pytest_cache
 	find . -name '__pycache__' -type d -prune -exec rm -rf {} +
 	rm -rf .pytest_cache Scripts/tests/.pytest_cache
+
+commit-template: ## Configure git to use the repo .gitmessage commit template
+	git config commit.template .gitmessage
+	@echo "Configured git commit.template -> .gitmessage"

@@ -1,0 +1,31 @@
+
+# <short imperative summary, max 50-72 chars> (e.g., Fix RMD divisor rounding)
+# Leave a blank line between the subject line above and section (A) below.
+# Lines starting with '#' are stripped automatically by Git when you commit.
+
+(A) Classification: 
+# Select one: Bug | Feature | Performance | Cosmetic
+# - Bug:         Fixes unexpected behavior, wrong math, or a crash
+# - Feature:     Adds new capability, UI workflow, parser, or configuration
+# - Performance: Improves runtime, memory usage, caching, or bundle size
+# - Cosmetic:    Formatting, wording, layout polish, comments, or docs-only edits
+
+(B) Severity: 
+# Select one: Low | Medium | High
+# - High:   Security/privacy regression, data loss, crash, or wrong core math/tax
+# - Medium: Partial feature breakage, degraded UX, or notable performance impact
+# - Low:    Minor polish, documentation update, or non-blocking improvement
+
+(C) Description:
+# Summarize what changed and why. Reference affected modules, design choices,
+# edge cases, and related issue or PR numbers.
+
+(D) Privacy and Security Implications:
+# Note any impact on Privacy Shield (Modes A/B/C), Demo Mode scaling/aliasing,
+# localhost/session auth, 0600 file permissions, PII/leak gates, or LLM/MCP tools.
+# Write "None" if there is no privacy or security impact, and briefly state why.
+
+(E) Testing notes:
+# List commands run and observed results against isolated fixture portfolios
+# (e.g., `make test`, `make test-security`, `make test-full`, `make fixtures-check`,
+# or manual browser/UI verification steps).

@@ -125,11 +125,14 @@ Comprehensive guides and reference manuals live in the [`Docs/`](Docs/) director
      - *Scenario Management*: Creating, comparing, recording `## Upvotes & Concurrences` in **Details & Notes →**, and toggling `🔒 Protected` / `🔓 Unprotected` per scenario.
      - *Holding Forecast Methodology*: Return projections and confidence indicators.
    - [**Chapter 3: Security & Privacy Architecture**](Docs/ch3-security-privacy.html): Local-only architecture, session authentication, Privacy Shield profiles (**Clear Text**, **Obfuscated Names**, **Obfuscated Names & Values**), Demo Mode, and local AI setup.
-   - [**Chapter 4: Developer & Agent Integration**](Docs/ch4-developer-agent.html): Model Context Protocol (MCP) server setup, privacy boundaries, engineering guardrails, and isolated fixture test suite reference.
+   - [**Chapter 4: Developer & Agent Integration**](Docs/ch4-developer-agent.html): Model Context Protocol (MCP) server setup, privacy boundaries, engineering guardrails, isolated fixture test suite reference, and contributor commit template.
 2. [**Examples/ Directory**](Examples/):
    - [`project.example.json`](Examples/project.example.json) & [`grants.example.json`](Examples/grants.example.json): Starter templates for portfolio configuration and equity-grant schedules.
    - [`llm_config.gemini.json`](Examples/llm_config.gemini.json), [`llm_config.claude.json`](Examples/llm_config.claude.json), [`llm_config.openai.json`](Examples/llm_config.openai.json), [`llm_config.local_ollama.json`](Examples/llm_config.local_ollama.json) (see [`README_LLM_CONFIGS.md`](Examples/README_LLM_CONFIGS.md)): Starter templates for cloud and local AI providers.
    - [`mcp_config.example.json`](Examples/mcp_config.example.json): Starter configuration for connecting external MCP clients.
+3. **Contributor Guides & Templates**:
+   - [`CONTRIBUTING.md`](CONTRIBUTING.md): Contributor workflow, engineering/privacy guardrails, and isolated fixture test commands.
+   - [`.gitmessage`](.gitmessage): Standardized Git commit template (`git config commit.template .gitmessage` or `make commit-template`).
 
 ---
 

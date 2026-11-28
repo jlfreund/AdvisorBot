@@ -185,7 +185,8 @@
       "#adv-mcp": "ch4-developer-agent.html#adv-mcp",
       "#adv-mcp-security": "ch4-developer-agent.html#adv-mcp-security",
       "#adv-guardrails": "ch4-developer-agent.html#adv-guardrails",
-      "#adv-testing": "ch4-developer-agent.html#adv-testing"
+      "#adv-testing": "ch4-developer-agent.html#adv-testing",
+      "#adv-contributing": "ch4-developer-agent.html#adv-contributing"
     };
 
     if (routes[hash]) {

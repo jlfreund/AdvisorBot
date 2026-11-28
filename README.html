@@ -356,7 +356,7 @@ python -m pip install -e ".[mcp,ingest,ui]"</code></pre>
               <li><a href="Docs/ch1-portfolio-setup.html"><strong>Chapter 1: Setting Up Your Portfolio</strong></a> &mdash; Creating a portfolio folder, configuring portfolio settings, adding statements, reviewing <strong>Settings &gt; Portfolio</strong> status indicators, and writing custom statement plugins.</li>
               <li><a href="Docs/ch2-core-walkthrough.html"><strong>Chapter 2: Core Application Walkthrough</strong></a> &mdash; Portfolio Performance, Stock Vesting, Retirement Simulator, SSN Visualizer, Scenario Management, and Holding Forecast Methodology.</li>
               <li><a href="Docs/ch3-security-privacy.html"><strong>Chapter 3: Security &amp; Privacy Architecture</strong></a> &mdash; Local-only architecture, session authentication, Privacy Shield profiles (<strong>Clear Text</strong>, <strong>Obfuscated Names</strong>, <strong>Obfuscated Names &amp; Values</strong>), Demo Mode, and local AI setup.</li>
-              <li><a href="Docs/ch4-developer-agent.html"><strong>Chapter 4: Developer &amp; Agent Integration</strong></a> &mdash; Model Context Protocol (MCP) server setup, privacy boundaries, engineering guardrails, and isolated fixture test suite reference.</li>
+              <li><a href="Docs/ch4-developer-agent.html"><strong>Chapter 4: Developer &amp; Agent Integration</strong></a> &mdash; Model Context Protocol (MCP) server setup, privacy boundaries, engineering guardrails, isolated fixture test suite reference, and contributor commit template.</li>
             </ul>
           </li>
           <li>
@@ -365,6 +365,13 @@ python -m pip install -e ".[mcp,ingest,ui]"</code></pre>
               <li><a href="Examples/project.example.json"><code>Examples/project.example.json</code></a> &amp; <a href="Examples/grants.example.json"><code>Examples/grants.example.json</code></a>: Starter templates for portfolio configuration and equity-grant schedules.</li>
               <li><a href="Examples/llm_config.gemini.json"><code>Examples/llm_config.gemini.json</code></a>, <a href="Examples/llm_config.claude.json"><code>llm_config.claude.json</code></a>, <a href="Examples/llm_config.openai.json"><code>llm_config.openai.json</code></a>, <a href="Examples/llm_config.local_ollama.json"><code>Examples/llm_config.local_ollama.json</code></a> (see <a href="Examples/README_LLM_CONFIGS.md"><code>README_LLM_CONFIGS.md</code></a> and <a href="Docs/ch1-portfolio-setup.html#llm-setup">Chapter 1.2</a>): Starter templates for cloud and local AI providers.</li>
               <li><a href="Examples/mcp_config.example.json"><code>Examples/mcp_config.example.json</code></a>: Starter configuration for connecting external MCP clients.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Contributor Guides &amp; Templates:</strong>
+            <ul>
+              <li><a href="CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a>: Contributor workflow, engineering/privacy guardrails, and isolated fixture test commands.</li>
+              <li><a href=".gitmessage"><code>.gitmessage</code></a>: Standardized Git commit template (<code>git config commit.template .gitmessage</code> or <code>make commit-template</code>).</li>
             </ul>
           </li>
         </ul>
