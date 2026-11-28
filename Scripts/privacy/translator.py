@@ -177,7 +177,7 @@ _RAW_NON_MONETARY_KEY_EXACT = {
     "tax_rate", "effective_tax_rate", "cap_gains_rate", "marginal_tax_rate",
     "siminflationpct", "ssncolapct", "ssninvestor1claimage", "ssninvestor2claimage",
     "simOptimismMultiplier", "pct_portfolio", "default_growth_pct", "ref_growth_pct", "growth_pct",
-    "expense_ratio_pct", "fee_pct", "return_pct", "cagr_pct", "yield_pct",
+    "expense_ratio_pct", "fee_pct", "return_pct", "cagr_pct", "yield_pct", "match_rate_pct",
     # SA5-08: Non-monetary D7 decay half-lives, tier selectors, and annual rate vectors must stay unscaled in Mode C
     "half_life", "holdinghalflife", "holding_half_life",
     "selected_tier", "dest_tier", "source_tier", "tiers", "yearly_rates",

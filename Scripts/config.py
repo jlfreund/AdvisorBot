@@ -858,7 +858,9 @@ _DOB_ISO_RE = re.compile(r"^\d{4}-\d{2}(?:-\d{2})?$")
 _SAFE_BUCKET_ID_RE = re.compile(r"^[A-Za-z0-9_.:-]{0,80}$")
 
 MAX_WORK_PLAN_ANNUAL_USD = 50_000_000.0
+MAX_WORK_PLAN_MATCH_RATE_PCT = 200.0
 MAX_WORK_PLAN_CONTRIB_ROWS = 10
+VALID_WORK_CONTRIB_PACING = ("monthly", "q1_frontloaded")
 
 
 def default_work_plan(milestone_age: int = 85, *, is_working: bool = False) -> dict[str, Any]:
@@ -974,15 +976,24 @@ def sanitize_work_plan(
                 match_usd = round(max(0.0, min(MAX_WORK_PLAN_ANNUAL_USD, match_raw)), 2) if math.isfinite(match_raw) else 0.0
             except (TypeError, ValueError):
                 match_usd = 0.0
+            try:
+                mr_raw = float(row.get("match_rate_pct") or 0.0)
+                mr_pct = round(max(0.0, min(MAX_WORK_PLAN_MATCH_RATE_PCT, mr_raw)), 2) if math.isfinite(mr_raw) else 0.0
+            except (TypeError, ValueError):
+                mr_pct = 0.0
+            raw_pacing = str(row.get("pacing") or "monthly").strip().lower()
+            pacing = raw_pacing if raw_pacing in VALID_WORK_CONTRIB_PACING else "monthly"
             catchup = bool(row.get("age_50_catchup", False))
-            if not target_id and emp_usd <= 0.0 and match_usd <= 0.0:
+            if not target_id and emp_usd <= 0.0 and match_usd <= 0.0 and not catchup:
                 continue
             cleaned_contribs.append({
                 "target_asset_id": target_id,
                 "employee_annual": emp_usd,
                 "employer_match_annual": match_usd,
+                "match_rate_pct": mr_pct,
                 "match_target_asset_id": match_id,
                 "age_50_catchup": catchup,
+                "pacing": pacing,
             })
 
     budget_answered = bool(
@@ -1229,9 +1240,20 @@ def validate_portfolio_config(cfg: dict[str, Any] | None) -> dict[str, Any]:
                                 validation_errors.append(
                                     f"{label} contribution #{c_idx + 1} {c_num} must be between $0 and ${MAX_WORK_PLAN_ANNUAL_USD:,.0f}."
                                 )
+                    if "match_rate_pct" in crow and crow["match_rate_pct"] is not None:
+                        try:
+                            mrv = float(crow["match_rate_pct"])
+                            if not math.isfinite(mrv) or mrv < 0.0 or mrv > MAX_WORK_PLAN_MATCH_RATE_PCT:
+                                raise ValueError("out of bounds")
+                        except (TypeError, ValueError):
+                            has_err = True
+                            validation_errors.append(
+                                f"{label} contribution #{c_idx + 1} match_rate_pct must be between 0% and {MAX_WORK_PLAN_MATCH_RATE_PCT:g}%."
+                            )
                     if raw_wp.get("is_working") and (
                         float(crow.get("employee_annual") or 0.0) > 0.0
                         or float(crow.get("employer_match_annual") or 0.0) > 0.0
+                        or bool(crow.get("age_50_catchup", False))
                     ):
                         tid = str(crow.get("target_asset_id") or "").strip()
                         if not tid or not _SAFE_BUCKET_ID_RE.match(tid):

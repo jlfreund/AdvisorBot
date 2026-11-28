@@ -3777,23 +3777,38 @@ def _step_sim_month(
                 target_net_burn = max(0.0, target_net_burn - monthly_paycheck_offset)
             if ym > str(wp_cfg.get("start_ym") or ""):
                 cur_yr_w = int(iso[:4])
+                cal_mo_w = int(iso[5:7])
                 for w in active_w:
                     attained_age_w = cur_yr_w - int(w["birth_year"])
                     for crow in w["contributions"]:
+                        pacing_mode = str(crow.get("pacing") or "monthly")
+                        if pacing_mode == "q1_frontloaded":
+                            pace_mult = (1.0 / 3.0) if cal_mo_w in (1, 2, 3) else 0.0
+                        else:
+                            pace_mult = 1.0 / 12.0
+                        if pace_mult <= 0.0:
+                            continue
                         emp_base = float(crow["employee_annual"])
-                        if emp_base > 0.0:
-                            catchup_w = (
-                                IRS_SUPER_CATCHUP_60_63_USD
-                                if (60 <= attained_age_w <= 63)
-                                else (IRS_CATCHUP_50_USD if attained_age_w >= 50 else 0.0)
-                            ) if crow["age_50_catchup"] else 0.0
-                            emp_mo = ((emp_base + catchup_w) * dfl) / 12.0
+                        catchup_w = (
+                            IRS_SUPER_CATCHUP_60_63_USD
+                            if (60 <= attained_age_w <= 63)
+                            else (IRS_CATCHUP_50_USD if attained_age_w >= 50 else 0.0)
+                        ) if crow.get("age_50_catchup") else 0.0
+                        emp_tot = emp_base + catchup_w
+                        if emp_tot > 0.0:
+                            emp_mo = (emp_tot * dfl) * pace_mult
                             monthly_work_contrib += _deposit_work_plan_leg(
                                 state_map, crow["target_asset_id"], iso, emp_mo, include_unvested, is_employer_match=False
                             )
                         match_base = float(crow["employer_match_annual"])
-                        if match_base > 0.0:
-                            match_mo = (match_base * dfl) / 12.0
+                        match_rate_pct = float(crow.get("match_rate_pct") or 0.0)
+                        if match_rate_pct > 0.0:
+                            raw_match = emp_base * (match_rate_pct / 100.0)
+                            eff_match = min(match_base, raw_match) if match_base > 0.0 else raw_match
+                        else:
+                            eff_match = match_base
+                        if eff_match > 0.0:
+                            match_mo = (eff_match * dfl) * pace_mult
                             match_tid = crow["match_target_asset_id"] or crow["target_asset_id"]
                             monthly_work_contrib += _deposit_work_plan_leg(
                                 state_map, match_tid, iso, match_mo, include_unvested, is_employer_match=True

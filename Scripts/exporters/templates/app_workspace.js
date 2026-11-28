@@ -7417,7 +7417,7 @@
       const staleTarget = wp.is_working && rows.some(
         r => String(r.target_asset_id || "").trim() && !eligIds.has(String(r.target_asset_id).trim())
       );
-      const bd = _computeWorkPlanPaycheckBreakdown(wp, _projDraft);
+      const bd = _computeWorkPlanPaycheckBreakdown(wp, _projDraft, mem);
       const totContrib = bd.totalGrossAccountDeposits;
       const hasBudgetImpact = Boolean(wp.covers_full_burn || bd.houseContrib > 0);
       const rawRetAge = (mem && mem.work_plan && mem.work_plan.default_retirement_age != null)
@@ -7627,7 +7627,7 @@
       return 0;
     }
 
-    function _computeWorkPlanPaycheckBreakdown(wp, draftCfg) {
+    function _computeWorkPlanPaycheckBreakdown(wp, draftCfg, mem = null) {
       const d = draftCfg || _projDraft || PROJECT_CFG || {};
       const refRaw = d.reference_annual_burn ?? d.retirement_annual_burn ?? (PROJECT_CFG && (PROJECT_CFG.reference_annual_burn ?? PROJECT_CFG.retirement_annual_burn));
       const refBurn = Number.isFinite(Number(refRaw)) && Number(refRaw) > 0 ? Math.round(Number(refRaw)) : 0;
@@ -7640,24 +7640,86 @@
       const eligMap = new Map(_getEligibleWorkPlanAssets().map(a => [a.id, a]));
       const baseOrdRate = _getDraftIraOrdinaryTaxRate(d, null);
 
+      const curYr = parseInt(String(TODAY_ISO || "2026-01-01").slice(0, 4), 10) || 2026;
+      const bStr = String((mem && (mem.birth_date || mem.birthdate)) || "");
+      const hasValidByr = /^\d{4}/.test(bStr);
+      const attainedAge = hasValidByr ? (curYr - parseInt(bStr.slice(0, 4), 10)) : 50;
+
       let empGrossTotal = 0;
       let empAfterTaxTotal = 0;
       let employerMatchTotal = 0;
       let hasPreTaxEmployee = false;
+      let plan401kTotalAdditions = 0;
+      let plan401kCatchupRows = 0;
+      let plan401kMaxCatchupAllowance = 0;
+      let iraEmpTotal = 0;
+      let iraHasCatchup = false;
+
       const rowDetails = rows.map(r => {
         const tid = String((r && r.target_asset_id) || "").trim();
         const asset = eligMap.get(tid) || null;
+        const wrapper = String((asset && asset.tax_wrapper) || "").toUpperCase();
+        const titleUp = String((asset && (asset.title || asset.short_title || asset.account_label)) || "").toUpperCase();
+        const is401kPlan = ["401K", "TRAD_401K", "ROTH_401K", "403B"].includes(wrapper) || titleUp.includes("401(K)") || titleUp.includes("403(B)");
+        const isIraPlan = !is401kPlan && (["TRAD_IRA", "ROTH_IRA"].includes(wrapper) || titleUp.includes(" IRA"));
         const isPreTax = Boolean(asset && String(asset.tax_model || "") === "ORDINARY_FULL");
         const rowOrdRate = isPreTax ? _getDraftIraOrdinaryTaxRate(d, asset) : 0;
-        const empGross = Math.max(0, Number((r && r.employee_annual) || 0));
-        const matchGross = Math.max(0, Number((r && r.employer_match_annual) || 0));
+        const empBase = Math.max(0, Number((r && r.employee_annual) || 0));
+        const catchupChecked = Boolean(r && r.age_50_catchup);
+        const catchupGross = catchupChecked
+          ? ((attainedAge >= 60 && attainedAge <= 63) ? IRS_SUPER_CATCHUP_60_63_USD : (attainedAge >= 50 ? IRS_CATCHUP_50_USD : 0))
+          : 0;
+        const empGross = empBase + catchupGross;
+        const matchCapOrFlat = Math.max(0, Number((r && r.employer_match_annual) || 0));
+        const matchRatePct = Math.max(0, Number((r && r.match_rate_pct) || 0));
+        const matchGross = matchRatePct > 0
+          ? (matchCapOrFlat > 0 ? Math.min(matchCapOrFlat, empBase * (matchRatePct / 100.0)) : empBase * (matchRatePct / 100.0))
+          : matchCapOrFlat;
         const empAfterTax = isPreTax ? (empGross * Math.max(0, Math.min(1, 1 - rowOrdRate))) : empGross;
         if (isPreTax && empGross > 0) hasPreTaxEmployee = true;
         empGrossTotal += empGross;
         empAfterTaxTotal += empAfterTax;
         employerMatchTotal += matchGross;
-        return { isPreTax, rowOrdRate, empGross, empAfterTax, matchGross };
+
+        if (is401kPlan) {
+          plan401kTotalAdditions += empGross + matchGross;
+          if (catchupChecked) {
+            plan401kCatchupRows += 1;
+            plan401kMaxCatchupAllowance = Math.max(plan401kMaxCatchupAllowance, catchupGross);
+          }
+        } else if (isIraPlan) {
+          iraEmpTotal += empBase;
+          if (catchupChecked) iraHasCatchup = true;
+        }
+        return {
+          isPreTax,
+          rowOrdRate,
+          empBase,
+          catchupChecked,
+          catchupGross,
+          attainedAge,
+          empGross,
+          empAfterTax,
+          matchCapOrFlat,
+          matchRatePct,
+          matchGross,
+          pacing: String((r && r.pacing) || "monthly") === "q1_frontloaded" ? "q1_frontloaded" : "monthly",
+        };
       });
+
+      const irsWarnings = [];
+      if (plan401kCatchupRows > 1) {
+        irsWarnings.push(`Age 50+ IRS Catch-Up is checked on ${plan401kCatchupRows} employer-plan rows — the IRS catch-up allowance (+${fmtUSD0(attainedAge >= 60 && attainedAge <= 63 ? IRS_SUPER_CATCHUP_60_63_USD : IRS_CATCHUP_50_USD)}/yr) is shared across Pre-Tax & Roth 401(k) sub-accounts.`);
+      }
+      const irs415Base = 72000;
+      const irs415Cap = irs415Base + plan401kMaxCatchupAllowance;
+      if (plan401kTotalAdditions > irs415Cap + 0.5) {
+        irsWarnings.push(`Combined 401(k)/403(b) additions (${fmtUSD0(Math.round(plan401kTotalAdditions))}/yr across employee + catch-up + match) exceed the 2026 IRS §415(c) plan limit (${fmtUSD0(irs415Cap)}/yr).`);
+      }
+      const iraCap = 7500 + (iraHasCatchup && attainedAge >= 50 ? 1100 : 0);
+      if (iraEmpTotal > iraCap + 0.5) {
+        irsWarnings.push(`Combined Traditional + Roth IRA employee contributions (${fmtUSD0(Math.round(iraEmpTotal))}/yr) exceed the 2026 IRS IRA limit (${fmtUSD0(iraCap)}/yr).`);
+      }
 
       const totalGrossAccountDeposits = empGrossTotal + employerMatchTotal;
       const hasConfiguredContribs = Boolean(rows.length > 0 || totalGrossAccountDeposits > 0);
@@ -7688,6 +7750,7 @@
         hasConfiguredContribs,
         remainingAfterTax,
         overAllocated,
+        irsWarnings,
         showRetirementSavingsBar,
         rowDetails,
       };
@@ -7819,13 +7882,28 @@
 
     function _renderWorkPlanEmpImpactNote(detail) {
       if (!detail || detail.empGross <= 0) {
+        if (detail && detail.catchupChecked && detail.attainedAge < 50) {
+          return `<span class="muted">+$8,000/yr catch-up activates at age 50</span>`;
+        }
         return `<span class="muted">Enter $/yr employee contribution</span>`;
       }
+      const cuNote = detail.catchupGross > 0
+        ? ` <span style="color:#38bdf8;">(incl. +${escHtml(fmtUSD0(detail.catchupGross))} ${detail.catchupGross > 8000 ? "60–63 super " : ""}catch-up)</span>`
+        : "";
       if (detail.isPreTax) {
         const pct = Math.round(detail.rowOrdRate * 1000) / 10;
-        return `<span style="color:#c4b5fd;">After-tax paycheck cost: ~${escHtml(fmtUSD0(Math.round(detail.empAfterTax)))}/yr</span> <span class="muted">(${pct}% pre-tax shelter)</span>`;
+        return `<span style="color:#c4b5fd;">After-tax paycheck cost: ~${escHtml(fmtUSD0(Math.round(detail.empAfterTax)))}/yr</span> <span class="muted">(${pct}% pre-tax shelter)</span>${cuNote}`;
       }
-      return `<span class="muted">After-tax paycheck cost: ${escHtml(fmtUSD0(Math.round(detail.empAfterTax)))}/yr (1:1)</span>`;
+      return `<span class="muted">After-tax paycheck cost: ${escHtml(fmtUSD0(Math.round(detail.empAfterTax)))}/yr (1:1)</span>${cuNote}`;
+    }
+
+    function _renderWorkPlanMatchImpactNote(detail) {
+      if (!detail) return `<span class="muted">Added to holding (not deducted from paycheck)</span>`;
+      if (detail.matchRatePct > 0) {
+        const capHint = detail.matchCapOrFlat > 0 ? ` up to ${escHtml(fmtUSD0(detail.matchCapOrFlat))} cap` : " (uncapped)";
+        return `<span style="color:#2dd4bf;">Effective match: +${escHtml(fmtUSD0(Math.round(detail.matchGross)))}/yr</span> <span class="muted">(${detail.matchRatePct}%${capHint})</span>`;
+      }
+      return `<span class="muted">Added to holding (not deducted from paycheck)</span>`;
     }
 
     function _formatWorkPlanQ1Sub(bd) {
@@ -7862,7 +7940,7 @@
       const msAge = Math.max(18, Math.min(100, parseInt(mem.milestone_age, 10) || 85));
       const wp = sanitizeWorkPlanJs(mem.work_plan, msAge);
       mem.work_plan = wp;
-      const bd = _computeWorkPlanPaycheckBreakdown(wp, _projDraft);
+      const bd = _computeWorkPlanPaycheckBreakdown(wp, _projDraft, mem);
 
       const bDate = String(mem.birth_date || mem.birthdate || "");
       const bParts = bDate.split("-");
@@ -7960,6 +8038,16 @@
           overBanner.innerHTML = "";
         }
       }
+      const irsBanner = document.getElementById("proj-wp-irs-banner");
+      if (irsBanner && irsBanner.style) {
+        if (bd.irsWarnings && bd.irsWarnings.length > 0) {
+          irsBanner.style.display = "block";
+          irsBanner.innerHTML = bd.irsWarnings.map(w => `<div>&#9888; ${escHtml(w)}</div>`).join("");
+        } else {
+          irsBanner.style.display = "none";
+          irsBanner.innerHTML = "";
+        }
+      }
 
       const detailRoot = document.getElementById("proj-family-detail-content");
       if (detailRoot && typeof detailRoot.querySelectorAll === "function") {
@@ -7968,6 +8056,22 @@
           const idx = parseInt(el.getAttribute("data-wp-emp-impact"), 10);
           if (Number.isFinite(idx) && bd.rowDetails[idx]) {
             el.innerHTML = _renderWorkPlanEmpImpactNote(bd.rowDetails[idx]);
+          }
+        });
+        const mImpEls = detailRoot.querySelectorAll("[data-wp-match-impact]");
+        mImpEls.forEach(el => {
+          const idx = parseInt(el.getAttribute("data-wp-match-impact"), 10);
+          if (Number.isFinite(idx) && bd.rowDetails[idx]) {
+            el.innerHTML = _renderWorkPlanMatchImpactNote(bd.rowDetails[idx]);
+          }
+        });
+        const mLblEls = detailRoot.querySelectorAll("[data-wp-match-lbl]");
+        mLblEls.forEach(el => {
+          const idx = parseInt(el.getAttribute("data-wp-match-lbl"), 10);
+          if (Number.isFinite(idx) && bd.rowDetails[idx]) {
+            el.textContent = bd.rowDetails[idx].matchRatePct > 0
+              ? "Annual Match Limit / Cap ($/yr, Today's $)"
+              : "Employer Match ($/yr, Today's $)";
           }
         });
       }
@@ -7994,22 +8098,24 @@
       const retYr = bYr + wp.default_retirement_age;
       const retYm = `${retYr}-${String(bMo).padStart(2, "0")}`;
       const eligCount = _getEligibleWorkPlanAssets().length;
-      const bd = _computeWorkPlanPaycheckBreakdown(wp, _projDraft);
+      const bd = _computeWorkPlanPaycheckBreakdown(wp, _projDraft, curMem);
 
       const pid = _editingPortfolioId || (_portfoliosBundle && _portfoliosBundle.active_portfolio_id) || "default";
       const mId = curMem.id || `idx_${_selectedFamilyIdx}`;
       const retSavKey = `${pid}:${mId}`;
       const hasMissingRowTarget = (wp.contributions || []).some(
-        r => (Number(r.employee_annual || 0) > 0 || Number(r.employer_match_annual || 0) > 0) && !String(r.target_asset_id || "").trim()
+        r => (Number(r.employee_annual || 0) > 0 || Number(r.employer_match_annual || 0) > 0 || Boolean(r.age_50_catchup)) && !String(r.target_asset_id || "").trim()
       );
       const retSavExpanded = _wpRetSavingsOpen.has(retSavKey)
         ? Boolean(_wpRetSavingsOpen.get(retSavKey))
-        : Boolean(hasMissingRowTarget || bd.overAllocated);
+        : Boolean(hasMissingRowTarget || bd.overAllocated || (bd.irsWarnings && bd.irsWarnings.length > 0));
 
       const contribRowsHtml = (wp.contributions || []).map((row, cIdx) => {
         const empOpts = _renderWorkPlanAssetOptions(row.target_asset_id, null);
         const matchOpts = _renderWorkPlanAssetOptions(row.match_target_asset_id, "Same holding as employee");
-        const rowDet = bd.rowDetails[cIdx] || { isPreTax: false, rowOrdRate: 0, empGross: 0, empAfterTax: 0, matchGross: 0 };
+        const rowDet = bd.rowDetails[cIdx] || { isPreTax: false, rowOrdRate: 0, empBase: 0, catchupChecked: false, catchupGross: 0, attainedAge: 50, empGross: 0, empAfterTax: 0, matchCapOrFlat: 0, matchRatePct: 0, matchGross: 0, pacing: "monthly" };
+        const mrVal = Number(row.match_rate_pct || 0);
+        const paceVal = String(row.pacing || "monthly") === "q1_frontloaded" ? "q1_frontloaded" : "monthly";
         return `
           <div style="background:rgba(15,23,42,0.58);border:1px solid ${empOpts.missingSelected ? 'rgba(245,158,11,0.55)' : '#1e293b'};border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr auto;gap:10px;align-items:start;">
@@ -8025,9 +8131,9 @@
                 <div class="mono" data-wp-emp-impact="${cIdx}" style="font-size:10px;margin-top:3px;line-height:1.35;">${_renderWorkPlanEmpImpactNote(rowDet)}</div>
               </div>
               <div>
-                <label class="ctrl-lbl" style="font-size:10.5px;display:block;margin-bottom:3px;">Employer Match ($/yr, Today&#39;s $)</label>
+                <label class="ctrl-lbl" data-wp-match-lbl="${cIdx}" style="font-size:10.5px;display:block;margin-bottom:3px;">${mrVal > 0 ? "Annual Match Limit / Cap ($/yr, Today&#39;s $)" : "Employer Match ($/yr, Today&#39;s $)"}</label>
                 <input type="number" class="save-name-input mono" data-wp-contrib-field="employer_match_annual" data-wp-idx="${cIdx}" min="0" max="50000000" step="500" value="${Number(row.employer_match_annual || 0)}" style="width:100%;" />
-                <div class="muted mono" style="font-size:10px;margin-top:3px;line-height:1.35;">Added to holding (not deducted from paycheck)</div>
+                <div class="mono" data-wp-match-impact="${cIdx}" style="font-size:10px;margin-top:3px;line-height:1.35;">${_renderWorkPlanMatchImpactNote(rowDet)}</div>
               </div>
               <div style="padding-top:19px;">
                 <button type="button" class="btn-delete-symbol" data-wp-action="del-contrib" data-wp-idx="${cIdx}" title="Remove contribution target">${ICONS.trash}</button>
@@ -8037,6 +8143,7 @@
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                 <span class="muted" style="font-size:10.5px;">IRS Presets:</span>
                 <button type="button" class="cap-btn mono" data-wp-action="preset-emp" data-wp-idx="${cIdx}" data-wp-val="24500" title="2026 IRS 401(k)/403(b) elective deferral limit ($24,500/yr)">401(k) Max ($24.5K)</button>
+                <button type="button" class="cap-btn mono" data-wp-action="preset-match-50" data-wp-idx="${cIdx}" title="Set 50% employer match rate with $12,250/yr annual match cap (50% of $24.5K IRS §402(g) limit)">50% Match ($12.25K Cap)</button>
                 <button type="button" class="cap-btn mono" data-wp-action="preset-emp" data-wp-idx="${cIdx}" data-wp-val="7500" title="2026 IRS Traditional/Roth IRA contribution limit ($7,500/yr)">IRA Max ($7.5K)</button>
                 <label class="has-tip" data-tip="&lt;b&gt;IRS Age 50+ &amp; SECURE 2.0 Super Catch-Up&lt;/b&gt;&lt;br&gt;Automatically adds +$8,000/yr (Today's $, CPI-indexed) starting in the calendar year this member turns 50, and +$11,250/yr at attained ages 60–63." style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#cbd5e1;cursor:pointer;margin-left:4px;">
                   <input type="checkbox" data-wp-contrib-field="age_50_catchup" data-wp-idx="${cIdx}" ${row.age_50_catchup ? "checked" : ""} style="accent-color:#38bdf8;cursor:pointer;" />
@@ -8044,11 +8151,29 @@
                 </label>
                 ${empOpts.missingSelected ? `<span class="pill pill-amber mono" style="font-size:9.5px;">&#9888; Holding missing from statements (skipped)</span>` : ""}
               </div>
-              <div style="display:flex;align-items:center;gap:6px;min-width:220px;">
-                <span class="muted" style="font-size:10.5px;white-space:nowrap;">Match Target:</span>
-                <select class="save-name-input mono" data-wp-contrib-field="match_target_asset_id" data-wp-idx="${cIdx}" style="font-size:11px;padding:3px 7px;max-width:230px;" title="Optional separate holding for employer match (e.g. Pre-Tax 401(k) when employee contributes to Roth 401(k))">
-                  ${matchOpts.html}
-                </select>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:4px;" title="Optional match percentage capped by Annual Match Limit ($/yr) so lowering Employee Contribution automatically scales down the match">
+                  <span class="muted" style="font-size:10.5px;white-space:nowrap;">Match Rule:</span>
+                  <select class="save-name-input mono" data-wp-contrib-field="match_rate_pct" data-wp-idx="${cIdx}" style="font-size:11px;padding:3px 6px;">
+                    <option value="0" ${mrVal <= 0 ? "selected" : ""}>Flat $/yr</option>
+                    <option value="50" ${Math.abs(mrVal - 50) < 0.01 ? "selected" : ""}>50% up to Cap</option>
+                    <option value="100" ${Math.abs(mrVal - 100) < 0.01 ? "selected" : ""}>100% up to Cap</option>
+                    ${(mrVal > 0 && Math.abs(mrVal - 50) >= 0.01 && Math.abs(mrVal - 100) >= 0.01) ? `<option value="${mrVal}" selected>${mrVal}% up to Cap</option>` : ""}
+                  </select>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;" title="Monthly spreads deposits 1/12 per month; Q1 Front-Loaded funds 100% across Jan–Mar (e.g. bonus max-out) and $0 in Apr–Dec">
+                  <span class="muted" style="font-size:10.5px;white-space:nowrap;">Pacing:</span>
+                  <select class="save-name-input mono" data-wp-contrib-field="pacing" data-wp-idx="${cIdx}" style="font-size:11px;padding:3px 6px;">
+                    <option value="monthly" ${paceVal === "monthly" ? "selected" : ""}>Monthly (1/12)</option>
+                    <option value="q1_frontloaded" ${paceVal === "q1_frontloaded" ? "selected" : ""}>Q1 Front-Loaded</option>
+                  </select>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;">
+                  <span class="muted" style="font-size:10.5px;white-space:nowrap;">Match Target:</span>
+                  <select class="save-name-input mono" data-wp-contrib-field="match_target_asset_id" data-wp-idx="${cIdx}" style="font-size:11px;padding:3px 7px;max-width:195px;" title="Optional separate holding for employer match (e.g. Pre-Tax 401(k) when employee contributes to Roth 401(k))">
+                    ${matchOpts.html}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -8182,6 +8307,9 @@
                   <div class="proj-collapse-body" style="padding:11px 13px;border-top:1px solid rgba(51,65,85,0.45);">
                     <div id="proj-wp-overalloc-banner" class="mono" style="display:${bd.overAllocated ? 'block' : 'none'};padding:7px 10px;border-radius:6px;background:rgba(244,63,94,0.12);border:1px solid rgba(244,63,94,0.4);color:#fda4af;font-size:11px;line-height:1.4;">
                       ${bd.overAllocated ? `&#9888; House contribution (${escHtml(fmtUSD0(bd.houseContrib))}) + after-tax employee retirement contributions (${escHtml(fmtUSD0(Math.round(bd.empAfterTaxTotal)))}) exceed annual take-home pay (${escHtml(fmtUSD0(bd.totalPaycheck))}) by <b>${escHtml(fmtUSD0(Math.round(Math.abs(bd.remainingAfterTax))))}/yr</b>.` : ""}
+                    </div>
+                    <div id="proj-wp-irs-banner" class="mono" style="display:${(bd.irsWarnings && bd.irsWarnings.length > 0) ? 'block' : 'none'};padding:7px 10px;border-radius:6px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);color:#fcd34d;font-size:11px;line-height:1.45;">
+                      ${(bd.irsWarnings && bd.irsWarnings.length > 0) ? bd.irsWarnings.map(w => `<div>&#9888; ${escHtml(w)}</div>`).join("") : ""}
                     </div>
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
                       <div>
@@ -8351,8 +8479,10 @@
             target_asset_id: defAsset ? defAsset.id : "",
             employee_annual: defEmpUsd,
             employer_match_annual: 0,
+            match_rate_pct: 0,
             match_target_asset_id: "",
             age_50_catchup: false,
+            pacing: "monthly",
           });
           _projSectionExplicitOpen.set(`family:work:${pid}:${mId}`, true);
           _wpRetSavingsOpen.set(`${pid}:${mId}`, true);
@@ -8376,6 +8506,18 @@
             _projSectionExplicitOpen.set(`family:work:${pid}:${mId}`, true);
             _wpRetSavingsOpen.set(`${pid}:${mId}`, true);
             mem.work_plan.contributions[cIdx].employee_annual = val;
+            _syncInvestorsAndBeneficiariesFromFamily();
+            renderProjectFamilyMembers();
+            _scheduleProjectAutoSave(150);
+          }
+        } else if (action === "preset-match-50") {
+          const cIdx = parseInt(actBtn.getAttribute("data-wp-idx"), 10);
+          if (Array.isArray(mem.work_plan.contributions) && mem.work_plan.contributions[cIdx]) {
+            _projSectionExplicitOpen.set(`family:work:${pid}:${mId}`, true);
+            _wpRetSavingsOpen.set(`${pid}:${mId}`, true);
+            const row = mem.work_plan.contributions[cIdx];
+            row.match_rate_pct = 50;
+            row.employer_match_annual = 12250;
             _syncInvestorsAndBeneficiariesFromFamily();
             renderProjectFamilyMembers();
             _scheduleProjectAutoSave(150);
@@ -8459,12 +8601,19 @@
             _syncInvestorsAndBeneficiariesFromFamily();
             _syncWorkPlanLiveDOM(mem);
             _scheduleProjectAutoSave(150);
-          } else if (cField === "target_asset_id" || cField === "match_target_asset_id") {
+          } else if (cField === "target_asset_id" || cField === "match_target_asset_id" || cField === "pacing") {
             if (!isCommit) return;
             row[cField] = String(t.value || "").trim();
             if (row.match_target_asset_id === row.target_asset_id) row.match_target_asset_id = "";
             _syncInvestorsAndBeneficiariesFromFamily();
             renderProjectFamilyMembers();
+            _scheduleProjectAutoSave(150);
+          } else if (cField === "match_rate_pct") {
+            if (!isCommit) return;
+            const mr = parseFloat(t.value);
+            row.match_rate_pct = Number.isFinite(mr) ? Math.max(0, Math.min(200, mr)) : 0;
+            _syncInvestorsAndBeneficiariesFromFamily();
+            _syncWorkPlanLiveDOM(mem);
             _scheduleProjectAutoSave(150);
           } else if (cField === "employee_annual" || cField === "employer_match_annual") {
             const raw = parseFloat(t.value);

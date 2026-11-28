@@ -603,8 +603,10 @@ class PreRetirementWorkTest(unittest.TestCase):
                             "target_asset_id": roth_id,
                             "employee_annual": 24500,
                             "employer_match_annual": 10000,
+                            "match_rate_pct": 50,
                             "match_target_asset_id": pretax_id if pretax_id != roth_id else "",
                             "age_50_catchup": True,
+                            "pacing": "q1_frontloaded",
                         }
                     ],
                 }
@@ -683,6 +685,64 @@ class PreRetirementWorkTest(unittest.TestCase):
                 payload=payload,
             )
             self.assertEqual(py_order, js_order)
+
+    def test_match_rate_cap_and_q1_frontloaded_pacing(self):
+        """Match rate % caps at employer_match_annual and Q1 front-loaded pacing skips H2 Year-0 and funds Q1 before mid-year retirement."""
+        # Start in Nov 2026 (`2026-11-27`) with worker born `1968-07` retiring at age 59 (`2027-07`):
+        # - Dec 2026 (`m=1`, cal_mo=12): Q1 front-loaded row deposits $0 (already maxed in Q1 2026!).
+        # - Jan, Feb, Mar 2027 (`m=2,3,4`): deposits 1/3 each = 100% of 2027 annual employee + capped match!
+        # - Apr, May, Jun 2027 (`m=5,6,7`): deposits $0; retires July 2027 (`m=8`).
+        payload = _make_synthetic_payload(today_iso="2026-11-27")
+        payload["project"]["investors"][0]["birth_date"] = "1968-07"
+        payload["ssn_model"]["investors"][0]["birth_year"] = 1968
+        payload["ssn_model"]["investors"][0]["birth_month"] = 7
+        payload["project"]["investors"][0]["work_plan"] = {
+            "is_working": True,
+            "default_retirement_age": 59,
+            "covers_full_burn": True,
+            "annual_budget_offset": 0,
+            "contributions": [
+                # Row 1: $10,000 employee w/ 50% match capped at $12,250 -> effective match is $5,000 (not $12,250!), Q1 front-loaded
+                {
+                    "target_asset_id": "acct_HB_7002",
+                    "employee_annual": 10000,
+                    "employer_match_annual": 12250,
+                    "match_rate_pct": 50,
+                    "age_50_catchup": False,
+                    "pacing": "q1_frontloaded",
+                },
+                # Row 2: $0 base employee + age_50_catchup=True (+$8,000 catch-up only) into Roth 401(k), monthly pacing
+                {
+                    "target_asset_id": "acct_HB_7003",
+                    "employee_annual": 0,
+                    "employer_match_annual": 0,
+                    "age_50_catchup": True,
+                    "pacing": "monthly",
+                },
+            ],
+        }
+        res = run_simulation(
+            payload,
+            {
+                "simAnnualBurn": 120000,
+                "simInflationPct": 0.0,
+                "simIncludeSSN": False,
+                "holdingForecasts": {
+                    "acct_HB_7001": {"growth_pct": 0.0, "risk_class": "broad_equity"},
+                    "acct_HB_7002": {"growth_pct": 0.0, "risk_class": "broad_equity"},
+                    "acct_HB_7003": {"growth_pct": 0.0, "risk_class": "broad_equity"},
+                    "ann_HB_7004": {"growth_pct": 0.0, "risk_class": "cash_fixed"},
+                },
+            },
+        )
+        # Month 1 (`2026-12`): Q1 front-loaded row added $0 to `acct_HB_7002`!
+        self.assertAlmostEqual(res["bars"][1]["assetVals"]["acct_HB_7002"], 200000.0, delta=0.5)
+        # Month 4 (`2027-03`): Full 2027 Q1 ($10,000 emp + $5,000 50%-match = $15,000) funded into `acct_HB_7002`!
+        self.assertAlmostEqual(res["bars"][4]["assetVals"]["acct_HB_7002"], 215000.0, delta=0.5)
+        # Month 7 (`2027-06`, last working month before `2027-07` retirement): still $215,000 on `acct_HB_7002`,
+        # while `acct_HB_7003` received 7 months (Dec 2026..Jun 2027) of $8,000/12 catch-up!
+        self.assertAlmostEqual(res["bars"][7]["assetVals"]["acct_HB_7002"], 215000.0, delta=0.5)
+        self.assertAlmostEqual(res["bars"][7]["assetVals"]["acct_HB_7003"], 100000.0 + 7.0 * (8000.0 / 12.0), delta=0.5)
 
 
 if __name__ == "__main__":

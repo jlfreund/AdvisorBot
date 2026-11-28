@@ -270,9 +270,21 @@
           const empUsd = Number.isFinite(empR) ? Math.round(Math.max(0, Math.min(MAX_WORK_PLAN_ANNUAL_USD_JS, empR)) * 100) / 100 : 0.0;
           const mR = Number(row.employer_match_annual || 0);
           const matchUsd = Number.isFinite(mR) ? Math.round(Math.max(0, Math.min(MAX_WORK_PLAN_ANNUAL_USD_JS, mR)) * 100) / 100 : 0.0;
+          const mrRaw = Number(row.match_rate_pct || 0);
+          const matchRatePct = Number.isFinite(mrRaw) ? Math.round(Math.max(0, Math.min(200, mrRaw)) * 100) / 100 : 0.0;
+          const rawPacing = String(row.pacing || "monthly").trim().toLowerCase();
+          const pacing = rawPacing === "q1_frontloaded" ? "q1_frontloaded" : "monthly";
           const catchup = Boolean(row.age_50_catchup);
-          if (!tid && empUsd <= 0 && matchUsd <= 0) return;
-          contribs.push({ target_asset_id: tid, employee_annual: empUsd, employer_match_annual: matchUsd, match_target_asset_id: mid, age_50_catchup: catchup });
+          if (!tid && empUsd <= 0 && matchUsd <= 0 && !catchup) return;
+          contribs.push({
+            target_asset_id: tid,
+            employee_annual: empUsd,
+            employer_match_annual: matchUsd,
+            match_rate_pct: matchRatePct,
+            match_target_asset_id: mid,
+            age_50_catchup: catchup,
+            pacing,
+          });
         });
       }
       const budgetAnswered = Boolean(rawWp.budget_answered || offsetUsd > 0 || coversFull || contribs.length > 0);
@@ -1638,20 +1650,33 @@
           }
           if (ym > String(wpCfg.start_ym || "")) {
             const curYrW = parseInt(iso.slice(0, 4), 10);
+            const calMoW = parseInt(iso.slice(5, 7), 10);
             activeW.forEach(w => {
               const attainedAgeW = curYrW - Number(w.birth_year);
               (w.contributions || []).forEach(crow => {
+                const pacingMode = String(crow.pacing || "monthly");
+                const paceMult = pacingMode === "q1_frontloaded"
+                  ? ((calMoW >= 1 && calMoW <= 3) ? (1.0 / 3.0) : 0.0)
+                  : (1.0 / 12.0);
+                if (paceMult <= 0.0) return;
                 const empBase = Number(crow.employee_annual || 0);
-                if (empBase > 0.0) {
-                  const catchupW = crow.age_50_catchup
-                    ? ((attainedAgeW >= 60 && attainedAgeW <= 63) ? IRS_SUPER_CATCHUP_60_63_USD : (attainedAgeW >= 50 ? IRS_CATCHUP_50_USD : 0.0))
-                    : 0.0;
-                  const empMo = ((empBase + catchupW) * dfl) / 12.0;
+                const catchupW = crow.age_50_catchup
+                  ? ((attainedAgeW >= 60 && attainedAgeW <= 63) ? IRS_SUPER_CATCHUP_60_63_USD : (attainedAgeW >= 50 ? IRS_CATCHUP_50_USD : 0.0))
+                  : 0.0;
+                const empTot = empBase + catchupW;
+                if (empTot > 0.0) {
+                  const empMo = (empTot * dfl) * paceMult;
                   monthlyWorkContrib += depositWorkPlanLeg(stateMap, crow.target_asset_id, iso, empMo, false);
                 }
                 const matchBase = Number(crow.employer_match_annual || 0);
-                if (matchBase > 0.0) {
-                  const matchMo = (matchBase * dfl) / 12.0;
+                const matchRatePct = Number(crow.match_rate_pct || 0);
+                let effMatch = matchBase;
+                if (matchRatePct > 0.0) {
+                  const rawMatch = empBase * (matchRatePct / 100.0);
+                  effMatch = matchBase > 0.0 ? Math.min(matchBase, rawMatch) : rawMatch;
+                }
+                if (effMatch > 0.0) {
+                  const matchMo = (effMatch * dfl) * paceMult;
                   const matchTid = crow.match_target_asset_id || crow.target_asset_id;
                   monthlyWorkContrib += depositWorkPlanLeg(stateMap, matchTid, iso, matchMo, true);
                 }
