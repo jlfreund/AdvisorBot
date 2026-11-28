@@ -247,6 +247,17 @@ def _account_id_variants(raw_aid: str) -> list[str]:
     if not aid:
         return []
     syns = [aid]
+    m_plan_sub = re.match(
+        r"^(.+?)[-_](?:PRETAX|PRE[-_]?TAX|ROTH|AFTERTAX|AFTER[-_]?TAX|TRAD|MATCH)$",
+        aid,
+        flags=re.IGNORECASE,
+    )
+    if m_plan_sub:
+        base_plan = m_plan_sub.group(1).strip()
+        if len(base_plan) >= 4:
+            syns.append(base_plan)
+            if "-" in base_plan:
+                syns.append(base_plan.replace("-", "_"))
     if "-" in aid:
         syns.append(aid.replace("-", "_"))
     if "_" in aid and re.match(r"^(?:ACCT|ANN|WFA|MS)_\d{2,3}$", aid, flags=re.IGNORECASE):

@@ -2,7 +2,7 @@
 
 <!-- GENERATED FILE. Run `make fixtures` (or `python3 -m tests.catalog`) to refresh. -->
 
-**324 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 102 are ported from the pre-fixture suite.
+**326 tests** across 9 tiers. 80 are tagged as security regressions, 0 are expected failures recording an open finding, and 102 are ported from the pre-fixture suite.
 
 Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA3-05`, `DA3-06`, `DA4-03`, `DA4-07`, `DA4-08b`, `DA4-09`, `DA4-10`, `DA4-11`, `DA4-13`, `DP-01`, `DP-02`, `DP-03`, `DP-04`, `I4`, `LL-01`, `LL-03`, `LL-06`, `LL-08`, `LL-09`, `LL-13`, `LL-14`, `LL-22`, `LL-23`, `S1`, `SA-02`, `SA-03`, `SA-04`, `SA-05`, `SA-06`, `SA-09`, `SA-11`, `SA-13`, `SA-15`, `SA-18`, `SA-20`, `SA2-01`, `SA2-02`, `SA2-03`, `SA2-04`, `SA2-06`, `SA2-07`, `SA2-08`, `SA2-10`, `SA2-11`, `SA2-12`, `SA2-13`, `SA2-14`, `SA2-15`, `SA2-16`, `SA2-17`, `SA2-21`, `SA2-22`, `SA3-01`, `SA3-02`, `SA3-05`, `SA3-06`, `SA3-08`, `SA4-01`, `SA4-03`, `SA4-04`, `SA4-05`, `SA5-01`, `SA5-02`, `SA5-03`, `SA5-04`, `SA5-05`, `SA5-06`, `SA5-07`, `SA5-08`, `SA5-09`, `SA5-10`.
 
@@ -10,8 +10,8 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | --- | --- |
 | `unit` | 18 |
 | `parsers` | 28 |
-| `pipeline` | 53 |
-| `engine` | 41 |
+| `pipeline` | 54 |
+| `engine` | 42 |
 | `parity` | 10 |
 | `render` | 18 |
 | `server` | 99 |
@@ -176,6 +176,12 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `test_payload__spec_invariants__hold` | `p1_index_saver` | _payload_ | The invariants the fixture's spec declares are true of the built payload. |
 | `test_cash_sweep__is_a_single_merged_bucket_with_its_configured_rate` | `p1_index_saver` | _cash_interest_ | Cash across accounts rolls into one simulator bucket carrying the configured APY. |
 
+### `pipeline/test_plan_tax_source_rollup.py`
+
+| Case | Portfolio | Covers | Summary |
+| --- | --- | --- | --- |
+| `MultiSourcePlanRollupTest::test_canonical_json_tax_sources_collapse_strategy_and_preserve_sim_wrappers` | — | — | Multi-source plan statements collapse into one expandable Strategy row while keeping tax-split Simulator buckets. |
+
 ### `pipeline/test_recent_change.py`
 
 | Case | Portfolio | Covers | Summary |
@@ -237,6 +243,7 @@ Tagged findings: `DA2-01`, `DA2-04`, `DA2-13`, `DA3-01`, `DA3-03`, `DA3-04`, `DA
 | `PreRetirementWorkTest::test_early_crash_stress_anchors_to_drawdown_start_month` | — | — | Early Crash (`stress`) defers Downfall shock until `drawdown_start_month` when paycheck covers burn. |
 | `PreRetirementWorkTest::test_privacy_shield_and_demo_mode_work_plan_invariants` | — | — | Mode C and Demo Mode alias composite IDs and scale work USD fields without scaling retirement ages. |
 | `PreRetirementWorkTest::test_python_js_parity_with_work_plan_and_scenario_overrides` | — | — | Python and Browser JS engines match 1:1 across Single-Path, Stress, MC, Cohorts, and Auto-Optimize. |
+| `PreRetirementWorkTest::test_match_rate_cap_and_q1_frontloaded_pacing` | — | — | Match rate % caps at employer_match_annual and Q1 front-loaded pacing skips H2 Year-0 and funds Q1 before mid-year retirement. |
 
 ### `engine/test_projection_models.py`
 

@@ -1028,7 +1028,7 @@ def cmd_test_plugin(args: argparse.Namespace) -> int:
     )
 
     with PortfolioDB(":memory:") as mem_db:
-        pos_chg, anc_chg = apply_parsed_statement(mem_db, stmt, cand, run_id=None)
+        pos_chg, anc_chg = apply_parsed_statement(mem_db, stmt, cand, run_id=None, cfg=cfg)
         plugin.post_ingest_reconcile(mem_db, cfg)
         enrich_summary = enrich_holding_forecasts(
             mem_db,

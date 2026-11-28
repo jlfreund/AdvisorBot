@@ -20,8 +20,9 @@ CREATE TABLE IF NOT EXISTS accounts (
     institution TEXT NOT NULL,               -- e.g. 'Brokerage Custodian' | 'Stock Plan Administrator'
     account_name TEXT NOT NULL,
     account_type TEXT NOT NULL,
-    tax_status TEXT NOT NULL,                -- 'TAXABLE', 'TRAD_IRA', 'ROTH_IRA'
-    display_order INTEGER DEFAULT 100
+    tax_status TEXT NOT NULL,                -- 'TAXABLE', 'TRAD_IRA', 'ROTH_IRA', '401K', 'ROTH_401K'
+    display_order INTEGER DEFAULT 100,
+    parent_account_id TEXT                   -- Optional parent employer plan ID when split across tax sources
 );
 
 CREATE TABLE IF NOT EXISTS ingested_files (

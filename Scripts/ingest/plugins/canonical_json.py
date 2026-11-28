@@ -46,7 +46,7 @@ from typing import Any
 
 from ingest.errors import StatementParseError
 from ingest.framework import IngestContext, StatementPlugin
-from ingest.models import ParsedAdjustment, ParsedPosition, ParsedStatement
+from ingest.models import ParsedAdjustment, ParsedPosition, ParsedStatement, ParsedTaxSource
 
 FORMAT_ID = "advisorbot.statement/1"
 FILE_SUFFIX = ".statement.json"
@@ -68,8 +68,13 @@ def _mask_if_raw_account_number(raw_acct: str | None, cfg: dict[str, Any] | None
 _STATEMENT_KEYS = {
     "format", "doc_type", "institution", "account_id", "account_name", "account_type",
     "tax_status", "display_order", "period_start", "as_of_date", "reported_total",
-    "positions", "adjustments", "grants", "fixture",
+    "positions", "adjustments", "grants", "tax_sources", "fixture",
 }
+_TAX_SOURCE_KEYS = {
+    "source_id", "tax_status", "closing_balance", "opening_balance",
+    "account_name", "account_type", "cost_basis",
+}
+_TAX_SOURCE_REQUIRED = ("source_id", "tax_status", "closing_balance")
 _REQUIRED_STATEMENT_KEYS = ("institution", "as_of_date")
 
 _POSITION_REQUIRED = ("security_id", "symbol_or_code", "canonical_name", "asset_class", "quantity", "market_value")
@@ -211,6 +216,31 @@ def _parse_adjustment(label: str, idx: int, raw: Any) -> ParsedAdjustment:
     )
 
 
+def _parse_tax_source(label: str, idx: int, raw: Any) -> ParsedTaxSource:
+    tag = f"{label} tax_sources[{idx}]"
+    if not isinstance(raw, dict):
+        raise _err(tag, "must be an object")
+    _reject_unknown(tag, raw, _TAX_SOURCE_KEYS, "tax_source")
+    for field in _TAX_SOURCE_REQUIRED:
+        if raw.get(field) is None:
+            raise _err(tag, f"`{field}` is required")
+    sid = re.sub(r"[^A-Za-z0-9_-]+", "", str(raw["source_id"]).strip()).upper()
+    if not sid:
+        raise _err(tag, "`source_id` must be a non-empty alphanumeric identifier")
+    t_stat = str(raw["tax_status"]).strip().upper()
+    if not t_stat:
+        raise _err(tag, "`tax_status` must be non-empty")
+    return ParsedTaxSource(
+        source_id=sid,
+        tax_status=t_stat,
+        closing_balance=_require_float(tag, "closing_balance", raw["closing_balance"]),
+        opening_balance=_optional_float(tag, "opening_balance", raw.get("opening_balance")),
+        account_name=str(raw["account_name"]).strip() if raw.get("account_name") else None,
+        account_type=str(raw["account_type"]).strip() if raw.get("account_type") else None,
+        cost_basis=_optional_float(tag, "cost_basis", raw.get("cost_basis")),
+    )
+
+
 def parse_canonical_statement_payload(
     payload: dict[str, Any],
     source_label: str = "statement.json",
@@ -235,6 +265,9 @@ def parse_canonical_statement_payload(
     raw_adjustments = payload.get("adjustments") or []
     if not isinstance(raw_adjustments, list):
         raise _err(source_label, "`adjustments` must be a list")
+    raw_tax_sources = payload.get("tax_sources") or []
+    if not isinstance(raw_tax_sources, list):
+        raise _err(source_label, "`tax_sources` must be a list")
 
     positions = [_parse_position(source_label, i, row, as_of) for i, row in enumerate(raw_positions)]
     seen: set[str] = set()
@@ -243,6 +276,7 @@ def parse_canonical_statement_payload(
             raise _err(source_label, f"duplicate security_id in positions: {pos.security_id}")
         seen.add(pos.security_id)
     adjustments = [_parse_adjustment(source_label, i, row) for i, row in enumerate(raw_adjustments)]
+    tax_sources = [_parse_tax_source(source_label, i, row) for i, row in enumerate(raw_tax_sources)]
 
     grants = payload.get("grants")
     tranches: list[Any] = []
@@ -275,6 +309,14 @@ def parse_canonical_statement_payload(
                 source_label,
                 f"reported_total checksum mismatch: positions sum {pos_sum:.2f} vs reported_total {reported_total:.2f}",
             )
+    if tax_sources and positions:
+        pos_sum_ts = sum(float(p.market_value) for p in positions)
+        ts_sum = sum(float(ts.closing_balance) for ts in tax_sources)
+        if abs(ts_sum - pos_sum_ts) > 0.05:
+            raise _err(
+                source_label,
+                f"tax_sources checksum mismatch: tax_sources sum {ts_sum:.2f} vs positions sum {pos_sum_ts:.2f}",
+            )
     return ParsedStatement(
         doc_type=str(payload.get("doc_type") or DEFAULT_DOC_TYPE).strip().upper(),
         institution=str(payload["institution"]).strip(),
@@ -291,6 +333,7 @@ def parse_canonical_statement_payload(
         gsu_tranches=tranches,
         gsu_releases=releases,
         gsu_withdrawals=withdrawals,
+        tax_sources=tax_sources,
     )
 
 

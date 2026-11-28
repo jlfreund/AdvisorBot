@@ -1442,7 +1442,7 @@ def build_report_payload(
         aid = a["id"]
         sim_by_id[aid] = a
         rgid = a.get("rollup_group_id")
-        if rgid and (rgid not in rollup_to_sim_key or aid == "cash_sweeps"):
+        if rgid and not str(rgid).startswith("rollup_plan_") and (rgid not in rollup_to_sim_key or aid == "cash_sweeps"):
             rollup_to_sim_key[rgid] = aid
 
     # Map standalone `(account_id, security_id)` pairs to their canonical Strategy/Sim `forecast_key`
@@ -1507,6 +1507,29 @@ def build_report_payload(
             g["source_detail"] = roll_metrics["source_detail"]
             g["growth_evidence"] = roll_metrics["growth_evidence"]
             g["constituent_forecasts"] = roll_metrics["constituents"]
+        elif gid.startswith("rollup_plan_"):
+            plan_children = list(g.get("children") or [])
+            first_ch_aid = str(plan_children[0].get("account_id") or "") if plan_children else ""
+            st_sid = str(g.get("security_id") or "")
+            st_fb_rc = infer_risk_class(
+                asset_id=fk,
+                asset_class=str(g.get("asset_class") or g.get("investment_type") or ""),
+                symbol=raw_sym,
+                primary_symbol=primary_sym_up,
+            )
+            st_bl = _lookup_baseline(first_ch_aid, st_sid, fallback_rc=st_fb_rc)
+            _apply_baseline_fields(g, st_bl)
+            for ch in plan_children:
+                ch_aid = str(ch.get("account_id") or "")
+                ch_sid = str(ch.get("security_id") or st_sid)
+                ch_sym = str(ch.get("symbol") or raw_sym).lstrip("#").lower()
+                ch_sim_fk = f"{ch_sym}_{ch_aid.replace('-', '_')}" if (ch_sym and ch_aid) else str(ch.get("holding_key") or f"{ch_aid}:{ch_sid}")
+                ch["forecast_key"] = ch_sim_fk
+                ch["parent_forecast_keys"] = [fk, *([f"acct_{ch_aid}"] if ch_aid else []), *parent_fks]
+                ch_bl = _lookup_baseline(ch_aid, ch_sid, fallback_rc=st_fb_rc)
+                _apply_baseline_fields(ch, ch_bl)
+                if ch_aid and ch_sid:
+                    acct_sec_to_canonical_fk[(ch_aid, ch_sid)] = (ch_sim_fk, [fk])
         else:
             st_aid = str(g.get("account_id") or "")
             st_sid = str(g.get("security_id") or "")
@@ -2955,6 +2978,65 @@ def _build_retirement_sim_assets(
                     "_rollup_gid": gid,
                 }
             )
+        elif gid.startswith("rollup_plan_"):
+            raw_sym = str(r.get("symbol") or "").lstrip("#")
+            inv_type = str(r.get("asset_class") or r.get("investment_type") or "")
+            r_rc = str(r.get("default_risk_class") or r.get("ingested_risk_class") or "").lower()
+            inv_up = inv_type.upper()
+            is_taxable_bond = (
+                (r_rc == "fixed_income" or any(tok in inv_up for tok in ("FIXED_INCOME", "BOND", "TREASURY", "CD", "CERTIFICATE")))
+                and "MUNI" not in inv_up
+            )
+            for ch in r.get("children") or []:
+                ch_aid = str(ch.get("account_id") or "")
+                if not ch_aid:
+                    continue
+                ch_slug = ch_aid.replace("-", "_")
+                ch_lbl = _friendly_account_label(ch_aid, accounts_db, cfg)
+                ch_cur_v = round(float(ch.get("current_value") or 0.0), 2)
+                ch_p_val = float(ch.get("principal_val") if ch.get("principal_val") is not None else ch_cur_v)
+                ch_sym = str(ch.get("symbol") or raw_sym).lstrip("#")
+                bid = f"{ch_sym.lower()}_{ch_slug}"
+                ch_gid = str(ch.get("holding_key") or f"single_{ch_aid}_{ch_sym}")
+                base_stmt_name = str(r.get("statement_name") or ch.get("statement_name") or ch_sym)
+                ch_wrap = str((accounts_db.get(ch_aid) or {}).get("tax_status") or "TAXABLE").upper()
+                wrap_tag = _tax_sleeve_short_label(ch_wrap)
+                d_title = f"{base_stmt_name} — {wrap_tag}"
+                d_short = f"{ch_sym} ({wrap_tag})"
+                t_final, s_final = _sim_title_short(ch_gid, d_title, d_short)
+                gain_ratio = max(0.0, (ch_cur_v - ch_p_val) / ch_cur_v) if ch_cur_v > 0 else 0.0
+                rank_val = 10 + min(9, int(round(gain_ratio * 8))) + (fund_rank_counter - 10)
+                assets.append(
+                    {
+                        "id": bid,
+                        "account_id": ch_aid,
+                        "symbol": ch_sym.upper() if ch_sym else None,
+                        "parent_forecast_keys": [gid],
+                        "default_rank": rank_val,
+                        "color": "#2dd4bf",
+                        "title": t_final,
+                        "short_title": s_final,
+                        "subtitle": f"{ch_lbl} • {ch.get('quantity_str') or '1 contract'}",
+                        "account_label": ch_lbl,
+                        "bucket": "non_goog",
+                        "is_unvested_goog": False,
+                        "is_goog_priced": False,
+                        "shares": None,
+                        "current_value": ch_cur_v,
+                        "cost_basis": ch_p_val,
+                        "basis_sub": ch.get("principal_sub") or "Initial Principal",
+                        "maturity_iso": None,
+                        "liquidity_label": "Liquid Now",
+                        "liquidity_sub": "Daily mutual fund NAV" if inv_type == "MUTUAL_FUND" else ("Fixed-income position" if is_taxable_bond else "Retirement plan investment"),
+                        "tax_model": "TAXABLE_YIELD" if is_taxable_bond else "LTCG_POOL",
+                        "tax_rate": ORD_TOP_RATE if is_taxable_bond else LTCG_TOP_RATE,
+                        "tax_rule_title": "",
+                        "tax_rule_detail": "",
+                        "tranches": [],
+                        "_rollup_gid": gid,
+                    }
+                )
+                fund_rank_counter += 1
         elif gid.startswith("single_"):
             inv_type = str(r.get("asset_class") or r.get("investment_type") or "")
             raw_sym = str(r.get("symbol") or "").lstrip("#")
@@ -3278,11 +3360,10 @@ def _build_retirement_sim_assets(
             primary_symbol=primary_sym,
         )
         a["forecast_key"] = a["id"]
-        a["parent_forecast_keys"] = (
-            [primary_sym]
-            if primary_sym and (a.get("symbol") == primary_sym or a.get("is_goog_priced"))
-            else []
-        )
+        existing_parents = list(a.get("parent_forecast_keys") or [])
+        if primary_sym and (a.get("symbol") == primary_sym or a.get("is_goog_priced")) and primary_sym not in existing_parents:
+            existing_parents.append(primary_sym)
+        a["parent_forecast_keys"] = existing_parents
         a["default_risk_class"] = rc
         a["default_growth_pct"] = round(float(a["annual_rate_pct"]), 2) if (a["rate_model"] == "fixed" and a["annual_rate_pct"] is not None) else 0.0
 
@@ -4127,6 +4208,90 @@ def _child_from_item(
     }
 
 
+_PLAN_SUBACCOUNT_SUFFIX_RE = re.compile(
+    r"^(.+?)[-_](?:PRETAX|PRE[-_]?TAX|ROTH|AFTERTAX|AFTER[-_]?TAX|TRAD|MATCH)$",
+    re.IGNORECASE,
+)
+
+
+def _tax_sleeve_short_label(tax_status: str) -> str:
+    ts = str(tax_status or "").strip().upper()
+    mapping = {
+        "401K": "Pre-Tax 401(k)",
+        "TRAD_401K": "Pre-Tax 401(k)",
+        "ROTH_401K": "Roth 401(k)",
+        "403B": "Pre-Tax 403(b)",
+        "TRAD_IRA": "Traditional IRA",
+        "ROTH_IRA": "Roth IRA",
+        "HSA": "HSA",
+        "TAXABLE": "Taxable",
+    }
+    return mapping.get(ts, ts.replace("_", " ").title() or "Sub-Account")
+
+
+def _resolve_parent_plan_id(
+    aid: str | None,
+    accounts: dict[str, dict[str, Any]],
+    cfg: dict[str, Any] | None = None,
+) -> str | None:
+    """
+    Identifies the shared parent plan ID when an employer retirement plan is split across
+    multiple tax-wrapper sub-accounts (e.g. `<PLAN>-PRETAX` + `<PLAN>-ROTH`), either via
+    `accounts.parent_account_id` or matching `<BASE>-PRETAX`/`<BASE>-ROTH` sibling accounts.
+    """
+    if not aid:
+        return None
+    acc = accounts.get(aid) or {}
+    cfg_accts = (cfg or {}).get("accounts") or {}
+    c_acc = cfg_accts.get(aid) or {}
+    explicit = str(acc.get("parent_account_id") or c_acc.get("parent_account_id") or "").strip()
+    if explicit:
+        return explicit
+    m = _PLAN_SUBACCOUNT_SUFFIX_RE.match(str(aid).strip())
+    if not m:
+        return None
+    base_id = m.group(1).strip()
+    if not base_id:
+        return None
+    inst = str(acc.get("institution") or c_acc.get("institution") or "").strip().lower()
+    siblings = [
+        other_id
+        for other_id, other_acc in accounts.items()
+        if other_id != aid
+        and (
+            str(other_acc.get("parent_account_id") or "").strip() == base_id
+            or (
+                _PLAN_SUBACCOUNT_SUFFIX_RE.match(str(other_id))
+                and _PLAN_SUBACCOUNT_SUFFIX_RE.match(str(other_id)).group(1).strip() == base_id
+                and (not inst or str(other_acc.get("institution") or "").strip().lower() == inst)
+            )
+        )
+    ]
+    return base_id if siblings else None
+
+
+def _derive_parent_plan_account_label(
+    plan_id: str,
+    plan_items: list[dict[str, Any]],
+    accounts: dict[str, dict[str, Any]],
+    cfg: dict[str, Any] | None,
+) -> str:
+    first_aid = str(plan_items[0].get("account_id") or "") if plan_items else ""
+    first_lbl = _friendly_account_label(first_aid, accounts, cfg) if first_aid else ""
+    cleaned = re.sub(
+        r"\s*(?:Pre-Tax(?:\s*&\s*Match)?|Roth(?:\s*401\(k\))?(?:\s*&\s*(?:In-Plan\s+)?Conversions)?|After-Tax)\s*",
+        " ",
+        first_lbl,
+        flags=re.IGNORECASE,
+    )
+    cleaned = re.sub(rf"\({re.escape(first_aid)}\)", f"({plan_id})", cleaned)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip(" •-")
+    if cleaned:
+        return cleaned
+    inst = (accounts.get(first_aid) or {}).get("institution") or "Retirement Plan"
+    return f"{inst} • Plan ({plan_id})"
+
+
 def _build_strategy_rollups(
     items: list[dict[str, Any]],
     accounts: dict[str, dict[str, Any]],
@@ -4162,12 +4327,194 @@ def _build_strategy_rollups(
     uma_items = [x for x in items if x["account_id"] in uma_acct_ids and x["asset_class"] == "EQUITY"]
     muni_items = [x for x in items if x["asset_class"] == "MUNI_BOND"]
     cash_items = [x for x in items if x["asset_class"] == "CASH"]
-    standalone = [
+    standalone_raw = [
         x for x in items
         if x not in uma_items and x not in muni_items and x not in cash_items
     ]
 
+    # Group multi-source employer retirement plan holdings that share `(parent_plan_id, security_id)`
+    # (e.g. a 401(k)/403(b) fund held across `<PLAN>-PRETAX` and `<PLAN>-ROTH` sleeves) into a single
+    # collapsible Screen 1 parent row while preserving separate tax-wrapped Simulator buckets underneath.
+    plan_candidates: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for x in standalone_raw:
+        if x["asset_class"].endswith("ANNUITY"):
+            continue
+        p_plan = _resolve_parent_plan_id(x.get("account_id"), accounts, cfg)
+        if p_plan and x.get("security_id"):
+            plan_candidates.setdefault((p_plan, str(x["security_id"])), []).append(x)
+
+    plan_grouped_pairs = {k: v for k, v in plan_candidates.items() if len(v) >= 2}
+    plan_grouped_item_ids = {id(it) for grp_items in plan_grouped_pairs.values() for it in grp_items}
+    standalone = [x for x in standalone_raw if id(x) not in plan_grouped_item_ids]
+
     groups: list[dict[str, Any]] = []
+
+    for (plan_id, sec_id), plan_items in plan_grouped_pairs.items():
+        first_it = plan_items[0]
+        first_acc = accounts.get(first_it["account_id"], {})
+        inst = first_acc.get("institution") or "Retirement Plan"
+        inst_short = inst.replace(" Advisors", "")
+        raw_sym = str(first_it.get("symbol") or "").strip()
+        plan_slug = re.sub(r"[^A-Za-z0-9]+", "_", plan_id).strip("_") or "plan"
+        sym_slug = re.sub(r"[^A-Za-z0-9]+", "_", raw_sym.lower()).strip("_") or "fund"
+        plan_gid = f"rollup_plan_{plan_slug}_{sym_slug}"
+
+        plan_val = round(sum(float(x["current_value"]) for x in plan_items), 2)
+        plan_wow = round(sum(float(x["wow_change"]) for x in plan_items), 2)
+        plan_pct = round(plan_val / total_now * 100.0, 2) if total_now else 0.0
+        plan_stmt_val = round(sum(float(x["stmt_value"]) for x in plan_items), 2)
+        plan_qty = sum(float(x["quantity"]) for x in plan_items)
+        asof_dt = first_it["eval_date"] if first_it["is_scrapeable"] else first_it["stmt_date"]
+
+        if all(x.get("principal_val") is not None for x in plan_items):
+            p_tot = round(sum(float(x["principal_val"]) for x in plan_items), 2)
+            gain_u = round(plan_val - p_tot, 2)
+            gain_p = (gain_u / p_tot * 100.0) if p_tot > 0 else 0.0
+            p_dates = [str(x["principal_date"]) for x in plan_items if x.get("principal_date")]
+            p_dt = min(p_dates) if len(p_dates) == len(plan_items) else None
+            p_str = f"${p_tot:,.2f}"
+            p_sub = f"Acquired {p_dt}" if p_dt else f"{len(plan_items)} tax sources (net contributions)"
+            p_tip = (
+                f"Combined contributed principal / cost basis across {len(plan_items)} plan tax sources "
+                f"({', '.join(_tax_sleeve_short_label((accounts.get(x['account_id']) or {}).get('tax_status') or '') for x in plan_items)}): "
+                f"${p_tot:,.2f}."
+            )
+            if p_dt:
+                cagr_v, yrs_v = solve_annualized_return([(p_dt, p_tot)], asof_dt or today_iso, plan_val)
+            else:
+                cagr_v, yrs_v = None, 0.0
+            if cagr_v is not None:
+                g_str = f"{'+' if cagr_v >= 0 else ''}{cagr_v:.2f}% / yr"
+                g_sub = f"{'+' if gain_u >= 0 else '-'}${abs(gain_u):,.0f} ({'+' if gain_p >= 0 else ''}{gain_p:.1f}%)"
+                g_sign = 1 if cagr_v >= 0 else -1
+                g_tip = f"Annualized growth over {yrs_v:.2f} yrs since {p_dt}: ${p_tot:,.2f} → ${plan_val:,.2f}."
+            else:
+                cagr_v = None
+                g_str = f"{'+' if gain_p >= 0 else ''}{gain_p:.1f}% total"
+                g_sub = f"{'+' if gain_u >= 0 else '-'}${abs(gain_u):,.0f} (across {len(plan_items)} sources)"
+                g_sign = 1 if gain_u > 0 else (-1 if gain_u < 0 else 0)
+                g_tip = (
+                    f"Combined investment gain across Pre-Tax & Roth plan sources vs. ${p_tot:,.2f} net contributions: "
+                    f"{'+' if gain_u >= 0 else '-'}${abs(gain_u):,.2f} ({'+' if gain_p >= 0 else ''}{gain_p:.2f}%)."
+                )
+        else:
+            p_tot, p_dt, cagr_v = None, None, None
+            p_str, p_sub = "—", "Cost N/A in statement"
+            p_tip = "Statement snapshot omits cumulative contribution basis."
+            g_str, g_sub, g_sign = "—", "Inception N/A", 0
+            g_tip = p_tip
+
+        if first_it["is_scrapeable"] or plan_wow != 0.0:
+            prev_p = plan_val - plan_wow
+            rc_pct = (plan_wow / prev_p * 100.0) if prev_p > 0 else 0.0
+            rc_val = plan_wow
+            rc_sign = 1 if plan_wow > 0 else (-1 if plan_wow < 0 else 0)
+            base_date_str = f" (vs {prior_iso})" if prior_iso else ""
+            rc_sub = f"{'+' if rc_pct >= 0 else ''}{rc_pct:.1f}% • 1w{base_date_str}"
+            rc_tip = _format_delta_tooltip(
+                "1-Week Change",
+                f"{'+' if plan_wow >= 0 else '-'}${abs(plan_wow):,.2f} ({rc_pct:+.2f}%)",
+                f"Valuation as of {prior_iso or 'prior week'} across {len(plan_items)} plan tax sources.",
+                f"{today_iso}.",
+            )
+        else:
+            rc_val = 0.0
+            rc_sign = 0
+            date_str = f" (as of {asof_dt})" if asof_dt else ""
+            rc_sub = f"Statement{date_str}"
+            rc_tip = _format_delta_tooltip(
+                "Statement Valuation",
+                f"${plan_val:,.2f}",
+                f"Combined valuation across {len(plan_items)} plan tax sources.",
+                f"{asof_dt or today_iso}.",
+            )
+
+        plan_children: list[dict[str, Any]] = []
+        for x in plan_items:
+            ch = _child_from_item(x, inst_short, holding_prefs, accounts=accounts, cfg=cfg)
+            ch_wrap = str((accounts.get(x["account_id"]) or {}).get("tax_status") or "")
+            sleeve_lbl = _tax_sleeve_short_label(ch_wrap)
+            if not ch.get("friendly_name"):
+                ch["title"] = f"{sleeve_lbl} — {ch['statement_name']}"
+            plan_children.append(ch)
+        plan_children.sort(key=lambda c: (c["pct_portfolio"], c["current_value"]), reverse=True)
+
+        pref = (holding_prefs or {}).get(plan_gid) or (holding_prefs or {}).get(sec_id) or {}
+        fn = pref.get("friendly_name") or ""
+        stmt_name = first_it["name"]
+        fee_pct = pref.get("fee_pct")
+        comment = pref.get("comment") or pref.get("notes") or ""
+        link = f"https://finance.yahoo.com/quote/{first_it['quote_symbol']}" if first_it["is_scrapeable"] and first_it["quote_symbol"] else None
+        sleeve_summary = " & ".join(
+            dict.fromkeys(_tax_sleeve_short_label((accounts.get(x["account_id"]) or {}).get("tax_status") or "") for x in plan_items)
+        )
+
+        groups.append(
+            {
+                "group_id": plan_gid,
+                "holding_key": plan_gid,
+                "account_id": plan_id,
+                "security_id": sec_id,
+                "institution": inst,
+                "asset_class": first_it.get("asset_class"),
+                "investment_type": format_investment_type(pref.get("investment_type") or first_it.get("asset_class")),
+                "maturity_date": first_it.get("maturity_date"),
+                "surrender_val": None,
+                "recent_vest_note": None,
+                "asof_date": asof_dt,
+                "statement_name": stmt_name,
+                "friendly_name": fn,
+                "fee_pct": fee_pct,
+                "comment": comment,
+                "title": fn if fn else stmt_name,
+                "subtitle": f"As of {asof_dt} • Click to expand {sleeve_summary} sleeves",
+                "maturity_str": first_it["maturity_str"],
+                "symbol": raw_sym,
+                "link": link,
+                "account_label": _derive_parent_plan_account_label(plan_id, plan_items, accounts, cfg),
+                "source_label": "Live Ticker" if first_it["is_scrapeable"] else f"Statement ({asof_dt})",
+                "source_tooltip": (
+                    f"Combined holding across {len(plan_items)} tax sources ({sleeve_summary}) in {inst} plan {plan_id}: "
+                    f"${plan_val:,.2f} as of {asof_dt}."
+                ),
+                "is_scrapeable": first_it["is_scrapeable"],
+                "quantity_str": f"{plan_qty:,.3f} sh" if first_it["is_scrapeable"] else f"{len(plan_items)} sources",
+                "stmt_price_str": (
+                    f"${first_it['stmt_price']:,.2f}"
+                    if first_it["stmt_price"] and first_it["is_scrapeable"]
+                    else f"${plan_stmt_val:,.0f}"
+                ),
+                "principal_val": p_tot,
+                "principal_date": p_dt,
+                "cagr_pct": cagr_v,
+                "principal_str": p_str,
+                "principal_sub": p_sub,
+                "principal_tooltip": p_tip,
+                "current_value": plan_val,
+                "wow_change": plan_wow,
+                "recent_change_val": rc_val,
+                "recent_change_sub": rc_sub,
+                "recent_change_tip": rc_tip,
+                "recent_change_sign": rc_sign,
+                "growth_str": g_str,
+                "growth_sub": g_sub,
+                "growth_sign": g_sign,
+                "growth_tooltip": g_tip,
+                "pct_portfolio": plan_pct,
+                "pct_tooltip": (
+                    f"{plan_pct:.2f}% of Current Vested Portfolio (${plan_val:,.2f} ÷ ${total_now:,.2f}). "
+                    f"Excludes unvested future equity grant releases."
+                ),
+                "tax_rule_title": f"Multi-Source Plan ({sleeve_summary}) — Modeled Separately by Tax Wrapper",
+                "tax_rule_detail": (
+                    f"Combined {inst} plan ({plan_id}) holding spanning {sleeve_summary} sleeves. "
+                    "In the Retirement Simulator, each tax source is modeled in its own tax-accurate bucket "
+                    "(pre-tax ordinary income with RMDs vs. 0%-tax qualified Roth distributions) while inheriting "
+                    "any growth/volatility forecast set on this parent holding."
+                ),
+                "children": plan_children,
+            }
+        )
 
     for st in standalone:
         acc = accounts.get(st["account_id"], {})

@@ -592,6 +592,15 @@ class PrivacyTranslator:
                     f"uma_{slug}", f"munis_{slug}", f"rollup_uma_{slug}", f"rollup_munis_{slug}",
                     f"cash_{slug}", f"cash_{canon}", f"acct_{canon}", f"acct_{slug}",
                 ])
+                m_plan_sub = re.match(
+                    r"^(.+?)[-_](?:PRETAX|PRE[-_]?TAX|ROTH|AFTERTAX|AFTER[-_]?TAX|TRAD|MATCH)$",
+                    canon,
+                    flags=re.IGNORECASE,
+                )
+                if m_plan_sub:
+                    base_slug = re.sub(r"[^A-Za-z0-9]+", "_", m_plan_sub.group(1).strip()).strip("_")
+                    if base_slug:
+                        in_mem_candidates.append(f"rollup_plan_{base_slug}")
             elif cat == "contract" and canon:
                 in_mem_candidates.append(f"CONTRACT:{canon}")
             elif cat == "scenario":

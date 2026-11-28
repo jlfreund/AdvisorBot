@@ -1450,6 +1450,20 @@
           basisGainStr = `Contract: ${fmtUSD2(parent.principal_val)} → ${fmtUSD2(parent.current_value)} (${pGain >= 0 ? "+" : ""}${fmtUSD2(pGain)}, ${pPct >= 0 ? "+" : ""}${pPct.toFixed(1)}%)`;
           subtext = `In contract (${parent.friendly_name || "Annuity"})`;
         }
+      } else if (src === "STATEMENT_REPORTED_RETURN" && refRate != null && !isNaN(refRate)) {
+        rateDisplay = (refRate >= 0 ? "+" : "") + Number(refRate).toFixed(2) + "% / yr";
+        rateSign = refRate >= 0 ? 1 : -1;
+        pillLabel = "Statement Return";
+        methodTitle = "Statement-Reported Annualized Return";
+        methodDetail = g.source_detail || (parent && parent.source_detail) || "Annualized personal rate of return reported directly by your plan custodian across historical contributions and investment gains.";
+        if (g.principal_val != null && g.current_value != null && g.principal_val > 0) {
+          const gain = g.current_value - g.principal_val;
+          const gainPct = (gain / g.principal_val) * 100;
+          basisGainStr = `${fmtUSD2(g.principal_val)} → ${fmtUSD2(g.current_value)} (${gain >= 0 ? "+" : ""}${fmtUSD2(gain)}, ${gainPct >= 0 ? "+" : ""}${gainPct.toFixed(1)}%)`;
+          subtext = `${gain >= 0 ? "+" : ""}${fmtUSD2(gain)} (${gainPct >= 0 ? "+" : ""}${gainPct.toFixed(1)}%)`;
+        } else {
+          subtext = g.growth_sub || "";
+        }
       } else if (isBond) {
         const yld = refRate != null ? refRate : 0.0;
         rateDisplay = Number(yld).toFixed(2) + "% Yld";

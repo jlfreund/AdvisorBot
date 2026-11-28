@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -94,7 +95,7 @@ def ingest_statements(
 
     try:
         for cand, stmt in parsed_batch:
-            chg, anc = apply_parsed_statement(db, stmt, cand, run_id=run_id)
+            chg, anc = apply_parsed_statement(db, stmt, cand, run_id=run_id, cfg=parse_cfg)
             pos_changes += chg
             anchor_updates += anc
             msg = (
@@ -141,12 +142,228 @@ def _ensure_grant_security(db: PortfolioDB, symbol: str, company_name: str = "")
     return sec_id
 
 
+def _materialize_multi_source_plan_positions(
+    db: PortfolioDB,
+    stmt: ParsedStatement,
+    *,
+    fhash: str,
+    run_id: int | None,
+    cfg: dict[str, Any] | None,
+) -> tuple[int, int]:
+    """
+    Materializes a multi-source employer retirement plan statement (`len(stmt.tax_sources) >= 2`,
+    e.g. Pre-Tax 401(k) + Roth 401(k) / Mega-Backdoor In-Plan Conversions) into linked
+    `<account_id>-<SOURCE_ID>` sub-accounts with `parent_account_id = stmt.account_id`.
+    """
+    base_plan_id = str(stmt.account_id or "").strip()
+    active_sources = [
+        ts for ts in (stmt.tax_sources or [])
+        if float(ts.closing_balance or 0.0) > 0.0 or float(ts.opening_balance or 0.0) > 0.0
+    ]
+    acct_cfg_map = ((cfg or {}).get("accounts") or {}) if isinstance(cfg, dict) else {}
+    pos_changes = 0
+    anchor_updates = 0
+
+    tot_src_close = sum(max(0.0, float(ts.closing_balance or 0.0)) for ts in active_sources)
+    tot_src_open = sum(max(0.0, float(ts.opening_balance or 0.0)) for ts in active_sources if ts.opening_balance is not None)
+
+    sub_accounts: list[tuple[str, Any]] = []
+    for idx, ts in enumerate(active_sources):
+        src_tag = re.sub(r"[^A-Za-z0-9_-]+", "", str(ts.source_id or "").strip()).upper() or f"SRC{idx + 1}"
+        sub_aid = f"{base_plan_id}-{src_tag}" if not base_plan_id.upper().endswith(f"-{src_tag}") else base_plan_id
+        ovr = acct_cfg_map.get(sub_aid) or {}
+        base_name = stmt.account_name or f"{stmt.institution} Plan ({base_plan_id})"
+        sub_name = ovr.get("account_name") or ts.account_name or f"{base_name} — {src_tag.title()}"
+        sub_type = ovr.get("account_type") or ts.account_type or stmt.account_type or "401(k) Savings Plan"
+        sub_tax = ovr.get("tax_status") or ts.tax_status or stmt.tax_status or "401K"
+        sub_order = int(ovr.get("display_order", int(stmt.display_order or 100) + idx * 5))
+        db.upsert_account(
+            account_id=sub_aid,
+            institution=stmt.institution,
+            account_name=sub_name,
+            account_type=sub_type,
+            tax_status=sub_tax,
+            display_order=sub_order,
+            parent_account_id=base_plan_id,
+        )
+        sub_accounts.append((sub_aid, ts))
+
+    for pos in stmt.positions:
+        pos_meta = dict(pos.metadata or {})
+        for extra_key in (
+            "acquisition_date",
+            "maturity_date",
+            "expense_ratio_pct",
+            "credited_rate_pct",
+            "reported_return_pct",
+            "reported_return_window",
+            "issue_date",
+        ):
+            val = getattr(pos, extra_key, None)
+            if val is not None and pos_meta.get(extra_key) is None:
+                pos_meta[extra_key] = val
+        pos_meta.setdefault("parent_account_id", base_plan_id)
+
+        db.upsert_security(
+            security_id=pos.security_id,
+            symbol_or_code=pos.symbol_or_code,
+            canonical_name=pos.canonical_name,
+            asset_class=pos.asset_class,
+            risk_class=pos.risk_class,
+            stack_bucket=pos.stack_bucket,
+            is_scrapeable=pos.is_scrapeable,
+            quote_symbol=pos.quote_symbol,
+            valuation_model="LIVE_TICKER" if pos.is_scrapeable else "STATEMENT_ANCHOR",
+            metadata_json=json.dumps(pos_meta),
+        )
+
+        full_mv = round(float(pos.market_value), 2)
+        full_qty = float(pos.quantity or 1.0)
+        rem_mv = full_mv
+        rem_qty = full_qty
+        rem_cb = round(float(pos.cost_basis), 2) if pos.cost_basis is not None else None
+        n_subs = len(sub_accounts)
+
+        for idx, (sub_aid, ts) in enumerate(sub_accounts):
+            weight = (max(0.0, float(ts.closing_balance or 0.0)) / tot_src_close) if tot_src_close > 0 else (1.0 / n_subs)
+            if idx == n_subs - 1:
+                s_mv = round(rem_mv, 2)
+                s_qty = round(rem_qty, 6) if pos.is_scrapeable else 1.0
+                s_cb = ts.cost_basis if ts.cost_basis is not None else (round(rem_cb, 2) if rem_cb is not None else None)
+            else:
+                s_mv = round(full_mv * weight, 2)
+                rem_mv = round(rem_mv - s_mv, 2)
+                if pos.is_scrapeable:
+                    s_qty = round(full_qty * weight, 6)
+                    rem_qty = round(rem_qty - s_qty, 6)
+                else:
+                    s_qty = 1.0
+                if ts.cost_basis is not None:
+                    s_cb = round(float(ts.cost_basis), 2)
+                elif rem_cb is not None and pos.cost_basis is not None:
+                    s_cb = round(float(pos.cost_basis) * weight, 2)
+                    rem_cb = round(rem_cb - s_cb, 2)
+                else:
+                    s_cb = None
+
+            s_price = pos.stmt_price if pos.is_scrapeable else s_mv
+            slice_meta = {**pos_meta, "tax_source_id": ts.source_id, "parent_account_id": base_plan_id}
+            existing_snap = db.conn.execute(
+                "SELECT details_json FROM position_snapshots WHERE account_id = ? AND as_of_date = ? AND security_id = ?",
+                (sub_aid, stmt.as_of_date, pos.security_id),
+            ).fetchone()
+            if existing_snap and existing_snap["details_json"]:
+                try:
+                    prev_details = json.loads(existing_snap["details_json"])
+                    if isinstance(prev_details, dict):
+                        slice_meta = {**prev_details, **{k: v for k, v in slice_meta.items() if v is not None}}
+                except (TypeError, ValueError):
+                    pass
+
+            db.conn.execute(
+                """
+                INSERT INTO position_snapshots
+                    (account_id, as_of_date, security_id, quantity, stmt_price, stmt_market_value,
+                     accrued_interest, cost_basis, est_annual_income, yield_pct, status, source_hash, details_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?)
+                ON CONFLICT(account_id, as_of_date, security_id) DO UPDATE SET
+                    quantity = excluded.quantity,
+                    stmt_price = excluded.stmt_price,
+                    stmt_market_value = excluded.stmt_market_value,
+                    accrued_interest = excluded.accrued_interest,
+                    cost_basis = COALESCE(excluded.cost_basis, position_snapshots.cost_basis),
+                    est_annual_income = excluded.est_annual_income,
+                    yield_pct = excluded.yield_pct,
+                    status = 'OPEN',
+                    source_hash = excluded.source_hash,
+                    details_json = excluded.details_json
+                """,
+                (
+                    sub_aid,
+                    stmt.as_of_date,
+                    pos.security_id,
+                    s_qty,
+                    s_price,
+                    s_mv,
+                    round(float(pos.accrued_interest or 0.0) * weight, 2),
+                    s_cb,
+                    round(float(pos.est_annual_income) * weight, 2) if pos.est_annual_income is not None else None,
+                    pos.yield_pct,
+                    fhash,
+                    json.dumps(slice_meta),
+                ),
+            )
+            pos_changes += 1
+
+            if not pos.is_scrapeable:
+                slice_pos = ParsedPosition(
+                    security_id=pos.security_id,
+                    symbol_or_code=pos.symbol_or_code,
+                    canonical_name=pos.canonical_name,
+                    asset_class=pos.asset_class,
+                    stack_bucket=pos.stack_bucket,
+                    is_scrapeable=False,
+                    quote_symbol=None,
+                    quantity=1.0,
+                    stmt_price=s_mv,
+                    market_value=s_mv,
+                    value_date=pos.value_date,
+                    risk_class=pos.risk_class,
+                    accrued_interest=round(float(pos.accrued_interest or 0.0) * weight, 2),
+                    cost_basis=s_cb,
+                    surrender_value=round(float(pos.surrender_value) * weight, 2) if pos.surrender_value is not None else None,
+                    issue_date=pos.issue_date,
+                    initial_premium=round(float(pos.initial_premium) * weight, 2) if pos.initial_premium is not None else None,
+                    metadata=slice_meta,
+                )
+                if _upsert_non_scrapeable_anchor(db, sub_aid, slice_pos, fhash, run_id):
+                    anchor_updates += 1
+
+                if (
+                    stmt.period_start
+                    and stmt.period_start < stmt.as_of_date
+                    and ts.opening_balance is not None
+                    and tot_src_open > 0
+                    and len(stmt.positions) == 1
+                ):
+                    has_prior = db.conn.execute(
+                        """
+                        SELECT 1 FROM position_snapshots WHERE account_id = ? AND as_of_date <= ?
+                        UNION ALL
+                        SELECT 1 FROM valuation_anchors WHERE account_id = ? AND security_id = ? AND value_date <= ?
+                        LIMIT 1
+                        """,
+                        (sub_aid, stmt.period_start, sub_aid, pos.security_id, stmt.period_start),
+                    ).fetchone()
+                    if not has_prior:
+                        open_pos = ParsedPosition(
+                            security_id=pos.security_id,
+                            symbol_or_code=pos.symbol_or_code,
+                            canonical_name=pos.canonical_name,
+                            asset_class=pos.asset_class,
+                            stack_bucket=pos.stack_bucket,
+                            is_scrapeable=False,
+                            quote_symbol=None,
+                            quantity=1.0,
+                            stmt_price=round(float(ts.opening_balance), 2),
+                            market_value=round(float(ts.opening_balance), 2),
+                            value_date=stmt.period_start,
+                            risk_class=pos.risk_class,
+                            metadata={"anchor_origin": "statement_period_opening", "reported_on": stmt.as_of_date},
+                        )
+                        if _upsert_non_scrapeable_anchor(db, sub_aid, open_pos, fhash, run_id):
+                            anchor_updates += 1
+
+    return pos_changes, anchor_updates
+
+
 def apply_parsed_statement(
     db: PortfolioDB,
     stmt: ParsedStatement,
     cand: CandidateFile | None = None,
     source_hash: str | None = None,
     run_id: int | None = None,
+    cfg: dict[str, Any] | None = None,
 ) -> tuple[int, int]:
     """
     Applies a single `ParsedStatement` into `PortfolioDB` (usable both from file scan and unit tests).
@@ -156,7 +373,15 @@ def apply_parsed_statement(
     pos_changes = 0
     anchor_updates = 0
 
-    if stmt.account_id and stmt.account_name and stmt.account_type and stmt.tax_status:
+    active_tax_sources = [
+        ts for ts in (stmt.tax_sources or [])
+        if float(ts.closing_balance or 0.0) > 0.0 or float(ts.opening_balance or 0.0) > 0.0
+    ]
+    use_multi_source = bool(stmt.account_id and stmt.positions and len(active_tax_sources) >= 2)
+
+    if not use_multi_source and stmt.account_id and stmt.account_name and stmt.account_type and stmt.tax_status:
+        acct_ovr = (((cfg or {}).get("accounts") or {}).get(stmt.account_id) or {}) if isinstance(cfg, dict) else {}
+        parent_aid = str(acct_ovr.get("parent_account_id") or "").strip() or None
         db.upsert_account(
             account_id=stmt.account_id,
             institution=stmt.institution,
@@ -164,6 +389,7 @@ def apply_parsed_statement(
             account_type=stmt.account_type,
             tax_status=stmt.tax_status,
             display_order=stmt.display_order,
+            parent_account_id=parent_aid,
         )
 
     # Capability 1: Unvested Stock Grant Tranches
@@ -312,7 +538,13 @@ def apply_parsed_statement(
         pos_changes += len(stmt.gsu_releases) + len(stmt.gsu_withdrawals)
 
     # Capability 3: Holdings Positions Snapshot
-    if stmt.account_id and stmt.positions:
+    if use_multi_source:
+        chg_m, anc_m = _materialize_multi_source_plan_positions(
+            db, stmt, fhash=fhash, run_id=run_id, cfg=cfg
+        )
+        pos_changes += chg_m
+        anchor_updates += anc_m
+    elif stmt.account_id and stmt.positions:
         acct_id = stmt.account_id
         # Fetch immediately preceding statement date for this account to compute position diffs
         prev_date_row = db.conn.execute(

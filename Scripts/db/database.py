@@ -54,6 +54,7 @@ class PortfolioDB:
             return
         ddl = SCHEMA_PATH.read_text(encoding="utf-8")
         self.conn.executescript(ddl)
+        self._add_missing_columns("accounts", [("parent_account_id", "TEXT")])
         self._add_missing_columns("holding_forecasts_baseline", [("growth_evidence_json", "TEXT")])
         self._add_missing_columns("holding_preferences", [
             ("fee_pct", "REAL"),
@@ -273,19 +274,21 @@ class PortfolioDB:
         account_type: str,
         tax_status: str,
         display_order: int = 100,
+        parent_account_id: str | None = None,
     ) -> None:
         self.conn.execute(
             """
-            INSERT INTO accounts (account_id, institution, account_name, account_type, tax_status, display_order)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO accounts (account_id, institution, account_name, account_type, tax_status, display_order, parent_account_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(account_id) DO UPDATE SET
                 institution = excluded.institution,
                 account_name = excluded.account_name,
                 account_type = excluded.account_type,
                 tax_status = excluded.tax_status,
-                display_order = excluded.display_order
+                display_order = excluded.display_order,
+                parent_account_id = COALESCE(excluded.parent_account_id, accounts.parent_account_id)
             """,
-            (account_id, institution, account_name, account_type, tax_status, display_order),
+            (account_id, institution, account_name, account_type, tax_status, display_order, parent_account_id),
         )
 
     def upsert_security(
@@ -304,6 +307,20 @@ class PortfolioDB:
         from ingest.classification import validate_risk_class
 
         validated_rc = validate_risk_class(asset_class, risk_class, security_id=security_id)
+        merged_meta_json = metadata_json
+        existing_sec = self.conn.execute(
+            "SELECT metadata_json FROM securities WHERE security_id = ?",
+            (security_id,),
+        ).fetchone()
+        if existing_sec and existing_sec["metadata_json"]:
+            try:
+                old_m = json.loads(existing_sec["metadata_json"])
+                new_m = json.loads(metadata_json or "{}")
+                if isinstance(old_m, dict) and isinstance(new_m, dict):
+                    merged = {**old_m, **{k: v for k, v in new_m.items() if v is not None}}
+                    merged_meta_json = json.dumps(merged)
+            except (TypeError, ValueError):
+                pass
         self.conn.execute(
             """
             INSERT INTO securities
@@ -330,7 +347,7 @@ class PortfolioDB:
                 1 if is_scrapeable else 0,
                 quote_symbol,
                 valuation_model,
-                metadata_json,
+                merged_meta_json,
             ),
         )
 

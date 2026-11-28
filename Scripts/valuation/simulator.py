@@ -7648,8 +7648,9 @@ def query_positions(
         is_muni_rollup = gid.startswith("rollup_munis_")
         is_uma_rollup = gid.startswith("rollup_uma_")
         is_cash_rollup = gid == "rollup_cash_all"
+        is_plan_rollup = gid.startswith("rollup_plan_")
 
-        if is_muni_rollup or is_uma_rollup or is_cash_rollup:
+        if is_muni_rollup or is_uma_rollup or is_cash_rollup or is_plan_rollup:
             for c in children:
                 mat_str = c.get("maturity_str")
                 mat_iso = None

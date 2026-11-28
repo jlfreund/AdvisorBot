@@ -106,6 +106,19 @@ ParsedGrantWithdrawal = ParsedGSUWithdrawal
 
 
 @dataclass
+class ParsedTaxSource:
+    """Tax-wrapper source slice inside a multi-source employer retirement plan (e.g. Pre-Tax vs. Roth 401(k))."""
+
+    source_id: str                           # e.g. 'PRETAX', 'ROTH'
+    tax_status: str                          # e.g. '401K', 'ROTH_401K', '403B'
+    closing_balance: float                   # Reported closing USD balance for this tax source
+    opening_balance: float | None = None     # Optional period-opening USD balance
+    account_name: str | None = None          # Optional default sub-account display name
+    account_type: str | None = None          # Optional default sub-account type label
+    cost_basis: float | None = None          # Optional contributed principal / basis for this slice
+
+
+@dataclass
 class ParsedStatement:
     doc_type: str                    # 'WFA_SNAPSHOT', 'MS_QUARTERLY', 'MS_UNVESTED_GSU', 'MS_ACTIVITY_XLSX'
     institution: str
@@ -122,3 +135,4 @@ class ParsedStatement:
     gsu_tranches: list[ParsedGSUTranche] = field(default_factory=list)
     gsu_releases: list[ParsedGSURelease] = field(default_factory=list)
     gsu_withdrawals: list[ParsedGSUWithdrawal] = field(default_factory=list)
+    tax_sources: list[ParsedTaxSource] = field(default_factory=list)
